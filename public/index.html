@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Samy Glow - Perfumes Premium</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css"/>
+</head>
+<body>
+
+  <!-- ===== HEADER / NAV ===== -->
+  <header class="w-full bg-white shadow-lg sticky top-0 z-50 border-b-2" style="border-color: var(--rosa-neon);">
+    <nav class="max-w-7xl mx-auto px-4 py-3 md:py-4">
+      <div class="flex justify-between items-center">
+        <!-- Logo -->
+        <div class="flex items-center space-x-2">
+          <img src="assets/img/logo.png" alt="Samy Glow Logo" class="h-10 md:h-12 w-auto">
+          <span class="text-xl md:text-2xl font-bold hidden sm:inline" style="color: var(--rosa-neon);">Samy Glow</span>
+        </div>
+
+        <!-- Menu Desktop -->
+        <ul class="hidden md:flex space-x-6 lg:space-x-8 font-medium">
+          <li><a href="index.html" class="hover:text-[#FF1493] transition">Inicio</a></li>
+          <li><a href="tienda.html" class="hover:text-[#FF1493] transition">Tienda</a></li>
+          <li><a href="contacto.html" class="hover:text-[#FF1493] transition">Contacto</a></li>
+        </ul>
+
+        <!-- Iconos -->
+        <div class="flex space-x-3 md:space-x-4 items-center">
+          <a href="login.html" class="glow-icon text-lg md:text-xl">
+            <i class="fas fa-user"></i>
+          </a>
+          <a href="carrito.html" class="glow-icon text-lg md:text-xl relative">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="absolute -top-2 -right-2 bg-[#FF1493] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </a>
+          <button id="menu-btn" class="md:hidden text-xl md:text-2xl glow-icon">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Menu Mobile -->
+      <div id="mobile-menu" class="md:hidden">
+        <ul class="flex flex-col space-y-3 mt-4 font-medium">
+          <li><a href="index.html" class="block py-2 hover:text-[#FF1493]">Inicio</a></li>
+          <li><a href="tienda.html" class="block py-2 hover:text-[#FF1493]">Tienda</a></li>
+          <li><a href="contacto.html" class="block py-2 hover:text-[#FF1493]">Contacto</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero-section flex items-center justify-center">
+    <div class="hero-overlay"></div>
+    <div class="hero-content text-center px-4 w-full max-w-4xl">
+      <img src="assets/img/logo.png" alt="Samy Glow" class="hero-logo mx-auto">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white font-bold mb-4 px-2">Fragancias que inspiran elegancia</h1>
+      <h2 id="hero-subtitle" class="text-lg sm:text-xl md:text-2xl text-white typing-effect px-2"></h2>
+      <a href="tienda.html" class="btn-primary mt-6 md:mt-8">Explorar Colección</a>
+    </div>
+  </section>
+
+  <!-- ===== CATEGORÍAS ===== -->
+  <section class="w-full py-12 md:py-16 section-border-top bg-pastel-gradient overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-8 md:mb-12">
+        <i class="fas fa-spray-can-sparkles text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
+        <h2 class="text-3xl md:text-4xl font-bold">Categorías</h2>
+        <p class="text-gray-600 mt-2 text-sm md:text-base">Encuentra tu fragancia perfecta</p>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" id="categories-grid">
+        <div class="fade-in-up bg-white p-6 md:p-8 rounded-2xl shadow-lg text-center cursor-pointer hover:shadow-2xl transition border-neon-light">
+          <i class="fas fa-bottle-droplet text-3xl md:text-4xl mb-4" style="color: var(--rosa-neon);"></i>
+          <h3 class="font-semibold text-base md:text-lg">Eau de Parfum</h3>
+        </div>
+        <div class="fade-in-up bg-white p-6 md:p-8 rounded-2xl shadow-lg text-center cursor-pointer hover:shadow-2xl transition border-neon-light">
+          <i class="fas fa-spray-can text-3xl md:text-4xl mb-4" style="color: var(--rosa-neon);"></i>
+          <h3 class="font-semibold text-base md:text-lg">Eau de Toilette</h3>
+        </div>
+        <div class="fade-in-up bg-white p-6 md:p-8 rounded-2xl shadow-lg text-center cursor-pointer hover:shadow-2xl transition border-neon-light">
+          <i class="fas fa-wind text-3xl md:text-4xl mb-4" style="color: var(--rosa-neon);"></i>
+          <h3 class="font-semibold text-base md:text-lg">Brumas Corporales</h3>
+        </div>
+        <div class="fade-in-up bg-white p-6 md:p-8 rounded-2xl shadow-lg text-center cursor-pointer hover:shadow-2xl transition border-neon-light">
+          <i class="fas fa-gift text-3xl md:text-4xl mb-4" style="color: var(--rosa-neon);"></i>
+          <h3 class="font-semibold text-base md:text-lg">Sets Regalo</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRODUCTOS DESTACADOS ===== -->
+  <section class="w-full py-12 md:py-16 section-border-top overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-8 md:mb-12">
+        <i class="fas fa-gem text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
+        <h2 class="text-3xl md:text-4xl font-bold">Productos Destacados</h2>
+        <p class="text-gray-600 mt-2 text-sm md:text-base">Lo más vendido de la temporada</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8" id="products-grid">
+        <div class="card-product bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div class="h-48 md:h-64 bg-pastel flex items-center justify-center">
+            <i class="fas fa-bottle-droplet text-5xl md:text-6xl" style="color: var(--rosa-neon);"></i>
+          </div>
+          <div class="p-4 md:p-6 text-center">
+            <h3 class="font-semibold text-base md:text-lg mb-2">Velvet Rose</h3>
+            <p class="text-gray-500 text-xs md:text-sm mb-3">Eau de Parfum 100ml</p>
+            <p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">$89.00</p>
+            <button class="btn-primary mt-4 w-full text-sm md:text-base">Agregar al Carrito</button>
+          </div>
+        </div>
+
+        <div class="card-product bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div class="h-48 md:h-64 bg-pastel flex items-center justify-center">
+            <i class="fas fa-bottle-droplet text-5xl md:text-6xl" style="color: var(--rosa-neon);"></i>
+          </div>
+          <div class="p-4 md:p-6 text-center">
+            <h3 class="font-semibold text-base md:text-lg mb-2">Lavender Dream</h3>
+            <p class="text-gray-500 text-xs md:text-sm mb-3">Eau de Toilette 75ml</p>
+            <p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">$65.00</p>
+            <button class="btn-primary mt-4 w-full text-sm md:text-base">Agregar al Carrito</button>
+          </div>
+        </div>
+
+        <div class="card-product bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div class="h-48 md:h-64 bg-pastel flex items-center justify-center">
+            <i class="fas fa-bottle-droplet text-5xl md:text-6xl" style="color: var(--rosa-neon);"></i>
+          </div>
+          <div class="p-4 md:p-6 text-center">
+            <h3 class="font-semibold text-base md:text-lg mb-2">Peony Bliss</h3>
+            <p class="text-gray-500 text-xs md:text-sm mb-3">Eau de Parfum 50ml</p>
+            <p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">$75.00</p>
+            <button class="btn-primary mt-4 w-full text-sm md:text-base">Agregar al Carrito</button>
+          </div>
+        </div>
+
+        <div class="card-product bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div class="h-48 md:h-64 bg-pastel flex items-center justify-center">
+            <i class="fas fa-gift text-5xl md:text-6xl" style="color: var(--rosa-neon);"></i>
+          </div>
+          <div class="p-4 md:p-6 text-center">
+            <h3 class="font-semibold text-base md:text-lg mb-2">Glam Set</h3>
+            <p class="text-gray-500 text-xs md:text-sm mb-3">Set Regalo Premium</p>
+            <p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">$120.00</p>
+            <button class="btn-primary mt-4 w-full text-sm md:text-base">Agregar al Carrito</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== OFERTAS ===== -->
+  <section class="w-full py-12 md:py-16 section-border-top bg-pastel-gradient overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-8 md:mb-12">
+        <i class="fas fa-tags text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
+        <h2 class="text-3xl md:text-4xl font-bold">Ofertas Especiales</h2>
+        <p class="text-gray-600 mt-2 text-sm md:text-base">Descuentos exclusivos por tiempo limitado</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8" id="offers-grid">
+        <div class="pulse-glam bg-gradient-to-r from-[#FF1493] to-[#8B3A9C] rounded-2xl p-6 md:p-8 text-white shadow-2xl border-neon">
+          <span class="bg-white text-[#FF1493] px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold">-30% OFF</span>
+          <h3 class="text-2xl md:text-3xl font-bold mt-4">Pack de 3 Brumas</h3>
+          <p class="mt-2 text-base md:text-lg">Fragancias florales de larga duración</p>
+          <p class="text-3xl md:text-4xl font-bold mt-4">$59.99 <span class="text-lg md:text-xl line-through opacity-75">$85.99</span></p>
+          <button class="bg-white text-[#FF1493] px-6 md:px-8 py-2 md:py-3 rounded-full font-bold mt-4 md:mt-6 hover:scale-105 transition">Comprar Ahora</button>
+        </div>
+
+        <div class="pulse-glam bg-gradient-to-r from-[#FF69B4] to-[#FF1493] rounded-2xl p-6 md:p-8 text-white shadow-2xl border-neon">
+          <span class="bg-white text-[#FF69B4] px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold">-25% OFF</span>
+          <h3 class="text-2xl md:text-3xl font-bold mt-4">Set Romántico</h3>
+          <p class="mt-2 text-base md:text-lg">Perfume + Loción corporal + Vela aromática</p>
+          <p class="text-3xl md:text-4xl font-bold mt-4">$95.00 <span class="text-lg md:text-xl line-through opacity-75">$126.00</span></p>
+          <button class="bg-white text-[#FF69B4] px-6 md:px-8 py-2 md:py-3 rounded-full font-bold mt-4 md:mt-6 hover:scale-105 transition">Comprar Ahora</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BENEFICIOS ===== -->
+  <section class="w-full py-12 md:py-16 section-border-top overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-8 md:mb-12">
+        <i class="fas fa-truck-fast text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
+        <h2 class="text-3xl md:text-4xl font-bold">¿Por qué elegirnos?</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8" id="benefits-grid">
+        <div class="fade-in-up text-center p-4 md:p-6 bg-pastel rounded-2xl border-neon-light">
+          <i class="fas fa-shipping-fast text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
+          <h3 class="font-bold text-lg md:text-xl mb-2">Envío Gratis</h3>
+          <p class="text-gray-600 text-sm md:text-base">En compras mayores a $50</p>
+        </div>
+
+        <div class="fade-in-up text-center p-4 md:p-6 bg-pastel rounded-2xl border-neon-light">
+          <i class="fas fa-certificate text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
+          <h3 class="font-bold text-lg md:text-xl mb-2">100% Original</h3>
+          <p class="text-gray-600 text-sm md:text-base">Garantía de autenticidad</p>
+        </div>
+
+        <div class="fade-in-up text-center p-4 md:p-6 bg-pastel rounded-2xl border-neon-light">
+          <i class="fas fa-undo text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
+          <h3 class="font-bold text-lg md:text-xl mb-2">Devoluciones Fáciles</h3>
+          <p class="text-gray-600 text-sm md:text-base">30 días para devolver</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="w-full bg-white py-8 md:py-12 section-border-top overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+      <div>
+        <div class="flex items-center space-x-2 mb-4">
+          <img src="assets/img/logo.png" alt="Samy Glow" class="h-8 md:h-10 w-auto">
+          <span class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">Samy Glow</span>
+        </div>
+        <p class="text-gray-600 text-sm md:text-base">Fragancias originales y exclusivas para cada momento especial.</p>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-base md:text-lg mb-4">Ayuda</h4>
+        <ul class="space-y-2 text-gray-600 text-sm md:text-base">
+          <li><a href="#" class="hover:text-[#FF1493]">Envíos y entregas</a></li>
+          <li><a href="#" class="hover:text-[#FF1493]">Devoluciones</a></li>
+          <li><a href="#" class="hover:text-[#FF1493]">Atención al cliente</a></li>
+          <li><a href="#" class="hover:text-[#FF1493]">Preguntas frecuentes</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-base md:text-lg mb-4">Legal</h4>
+        <ul class="space-y-2 text-gray-600 text-sm md:text-base">
+          <li><a href="#" class="hover:text-[#FF1493]">Términos y condiciones</a></li>
+          <li><a href="#" class="hover:text-[#FF1493]">Política de privacidad</a></li>
+          <li><a href="#" class="hover:text-[#FF1493]">Cookies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-base md:text-lg mb-4">Contacto</h4>
+        <ul class="space-y-3 text-gray-600 text-sm md:text-base">
+          <li class="flex items-center space-x-2">
+            <i class="fas fa-phone glow-icon" style="color: var(--rosa-neon);"></i>
+            <span>+51 999 888 777</span>
+          </li>
+          <li class="flex items-center space-x-2">
+            <i class="fas fa-envelope glow-icon" style="color: var(--rosa-neon);"></i>
+            <span>info@samyglow.com</span>
+          </li>
+          <li class="flex items-center space-x-2">
+            <i class="fab fa-instagram glow-icon" style="color: var(--rosa-neon);"></i>
+            <a href="#" class="hover:text-[#FF1493]">@samyglow</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 mt-6 md:mt-8 pt-6 md:pt-8 border-t-2 text-center text-gray-500 text-sm md:text-base" style="border-color: var(--rosa-neon);">
+      <p>&copy; 2025 Samy Glow. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // ===== HERO.JS - Typing Effect =====
+    const subtitle = document.getElementById('hero-subtitle');
+    const text = 'Perfumes premium para cada estilo de vida';
+    let index = 0;
+
+    function typeWriter() {
+      if (index < text.length) {
+        subtitle.textContent += text.charAt(index);
+        index++;
+        setTimeout(typeWriter, 80);
+      } else {
+        const cursor = document.createElement('span');
+        cursor.className = 'typing-cursor';
+        subtitle.appendChild(cursor);
+      }
+    }
+
+    setTimeout(typeWriter, 1000);
+
+    // ===== MENU MOBILE =====
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+    });
+
+    // ===== CATEGORIES.JS - Fade in on scroll =====
+    const observerOptions = {
+      threshold: 0.2,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry

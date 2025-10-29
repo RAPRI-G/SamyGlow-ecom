@@ -52,3 +52,5 @@ switch ($view) {
         echo "<h1 style='font-family:sans-serif;text-align:center;margin-top:20%;color:#555;'>404 - Página no encontrada</h1>";
         break;
 }
+
+
