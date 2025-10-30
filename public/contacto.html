@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contacto - Samy Glow | Perfumes Premium</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/contacto.css"/>
+</head>
+<body>
+
+  <!-- ===== HEADER / NAV ===== -->
+  <header class="w-full bg-white shadow-lg sticky top-0 z-50 border-b-2" style="border-color: var(--rosa-neon);">
+    <nav class="max-w-7xl mx-auto px-4 py-3 md:py-4">
+      <div class="flex justify-between items-center">
+        <!-- Logo -->
+        <div class="flex items-center space-x-2">
+          <img src="assets/img/logo.png" alt="Samy Glow Logo" class="h-10 md:h-12 w-auto">
+          <span class="text-xl md:text-2xl font-bold hidden sm:inline" style="color: var(--rosa-neon);">Samy Glow</span>
+        </div>
+
+        <!-- Menu Desktop -->
+        <ul class="hidden md:flex space-x-6 lg:space-x-8 font-medium">
+          <li><a href="index.html" class="hover:text-[#FF1493] transition">Inicio</a></li>
+          <li><a href="tienda.html" class="hover:text-[#FF1493] transition">Tienda</a></li>
+          <li><a href="contacto.html" class="text-[#FF1493] font-bold">Contacto</a></li>
+        </ul>
+
+        <!-- Iconos -->
+        <div class="flex space-x-3 md:space-x-4 items-center">
+          <a href="login.html" class="glow-icon text-lg md:text-xl">
+            <i class="fas fa-user"></i>
+          </a>
+          <a href="carrito.html" class="glow-icon text-lg md:text-xl relative">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF1493] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </a>
+          <button id="menu-btn" class="md:hidden text-xl md:text-2xl glow-icon">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Menu Mobile -->
+      <div id="mobile-menu">
+        <ul class="flex flex-col space-y-3 mt-4 font-medium">
+          <li><a href="index.html" class="block py-2 hover:text-[#FF1493]">Inicio</a></li>
+          <li><a href="tienda.html" class="block py-2 hover:text-[#FF1493]">Tienda</a></li>
+          <li><a href="contacto.html" class="block py-2 text-[#FF1493] font-bold">Contacto</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero-contact">
+    <div class="max-w-4xl mx-auto">
+      <i class="fas fa-envelope hero-icon"></i>
+      <h1>Contáctanos</h1>
+      <p>Estamos aquí para ayudarte</p>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT FORM & INFO ===== -->
+  <section class="w-full py-12 md:py-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+        
+        <!-- ===== FORMULARIO (60%) ===== -->
+        <div class="lg:col-span-3 fade-in-up">
+          <!-- Success Message -->
+          <div id="success-message" class="success-message">
+            <i class="fas fa-check-circle text-4xl mb-2"></i>
+            <h3 class="text-xl font-bold mb-1">¡Mensaje Enviado!</h3>
+            <p>Gracias por contactarnos. Te responderemos pronto.</p>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border-neon-light">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 flex items-center">
+              <i class="fas fa-paper-plane mr-3 glow-icon"></i>
+              Envíanos un mensaje
+            </h2>
+
+            <form id="contact-form" novalidate>
+              <!-- Nombre completo -->
+              <div class="form-group">
+                <label class="form-label">Nombre completo <span class="text-[#FF1493]">*</span></label>
+                <input 
+                  type="text" 
+                  id="name" 
+                  class="form-input" 
+                  placeholder="Ingresa tu nombre completo"
+                  required
+                />
+                <span class="form-error" id="name-error">Por favor ingresa tu nombre completo</span>
+              </div>
+
+              <!-- Email -->
+              <div class="form-group">
+                <label class="form-label">Email <span class="text-[#FF1493]">*</span></label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  class="form-input" 
+                  placeholder="tu@email.com"
+                  required
+                />
+                <span class="form-error" id="email-error">Por favor ingresa un email válido</span>
+              </div>
+
+              <!-- Teléfono -->
+              <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input 
+                  type="tel" 
+                  id="phone" 
+                  class="form-input" 
+                  placeholder="+51 999 888 777"
+                />
+              </div>
+
+              <!-- Asunto -->
+              <div class="form-group">
+                <label class="form-label">Asunto <span class="text-[#FF1493]">*</span></label>
+                <select id="subject" class="form-select" required>
+                  <option value="">Selecciona un asunto</option>
+                  <option value="consulta">Consulta general</option>
+                  <option value="pedidos">Pedidos</option>
+                  <option value="devoluciones">Devoluciones</option>
+                  <option value="sugerencias">Sugerencias</option>
+                </select>
+                <span class="form-error" id="subject-error">Por favor selecciona un asunto</span>
+              </div>
+
+              <!-- Mensaje -->
+              <div class="form-group">
+                <label class="form-label">Mensaje <span class="text-[#FF1493]">*</span></label>
+                <textarea 
+                  id="message" 
+                  class="form-textarea" 
+                  placeholder="Escribe tu mensaje aquí (mínimo 20 caracteres)"
+                  required
+                  minlength="20"
+                ></textarea>
+                <span class="form-error" id="message-error">El mensaje debe tener al menos 20 caracteres</span>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" class="btn-primary w-full text-lg">
+                <i class="fas fa-paper-plane mr-2"></i>
+                Enviar Mensaje
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ===== INFORMACIÓN (40%) ===== -->
+        <div class="lg:col-span-2 fade-in-up" style="animation-delay: 0.2s;">
+          
+          <!-- Datos de Contacto -->
+          <div class="contact-card bg-pastel">
+            <h3 class="text-xl font-bold mb-4 flex items-center">
+              <i class="fas fa-address-book mr-2 glow-icon"></i>
+              Información de Contacto
+            </h3>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-phone glow-icon"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-sm text-gray-600">Teléfono</p>
+                <p class="font-medium">+51 999 888 777</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-envelope glow-icon"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-sm text-gray-600">Email</p>
+                <p class="font-medium">info@samyglow.com</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-location-dot glow-icon"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-sm text-gray-600">Ubicación</p>
+                <p class="font-medium">Lima, Perú</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-clock glow-icon"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-sm text-gray-600">Horario</p>
+                <p class="font-medium">Lun-Vie: 9am-6pm</p>
+                <p class="font-medium text-sm">Sáb: 10am-2pm</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Redes Sociales -->
+          <div class="contact-card">
+            <h3 class="text-xl font-bold mb-4 flex items-center">
+              <i class="fas fa-share-nodes mr-2 glow-icon"></i>
+              Síguenos
+            </h3>
+            <p class="text-gray-600 mb-4">Conéctate con nosotros en redes sociales</p>
+            
+            <div class="social-icons">
+              <a href="#" class="social-icon" title="Instagram">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#" class="social-icon" title="Facebook">
+                <i class="fab fa-facebook"></i>
+              </a>
+              <a href="#" class="social-icon" title="TikTok">
+                <i class="fab fa-tiktok"></i>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PREGUNTAS FRECUENTES ===== -->
+  <section class="w-full py-12 md:py-16 bg-pastel-gradient border-t-2" style="border-color: var(--rosa-neon-light);">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="text-center mb-8 md:mb-12 fade-in-up">
+        <i class="fas fa-circle-question text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
+        <h2 class="text-3xl md:text-4xl font-bold">Preguntas Frecuentes</h2>
+        <p class="text-gray-600 mt-2">Encuentra respuestas rápidas</p>
+      </div>
+
+      <div class="fade-in-up" style="animation-delay: 0.2s;">
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>¿Cuál es el tiempo de entrega?</span>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="text-gray-600">El tiempo de entrega es de 2-5 días hábiles en Lima y 5-7 días en provincias. Los envíos son gratuitos para compras mayores a $50.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>¿Los productos son originales?</span>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="text-gray-600">Sí, todos nuestros perfumes son 100% originales y auténticos. Contamos con certificados de autenticidad y garantía de calidad.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>¿Puedo devolver un producto?</span>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="text-gray-600">Tienes 30 días para devolver productos sin abrir. El producto debe estar en su empaque original y con todos sus sellos intactos.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>¿Qué métodos de pago aceptan?</span>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="text-gray-600">Aceptamos tarjetas de crédito/débito (Visa, Mastercard), transferencias bancarias, Yape y Plin. Todos los pagos son 100% seguros.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>¿Tienen tienda física?</span>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="text-gray-600">Actualmente somos una tienda 100% online, pero puedes contactarnos para coordinar recojo en Lima. Próximamente abriremos nuestra primera tienda física.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MAPA ===== -->
+  <section class="w-full py-12 md:py-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-8 fade-in-up">
+        <i class="fas fa-map-location-dot text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
+        <h2 class="text-3xl md:text-4xl font-bold">Nuestra Ubicación</h2>
+      </div>
+
+      <div class="map-placeholder fade-in-up" style="animation-delay: 0.2s;">
+        <i class="fas fa-map-location-dot map-icon"></i>
+        <p class="font-bold text-xl">HUANCAYO, Perú</p>
+        <p class="text-sm mt-2 opacity-90">Envíos a todo el país</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="w-full bg-white py-8 md:py-12 border-t-2" style="border-color: var(--rosa-neon);">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+      <div>
+        <div class="flex items-center space-x-2 mb-4">
+          <img src="assets/img/logo.png" alt="Samy Glow" class="h-8 md:h-10 w-auto">
+          <span class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">Samy Glow</span>
+        </div>
+        <p class="text-gray-600 text-sm md:text-base">Fragancias originales y exclusivas para cada momento especial.</p>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-base md:text-lg mb-4">Ayuda</h4>
+        <ul class="space-y-2 text-gray-600 text-sm md:text-base">
+          <li><a href="#" class="hover:text-[#FF1493]">Envíos y entregas</a></li>
+          <li><a href="#" class="hover:text-[#FF1493]">Devoluciones</a></li>
+          <li><a href="#" class="hover:text-[#FF1493]">Atención al cliente</a></li>
+          <li><a href="#" class="hover:text-[#FF1493]">Preguntas frecuentes</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-base md:text-lg mb-4">Legal</h4>
+        <ul class="space-y-2 text-gray-600 text-sm md:text-base">
+          <li><a href="#" class="hover:text-[#FF1493]">Términos y condiciones</a></li>
+          <li><a href="#" class="hover:text-[#FF1493]">Política de privacidad</a></li>
+          <li><a href="#" class="hover:text-[#FF1493]">Cookies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-base md:text-lg mb-4">Contacto</h4>
+        <ul class="space-y-3 text-gray-600 text-sm md:text-base">
+          <li class="flex items-center space-x-2">
+            <i class="fab fa-instagram glow-icon" style="color: var(--rosa-neon);"></i>
+            <a href="#" class="hover:text-[#FF1493]">@samyglow</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 mt-6 md:mt-8 pt-6 md:pt-8 border-t-2 text-center text-gray-500 text-sm md:text-base" style="border-color: var(--rosa-neon);">
+      <p>&copy; 2025 Samy Glow. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+  <script src="assets/js/contacto.js"></script>   
+</body>
+</html>

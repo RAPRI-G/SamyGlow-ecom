@@ -1,4 +1,5 @@
- const subtitle = document.getElementById('hero-subtitle');
+  // ===== HERO.JS - Typing Effect =====
+    const subtitle = document.getElementById('hero-subtitle');
     const text = 'Perfumes premium para cada estilo de vida';
     let index = 0;
 
@@ -8,7 +9,6 @@
         index++;
         setTimeout(typeWriter, 80);
       } else {
-        // Añadir cursor parpadeante al final
         const cursor = document.createElement('span');
         cursor.className = 'typing-cursor';
         subtitle.appendChild(cursor);
@@ -90,4 +90,9 @@
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       });
+    });
+
+    // Fix para prevenir scroll horizontal en dispositivos móviles
+    window.addEventListener('resize', () => {
+      document.body.style.overflowX = 'hidden';
     });

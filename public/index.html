@@ -268,44 +268,6 @@
       <p>&copy; 2025 Samy Glow. Todos los derechos reservados.</p>
     </div>
   </footer>
-
-  <!-- ===== JAVASCRIPT ===== -->
-  <script>
-    // ===== HERO.JS - Typing Effect =====
-    const subtitle = document.getElementById('hero-subtitle');
-    const text = 'Perfumes premium para cada estilo de vida';
-    let index = 0;
-
-    function typeWriter() {
-      if (index < text.length) {
-        subtitle.textContent += text.charAt(index);
-        index++;
-        setTimeout(typeWriter, 80);
-      } else {
-        const cursor = document.createElement('span');
-        cursor.className = 'typing-cursor';
-        subtitle.appendChild(cursor);
-      }
-    }
-
-    setTimeout(typeWriter, 1000);
-
-    // ===== MENU MOBILE =====
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('active');
-    });
-
-    // ===== CATEGORIES.JS - Fade in on scroll =====
-    const observerOptions = {
-      threshold: 0.2,
-      rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, index) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            entry
+  <script src="assets/js/hero.js"></script>
+</body>
+</html>
