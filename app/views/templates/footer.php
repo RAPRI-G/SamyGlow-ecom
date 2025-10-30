@@ -52,19 +52,17 @@
                 closeAllMenus();
             }
         });
-
-        // ✅ Evitar volver atrás SOLO si el usuario está logueado
-        <?php if (isset($_SESSION['usuario'])): ?>
-
-            window.history.pushState(null, "", window.location.href);
-            window.onpopstate = function() {
-                window.history.pushState(null, "", window.location.href);
-            };
-
-        <?php endif; ?>
-
     });
 </script>
+<?php if (isset($_SESSION['usuario'])): ?>
+    <script>
+        // --- Evitar volver atrás SOLO si el usuario está logueado ---
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function() {
+            window.history.pushState(null, "", window.location.href);
+        };
+    </script>
+<?php endif; ?>
 </body>
 
 </html>
