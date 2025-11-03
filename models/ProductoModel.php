@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../config/database.php';
-
 class ProductoModel
 {
     /** @var PDO */
@@ -10,7 +8,35 @@ class ProductoModel
 
     public function __construct()
     {
-        $this->db = Database::getInstance()->getConnection();
+        // Soporte flexible para la configuración de BD.
+        // 1) Preferir `config/conexion.php` si define la clase Database (singleton).
+        // 2) Si no existe, usar `config/database.php` que define la variable $pdo.
+        $dbFile1 = __DIR__ . '/../config/conexion.php';
+        $dbFile2 = __DIR__ . '/../config/database.php';
+
+        try {
+            if (file_exists($dbFile1)) {
+                require_once $dbFile1;
+                if (class_exists('Database')) {
+                    $this->db = Database::getInstance()->getConnection();
+                    return;
+                }
+            }
+
+            if (file_exists($dbFile2)) {
+                require_once $dbFile2;
+                if (isset($pdo) && $pdo instanceof PDO) {
+                    $this->db = $pdo;
+                    return;
+                }
+            }
+
+            throw new Exception('No se encontró una configuración de base de datos válida (conexion.php o database.php)');
+        } catch (Throwable $e) {
+            error_log('ProductoModel::__construct DB error: ' . $e->getMessage());
+            // Re-emitir para que el endpoint API pueda manejar y devolver 500.
+            throw $e;
+        }
     }
 
     /**

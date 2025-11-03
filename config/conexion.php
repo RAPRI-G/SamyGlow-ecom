@@ -6,7 +6,7 @@ class Database {
     private $host = 'localhost';
     private $dbname = 'tienda_samyglow';
     private $user = 'root';
-    private $pass = 'rapri';
+    private $pass = '';
     
     private function __construct() {
         try {

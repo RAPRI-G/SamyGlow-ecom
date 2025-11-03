@@ -24,10 +24,18 @@ document.addEventListener('DOMContentLoaded', () => {
 /** Cargar productos desde la API */
 async function cargarProductos() {
   try {
-    const res = await fetch('api/productos.php');
-    if (!res.ok) throw new Error('Error al obtener el listado de productos');
+    // Usar ruta relativa explícita para evitar ambigüedades dependiendo de cómo se sirva la página
+    const res = await fetch('./api/productos.php');
+    if (!res.ok) throw new Error('Error al obtener el listado de productos (HTTP ' + res.status + ')');
     const json = await res.json();
-    if (!json.success) throw new Error(json.message || 'Respuesta inválida');
+
+    // Log de depuración: mostrar la respuesta completa en consola
+    console.log('API /api/productos.php response:', json);
+
+    if (!json.success) {
+      // Mostrar mensaje de la API si lo hay
+      throw new Error(json.message || 'Respuesta inválida de la API');
+    }
 
     // Guardar en la variable global
     productos.length = 0;
@@ -35,9 +43,9 @@ async function cargarProductos() {
 
     renderizarProductos(productos);
   } catch (err) {
-    console.error(err);
+    console.error('cargarProductos error:', err);
     const grid = document.getElementById('products-grid');
-    if (grid) grid.innerHTML = '<p class="text-center text-red-500">Error al cargar productos. Intente más tarde.</p>';
+    if (grid) grid.innerHTML = `<div class="col-span-full py-12 text-center"><p class="text-red-500">Error al cargar productos: ${escapeHtml(err.message || String(err))}</p></div>`;
   }
 }
 
@@ -49,8 +57,10 @@ function renderizarProductos(listaProductos) {
 
   if (!listaProductos || listaProductos.length === 0) {
     grid.innerHTML = '<p class="text-center">No hay productos disponibles</p>';
-    document.getElementById('results-count')?.textContent = '0';
-    document.getElementById('total-count')?.textContent = '0';
+    const resultsCountEl = document.getElementById('results-count');
+    if (resultsCountEl) resultsCountEl.textContent = '0';
+    const totalCountEl = document.getElementById('total-count');
+    if (totalCountEl) totalCountEl.textContent = '0';
     return;
   }
 
@@ -101,8 +111,10 @@ function renderizarProductos(listaProductos) {
     grid.appendChild(card);
   });
 
-  document.getElementById('results-count')?.textContent = String(listaProductos.length);
-  document.getElementById('total-count')?.textContent = String(listaProductos.length);
+  const resultsCountEl = document.getElementById('results-count');
+  if (resultsCountEl) resultsCountEl.textContent = String(listaProductos.length);
+  const totalCountEl = document.getElementById('total-count');
+  if (totalCountEl) totalCountEl.textContent = String(listaProductos.length);
 }
 
 /** Agrega un producto al carrito (disponible globalmente) */

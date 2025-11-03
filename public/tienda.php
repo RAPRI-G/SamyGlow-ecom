@@ -7,8 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/tienda.css"/>
-    <link rel="stylesheet" href="assets/css/main.css"/>
+  <link rel="stylesheet" href="assets/css/main.css"/>
+  <link rel="stylesheet" href="assets/css/tienda.css"/>
 </head>
 <body>
 
@@ -39,7 +39,7 @@
           </a>
           <a href="carrito.html" class="glow-icon text-lg md:text-xl relative">
             <i class="fas fa-shopping-cart"></i>
-            <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF1493] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+            <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF1493] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" style="display: none;">0</span>
           </a>
           <button id="menu-btn" class="md:hidden text-xl md:text-2xl glow-icon">
             <i class="fas fa-bars"></i>
@@ -48,7 +48,7 @@
       </div>
 
       <!-- Menu Mobile -->
-      <div id="mobile-menu">
+      <div id="mobile-menu" class="md:hidden">
         <ul class="flex flex-col space-y-3 mt-4 font-medium">
           <li><a href="index.html" class="block py-2 hover:text-[#FF1493]">Inicio</a></li>
           <li><a href="tienda.html" class="block py-2 text-[#FF1493] font-bold">Tienda</a></li>
@@ -71,7 +71,9 @@
 
         <!-- Sorting & Results -->
         <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <span class="text-sm text-gray-600">Mostrando <span id="results-count">12</span> de <span id="total-count">48</span> productos</span>
+          <span class="text-sm text-gray-600">
+            Mostrando <span id="results-count">0</span> de <span id="total-count">0</span> productos
+          </span>
           
           <div class="flex items-center gap-2">
             <label class="text-sm font-medium">Ordenar:</label>
@@ -112,19 +114,19 @@
               </h4>
               <div class="space-y-2">
                 <label class="flex items-center cursor-pointer hover:text-[#FF1493]">
-                  <input type="checkbox" class="category-filter mr-2" value="eau-parfum" checked>
+                  <input type="checkbox" class="category-filter mr-2" value="Eau de Parfum" checked>
                   <span class="text-sm">Eau de Parfum</span>
                 </label>
                 <label class="flex items-center cursor-pointer hover:text-[#FF1493]">
-                  <input type="checkbox" class="category-filter mr-2" value="eau-toilette" checked>
+                  <input type="checkbox" class="category-filter mr-2" value="Eau de Toilette" checked>
                   <span class="text-sm">Eau de Toilette</span>
                 </label>
                 <label class="flex items-center cursor-pointer hover:text-[#FF1493]">
-                  <input type="checkbox" class="category-filter mr-2" value="brumas" checked>
+                  <input type="checkbox" class="category-filter mr-2" value="Brumas Corporales" checked>
                   <span class="text-sm">Brumas Corporales</span>
                 </label>
                 <label class="flex items-center cursor-pointer hover:text-[#FF1493]">
-                  <input type="checkbox" class="category-filter mr-2" value="sets" checked>
+                  <input type="checkbox" class="category-filter mr-2" value="Sets Regalo" checked>
                   <span class="text-sm">Sets Regalo</span>
                 </label>
               </div>
@@ -141,8 +143,8 @@
               <div class="space-y-3">
                 <input type="range" id="price-range" min="0" max="200" value="200" class="w-full">
                 <div class="flex justify-between text-sm">
-                  <span>$0</span>
-                  <span id="price-value" class="font-bold" style="color: var(--rosa-neon);">$200</span>
+                  <span>S/ 0</span>
+                  <span id="price-value" class="font-bold" style="color: var(--rosa-neon);">S/ 200</span>
                 </div>
               </div>
             </div>
@@ -157,19 +159,19 @@
               </h4>
               <div class="space-y-2">
                 <label class="flex items-center cursor-pointer hover:text-[#FF1493]">
-                  <input type="checkbox" class="brand-filter mr-2" value="samy-signature" checked>
+                  <input type="checkbox" class="brand-filter mr-2" value="Samy" checked>
                   <span class="text-sm">Samy Signature</span>
                 </label>
                 <label class="flex items-center cursor-pointer hover:text-[#FF1493]">
-                  <input type="checkbox" class="brand-filter mr-2" value="glow-collection" checked>
+                  <input type="checkbox" class="brand-filter mr-2" value="Glow" checked>
                   <span class="text-sm">Glow Collection</span>
                 </label>
                 <label class="flex items-center cursor-pointer hover:text-[#FF1493]">
-                  <input type="checkbox" class="brand-filter mr-2" value="velvet-dreams" checked>
+                  <input type="checkbox" class="brand-filter mr-2" value="Velvet" checked>
                   <span class="text-sm">Velvet Dreams</span>
                 </label>
                 <label class="flex items-center cursor-pointer hover:text-[#FF1493]">
-                  <input type="checkbox" class="brand-filter mr-2" value="rose-elite" checked>
+                  <input type="checkbox" class="brand-filter mr-2" value="Rose" checked>
                   <span class="text-sm">Rose Elite</span>
                 </label>
               </div>
@@ -191,7 +193,7 @@
               </button>
             </div>
 
-            <!-- Category Filter -->
+            <!-- Category Filter Mobile -->
             <div class="mb-6">
               <h4 class="font-semibold mb-3 flex items-center">
                 <i class="fas fa-layer-group mr-2" style="color: var(--rosa-neon);"></i>
@@ -199,19 +201,19 @@
               </h4>
               <div class="space-y-2">
                 <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="category-filter-mobile mr-2" value="eau-parfum" checked>
+                  <input type="checkbox" class="category-filter-mobile mr-2" value="Eau de Parfum" checked>
                   <span class="text-sm">Eau de Parfum</span>
                 </label>
                 <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="category-filter-mobile mr-2" value="eau-toilette" checked>
+                  <input type="checkbox" class="category-filter-mobile mr-2" value="Eau de Toilette" checked>
                   <span class="text-sm">Eau de Toilette</span>
                 </label>
                 <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="category-filter-mobile mr-2" value="brumas" checked>
+                  <input type="checkbox" class="category-filter-mobile mr-2" value="Brumas Corporales" checked>
                   <span class="text-sm">Brumas Corporales</span>
                 </label>
                 <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="category-filter-mobile mr-2" value="sets" checked>
+                  <input type="checkbox" class="category-filter-mobile mr-2" value="Sets Regalo" checked>
                   <span class="text-sm">Sets Regalo</span>
                 </label>
               </div>
@@ -219,7 +221,7 @@
 
             <hr class="my-6" style="border-color: var(--rosa-pastel);">
 
-            <!-- Price Filter -->
+            <!-- Price Filter Mobile -->
             <div class="mb-6">
               <h4 class="font-semibold mb-3 flex items-center">
                 <i class="fas fa-dollar-sign mr-2" style="color: var(--rosa-neon);"></i>
@@ -228,15 +230,15 @@
               <div class="space-y-3">
                 <input type="range" id="price-range-mobile" min="0" max="200" value="200" class="w-full">
                 <div class="flex justify-between text-sm">
-                  <span>$0</span>
-                  <span id="price-value-mobile" class="font-bold" style="color: var(--rosa-neon);">$200</span>
+                  <span>S/ 0</span>
+                  <span id="price-value-mobile" class="font-bold" style="color: var(--rosa-neon);">S/ 200</span>
                 </div>
               </div>
             </div>
 
             <hr class="my-6" style="border-color: var(--rosa-pastel);">
 
-            <!-- Brand Filter -->
+            <!-- Brand Filter Mobile -->
             <div class="mb-6">
               <h4 class="font-semibold mb-3 flex items-center">
                 <i class="fas fa-star mr-2" style="color: var(--rosa-neon);"></i>
@@ -244,19 +246,19 @@
               </h4>
               <div class="space-y-2">
                 <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="brand-filter-mobile mr-2" value="samy-signature" checked>
+                  <input type="checkbox" class="brand-filter-mobile mr-2" value="Samy" checked>
                   <span class="text-sm">Samy Signature</span>
                 </label>
                 <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="brand-filter-mobile mr-2" value="glow-collection" checked>
+                  <input type="checkbox" class="brand-filter-mobile mr-2" value="Glow" checked>
                   <span class="text-sm">Glow Collection</span>
                 </label>
                 <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="brand-filter-mobile mr-2" value="velvet-dreams" checked>
+                  <input type="checkbox" class="brand-filter-mobile mr-2" value="Velvet" checked>
                   <span class="text-sm">Velvet Dreams</span>
                 </label>
                 <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="brand-filter-mobile mr-2" value="rose-elite" checked>
+                  <input type="checkbox" class="brand-filter-mobile mr-2" value="Rose" checked>
                   <span class="text-sm">Rose Elite</span>
                 </label>
               </div>
@@ -271,20 +273,26 @@
 
         <!-- ===== PRODUCTS GRID ===== -->
         <div class="flex-1">
+          <!-- Grilla de productos -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8" id="products-grid">
-            <!-- Products will be inserted here by JavaScript -->
+            <!-- Loading inicial -->
+            <div class="col-span-full flex justify-center items-center py-20">
+              <div class="text-center">
+                <i class="fas fa-spinner fa-spin text-5xl text-pink-500 mb-4"></i>
+                <p class="text-lg text-gray-600">Cargando productos...</p>
+              </div>
+            </div>
           </div>
 
           <!-- Pagination -->
-          <div class="pagination flex justify-center items-center mt-12 gap-2 flex-wrap">
-            <button id="prev-page">
+          <div class="pagination flex justify-center items-center mt-12 gap-2 flex-wrap" id="pagination-container" style="display: none;">
+            <button id="prev-page" class="pagination-btn">
               <i class="fas fa-chevron-left mr-2"></i>Anterior
             </button>
-            <button class="active" data-page="1">1</button>
-            <button data-page="2">2</button>
-            <button data-page="3">3</button>
-            <button data-page="4">4</button>
-            <button id="next-page">
+            <div id="page-numbers" class="flex gap-2">
+              <!-- Los números de página se generarán dinámicamente -->
+            </div>
+            <button id="next-page" class="pagination-btn">
               Siguiente<i class="fas fa-chevron-right ml-2"></i>
             </button>
           </div>
@@ -347,6 +355,8 @@
       <p>&copy; 2025 Samy Glow. Todos los derechos reservados.</p>
     </div>
   </footer>
-    <script src="assets/js/tienda.js"></script>
+
+  <!-- JavaScript -->
+  <script src="assets/js/tienda.js"></script>
 </body>
 </html>
