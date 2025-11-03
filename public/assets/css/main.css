@@ -1,0 +1,149 @@
+/* main.css - Librería Base de Estilos Comunes */
+
+/* ============================================
+   VARIABLES CSS
+   ============================================ */
+:root {
+  --rosa-pastel: #FFD6E8;
+  --rosa-neon: #FF1493;
+  --rosa-neon-light: #FF69B4;
+  --purpura-intenso: #8B3A9C;
+  --rosa-vibrante: #FF6BB5;
+  --fondo: #FFFFFF;
+  --texto-oscuro: #2D2D2D;
+}
+/* ============================================
+   RESET Y BASE
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: var(--texto-oscuro);
+  background: var(--fondo);
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+}
+
+/* ============================================
+   EFECTOS DE GLOW E ICONOS
+   ============================================ */
+.glow-icon {
+  transition: all 0.3s ease;
+  color: var(--rosa-neon);
+}
+
+.glow-icon:hover {
+  filter: drop-shadow(0 0 8px var(--rosa-neon)) drop-shadow(0 0 16px var(--rosa-neon-light));
+  transform: scale(1.1);
+}
+
+/* ============================================
+   BORDES Y FONDOS
+   ============================================ */
+.border-neon {
+  border: 2px solid var(--rosa-neon);
+  box-shadow: 0 0 15px rgba(255, 20, 147, 0.3);
+}
+
+.border-neon-light {
+  border: 1px solid var(--rosa-neon-light);
+}
+
+.bg-pastel {
+  background: var(--rosa-pastel);
+}
+
+.bg-pastel-gradient {
+  background: linear-gradient(135deg, var(--rosa-pastel) 0%, #FFFFFF 100%);
+}
+
+/* ============================================
+   SISTEMA DE BOTONES
+   ============================================ */
+.btn-primary {
+  background: linear-gradient(135deg, var(--rosa-neon) 0%, var(--purpura-intenso) 100%);
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  display: inline-block;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 25px var(--rosa-neon), 0 0 50px var(--rosa-neon-light);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--rosa-neon);
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 500;
+  border: 2px solid var(--rosa-neon);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: var(--rosa-neon);
+  color: white;
+  box-shadow: 0 0 20px var(--rosa-neon);
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* ============================================
+   MENÚ MÓVIL
+   ============================================ */
+#mobile-menu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+#mobile-menu.active {
+  max-height: 500px;
+}
+
+/* ============================================
+   TARJETAS DE PRODUCTO
+   ============================================ */
+.card-product {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.card-product:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(255, 20, 147, 0.4);
+  border: 2px solid var(--rosa-neon);
+}

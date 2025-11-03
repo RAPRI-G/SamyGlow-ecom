@@ -1,289 +1,166 @@
-:root {
-      --rosa-pastel: #FFD6E8;
-      --rosa-neon: #FF1493;
-      --rosa-neon-light: #FF69B4;
-      --purpura-intenso: #8B3A9C;
-      --rosa-vibrante: #FF6BB5;
-      --fondo: #FFFFFF;
-      --texto-oscuro: #2D2D2D;
-    }
+/* Product Cards */
+.card-product {
+  position: relative;
+  overflow: hidden;
+}
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+.card-product .favorite-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  color: var(--rosa-neon);
+  opacity: 0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  z-index: 10;
+}
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      color: var(--texto-oscuro);
-      background: var(--fondo);
-      overflow-x: hidden;
-    }
+.card-product:hover .favorite-icon {
+  opacity: 1;
+}
 
-    h1, h2, h3 {
-      font-family: 'Playfair Display', serif;
-    }
+.card-product .favorite-icon:hover {
+  filter: drop-shadow(0 0 8px var(--rosa-neon));
+  transform: scale(1.2);
+}
 
-    /* Glow Effects */
-    .glow-icon {
-      transition: all 0.3s ease;
-      color: var(--rosa-neon);
-    }
+.badge-discount {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: var(--rosa-neon);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 10;
+}
 
-    .glow-icon:hover {
-      filter: drop-shadow(0 0 8px var(--rosa-neon)) drop-shadow(0 0 16px var(--rosa-neon-light));
-      transform: scale(1.1);
-    }
+/* Filters */
+.filter-section {
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
 
-    .border-neon {
-      border: 2px solid var(--rosa-neon);
-      box-shadow: 0 0 15px rgba(255, 20, 147, 0.3);
-    }
+.filter-section::-webkit-scrollbar {
+  width: 6px;
+}
 
-    .border-neon-light {
-      border: 1px solid var(--rosa-neon-light);
-    }
+.filter-section::-webkit-scrollbar-track {
+  background: var(--rosa-pastel);
+  border-radius: 10px;
+}
 
-    .bg-pastel {
-      background: var(--rosa-pastel);
-    }
+.filter-section::-webkit-scrollbar-thumb {
+  background: var(--rosa-neon);
+  border-radius: 10px;
+}
 
-    .bg-pastel-gradient {
-      background: linear-gradient(135deg, var(--rosa-pastel) 0%, #FFFFFF 100%);
-    }
+/* Range Slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 5px;
+  background: var(--rosa-pastel);
+  outline: none;
+}
 
-    /* Buttons */
-    .btn-primary {
-      background: linear-gradient(135deg, var(--rosa-neon) 0%, var(--purpura-intenso) 100%);
-      color: white;
-      padding: 0.75rem 2rem;
-      border-radius: 50px;
-      font-weight: 600;
-      display: inline-block;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
-    }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--rosa-neon);
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--rosa-neon);
+}
 
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 25px var(--rosa-neon), 0 0 50px var(--rosa-neon-light);
-    }
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--rosa-neon);
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--rosa-neon);
+}
 
-    .btn-secondary {
-      background: white;
-      color: var(--rosa-neon);
-      padding: 0.5rem 1.5rem;
-      border-radius: 50px;
-      font-weight: 500;
-      border: 2px solid var(--rosa-neon);
-      transition: all 0.3s ease;
-    }
+/* Checkbox */
+input[type="checkbox"] {
+  accent-color: var(--rosa-neon);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
 
-    .btn-secondary:hover {
-      background: var(--rosa-neon);
-      color: white;
-      box-shadow: 0 0 20px var(--rosa-neon);
-    }
+/* Pagination */
+.pagination button {
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--rosa-neon-light);
+  background: white;
+  color: var(--texto-oscuro);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
-    /* Product Cards */
-    .card-product {
-      transition: all 0.3s ease;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
+.pagination button:hover {
+  background: var(--rosa-pastel);
+  border-color: var(--rosa-neon);
+}
 
-    .card-product:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 40px rgba(255, 20, 147, 0.4);
-      border: 2px solid var(--rosa-neon);
-    }
+.pagination button.active {
+  background: var(--rosa-pastel);
+  border: 2px solid var(--rosa-neon);
+  font-weight: bold;
+}
 
-    .card-product .favorite-icon {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      font-size: 1.5rem;
-      color: var(--rosa-neon);
-      opacity: 0;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      z-index: 10;
-    }
+/* Mobile Filters */
+.mobile-filters {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 80%;
+  max-width: 320px;
+  height: 100vh;
+  background: white;
+  z-index: 1000;
+  transition: left 0.3s ease;
+  overflow-y: auto;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+}
 
-    .card-product:hover .favorite-icon {
-      opacity: 1;
-    }
+.mobile-filters.active {
+  left: 0;
+}
 
-    .card-product .favorite-icon:hover {
-      filter: drop-shadow(0 0 8px var(--rosa-neon));
-      transform: scale(1.2);
-    }
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
 
-    .badge-discount {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      background: var(--rosa-neon);
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      z-index: 10;
-    }
+.mobile-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
 
-    /* Filters */
-    .filter-section {
-      position: sticky;
-      top: 80px;
-      max-height: calc(100vh - 100px);
-      overflow-y: auto;
-    }
-
-    .filter-section::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .filter-section::-webkit-scrollbar-track {
-      background: var(--rosa-pastel);
-      border-radius: 10px;
-    }
-
-    .filter-section::-webkit-scrollbar-thumb {
-      background: var(--rosa-neon);
-      border-radius: 10px;
-    }
-
-    /* Range Slider */
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      border-radius: 5px;
-      background: var(--rosa-pastel);
-      outline: none;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--rosa-neon);
-      cursor: pointer;
-      box-shadow: 0 0 10px var(--rosa-neon);
-    }
-
-    input[type="range"]::-moz-range-thumb {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--rosa-neon);
-      cursor: pointer;
-      box-shadow: 0 0 10px var(--rosa-neon);
-    }
-
-    /* Checkbox */
-    input[type="checkbox"] {
-      accent-color: var(--rosa-neon);
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-
-    /* Pagination */
-    .pagination button {
-      padding: 0.5rem 1rem;
-      margin: 0 0.25rem;
-      border-radius: 8px;
-      border: 1px solid var(--rosa-neon-light);
-      background: white;
-      color: var(--texto-oscuro);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .pagination button:hover {
-      background: var(--rosa-pastel);
-      border-color: var(--rosa-neon);
-    }
-
-    .pagination button.active {
-      background: var(--rosa-pastel);
-      border: 2px solid var(--rosa-neon);
-      font-weight: bold;
-    }
-
-    /* Animations */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .fade-in-up {
-      animation: fadeInUp 0.6s ease-out forwards;
-    }
-
-    /* Mobile Menu */
-    #mobile-menu {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-    }
-
-    #mobile-menu.active {
-      max-height: 500px;
-    }
-
-    /* Mobile Filters */
-    .mobile-filters {
-      position: fixed;
-      top: 0;
-      left: -100%;
-      width: 80%;
-      max-width: 320px;
-      height: 100vh;
-      background: white;
-      z-index: 1000;
-      transition: left 0.3s ease;
-      overflow-y: auto;
-      box-shadow: 2px 0 15px rgba(0,0,0,0.2);
-    }
-
-    .mobile-filters.active {
-      left: 0;
-    }
-
-    .mobile-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      background: rgba(0,0,0,0.5);
-      z-index: 999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .mobile-overlay.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    @media (max-width: 768px) {
-      .filter-section {
-        position: static;
-        max-height: none;
-      }
-    }
+@media (max-width: 768px) {
+  .filter-section {
+    position: static;
+    max-height: none;
+  }
+}
