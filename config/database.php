@@ -2,7 +2,7 @@
 $host = 'localhost';
 $dbname = 'tienda_samyglow';
 $user = 'root';
-$pass = 'rapri';
+$pass = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
