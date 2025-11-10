@@ -38,7 +38,7 @@ function activeClass($viewName, $currentView)
 
         <!-- VENTAS Y PEDIDOS -->
         <div class="menu-group">
-            <a href="?view=nuevo-pedido" class="menu-item flex items-center justify-between px-6 py-3 text-white" data-target="ventas-pedidos">
+            <a href="#" class="menu-item flex items-center justify-between px-6 py-3 text-white" data-target="ventas-pedidos">
                 <div class="flex items-center">
                     <i class="fas fa-shopping-bag mr-3"></i>
                     <span>Ventas & Pedidos</span>
@@ -72,7 +72,7 @@ function activeClass($viewName, $currentView)
                 <i class="fas fa-chevron-down text-xs transition-transform"></i>
             </a>
             <div class="submenu">
-                <a href="?view=productos" class="menu-item flex items-center px-10 py-2 text-white text-sm opacity-90">
+                <a href="?view=gestion-productos" class="menu-item flex items-center px-10 py-2 text-white text-sm opacity-90">
                     <i class="fas fa-list mr-2"></i> Todos los Productos
                 </a>
                 <a href="?view=categorias" class="menu-item flex items-center px-10 py-2 text-white text-sm opacity-90">

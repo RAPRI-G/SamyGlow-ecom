@@ -58,6 +58,20 @@ switch ($view) {
         break;
 
     // =====================================
+    // 🔹 GESTIÓN DE PRODUCTOS (VISTA PRINCIPAL)
+    // =====================================
+    case 'gestion-productos':
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: index.php?view=login");
+            exit;
+        }
+
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->index();
+        break;
+
+    // =====================================
     // 🔹 NUEVO PEDIDO (vista principal)
     // =====================================
     case 'nuevo-pedido':
@@ -72,7 +86,7 @@ switch ($view) {
         break;
 
     // =====================================
-    // 🔹 ENDPOINTS API PARA JS (AJAX)
+    // 🔹 ENDPOINTS API PARA JS (AJAX) - PEDIDOS
     // =====================================
     case 'api-productos':
         require_once __DIR__ . '/../app/controllers/PedidoController.php';
@@ -99,6 +113,64 @@ switch ($view) {
         break;
 
     // =====================================
+    // 🔹 APIs DE GESTIÓN DE PRODUCTOS (AJAX)
+    // =====================================
+    case 'api-listar-productos':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->listarProductos();
+        break;
+
+    case 'api-guardar-producto':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->guardarProducto();
+        break;
+
+    case 'api-editar-producto':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->editarProducto();
+        break;
+
+    case 'api-eliminar-producto':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->eliminarProducto();
+        break;
+
+    case 'api-obtener-producto':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        // Método que necesitarás agregar al controlador
+        $controller->obtenerProducto();
+        break;
+
+    case 'api-actualizar-stock':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->actualizarStock();
+        break;
+
+    case 'api-productos-stock-bajo':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->productosStockBajo();
+        break;
+
+    case 'api-buscar-productos':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->buscarProductos();
+        break;
+
+    case 'api-listar-categorias':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->listarCategorias();
+        break;
+
+    // =====================================
     // 🔹 PEDIDOS PENDIENTES (APIs)
     // =====================================
     case 'api-pedidos-pendientes':
@@ -118,6 +190,7 @@ switch ($view) {
         $controller = new PedidoController();
         $controller->marcarEntregado();
         break;
+
     // =====================================
     // 🔹 PAPELERA (APIs)
     // =====================================
@@ -171,6 +244,7 @@ switch ($view) {
         $controller = new PedidoController();
         $controller->historialVentas();
         break;
+
     // =====================================
     // ❌ 404 - Página no encontrada
     // =====================================
