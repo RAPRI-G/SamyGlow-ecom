@@ -38,7 +38,7 @@ function activeClass($viewName, $currentView)
 
         <!-- VENTAS Y PEDIDOS -->
         <div class="menu-group">
-            <a href="#" class="menu-item flex items-center justify-between px-6 py-3 text-white" data-target="ventas-pedidos">
+            <a href="?view=nuevo-pedido" class="menu-item flex items-center justify-between px-6 py-3 text-white" data-target="ventas-pedidos">
                 <div class="flex items-center">
                     <i class="fas fa-shopping-bag mr-3"></i>
                     <span>Ventas & Pedidos</span>

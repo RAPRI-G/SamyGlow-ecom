@@ -99,6 +99,79 @@ switch ($view) {
         break;
 
     // =====================================
+    // 🔹 PEDIDOS PENDIENTES (APIs)
+    // =====================================
+    case 'api-pedidos-pendientes':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->pedidosPendientes();
+        break;
+
+    case 'api-contar-pedidos-pendientes':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->contarPedidosPendientes();
+        break;
+
+    case 'api-marcar-entregado':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->marcarEntregado();
+        break;
+    // =====================================
+    // 🔹 PAPELERA (APIs)
+    // =====================================
+    case 'api-pedidos-eliminados':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->pedidosEliminados();
+        break;
+
+    case 'api-mover-papelera':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->moverAPapelera();
+        break;
+
+    case 'api-restaurar-pedido':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->restaurarPedido();
+        break;
+
+    case 'api-eliminar-permanentemente':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->eliminarPermanentemente();
+        break;
+
+    case 'api-eliminar-pedido':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->eliminarPedido();
+        break;
+
+    case 'api-detalles-pedido':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->obtenerDetallesPedido();
+        break;
+
+    // =====================================
+    // 🔹 PEDIDOS ENTREGADOS E HISTORIAL (APIs)
+    // =====================================
+    case 'api-pedidos-entregados':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->pedidosEntregados();
+        break;
+
+    case 'api-historial-ventas':
+        require_once __DIR__ . '/../app/controllers/PedidoController.php';
+        $controller = new PedidoController();
+        $controller->historialVentas();
+        break;
+    // =====================================
     // ❌ 404 - Página no encontrada
     // =====================================
     default:
@@ -108,4 +181,3 @@ switch ($view) {
               </h1>";
         break;
 }
-?>
