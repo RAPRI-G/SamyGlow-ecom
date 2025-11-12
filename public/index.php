@@ -245,6 +245,57 @@ switch ($view) {
         $controller->historialVentas();
         break;
 
+    // En el switch case, agrega estas rutas:
+
+    case 'api-listar-eliminados':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->listarEliminados();
+        break;
+
+    case 'api-restaurar-producto':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->restaurarProducto();
+        break;
+
+    case 'api-eliminar-permanentemente-producto':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->eliminarPermanentemente();
+        break;
+
+    case 'api-vaciar-papelera':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->vaciarPapelera();
+        break;
+
+    case 'api-contar-papelera':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->contarPapelera();
+        break;
+
+    // En el switch case, agrega estas rutas:
+
+    case 'api-obtener-categoria':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->obtenerCategoria();
+        break;
+
+    case 'api-actualizar-categoria':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->actualizarCategoria();
+        break;
+
+    case 'api-crear-categoria':
+        require_once __DIR__ . '/../app/controllers/ProductoController.php';
+        $controller = new ProductoController();
+        $controller->crearCategoria();
+        break;
     // =====================================
     // ❌ 404 - Página no encontrada
     // =====================================

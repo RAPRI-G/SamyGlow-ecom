@@ -87,18 +87,25 @@ class ProductoController
     }
 
     // 🔹 API: GUARDAR NUEVO PRODUCTO
+    // 🔹 API: GUARDAR NUEVO PRODUCTO (ACTUALIZADO para imágenes)
     public function guardarProducto()
     {
         header('Content-Type: application/json');
 
         try {
+            // Validar que se hayan enviado datos
+            if (empty($_POST['nombre'])) {
+                throw new Exception('El nombre del producto es obligatorio');
+            }
+
             $datos = [
                 'nombre' => $_POST['nombre'] ?? '',
                 'descripcion' => $_POST['descripcion'] ?? '',
                 'precio' => floatval($_POST['precio'] ?? 0),
                 'stock' => intval($_POST['stock'] ?? 0),
                 'categoria_id' => intval($_POST['categoria_id'] ?? 0),
-                'activo' => isset($_POST['activo']) ? 1 : 0
+                'activo' => isset($_POST['activo']) ? 1 : 0,
+                'imagen' => '' // Inicialmente vacío
             ];
 
             // Validaciones básicas
@@ -108,6 +115,14 @@ class ProductoController
 
             if ($datos['stock'] < 0) {
                 throw new Exception('El stock no puede ser negativo');
+            }
+
+            // Manejar la subida de imagen
+            if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+                $imagen = $this->manejarSubidaImagen($_FILES['imagen']);
+                if ($imagen) {
+                    $datos['imagen'] = $imagen;
+                }
             }
 
             $resultado = $this->productoModel->crear($datos);
@@ -128,24 +143,82 @@ class ProductoController
         }
     }
 
+    // 🔹 MÉTODO PARA MANEJAR SUBIDA DE IMAGEN
+    private function manejarSubidaImagen($archivo)
+    {
+        $directorioDestino = __DIR__ . '/../../uploads/productos/';
+
+        // Crear directorio si no existe
+        if (!is_dir($directorioDestino)) {
+            mkdir($directorioDestino, 0777, true);
+        }
+
+        // Validar tipo de archivo
+        $tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $tipoArchivo = mime_content_type($archivo['tmp_name']);
+
+        if (!in_array($tipoArchivo, $tiposPermitidos)) {
+            throw new Exception('Solo se permiten imágenes JPEG, PNG, GIF y WebP');
+        }
+
+        // Validar tamaño (máximo 5MB)
+        $tamañoMaximo = 5 * 1024 * 1024; // 5MB
+        if ($archivo['size'] > $tamañoMaximo) {
+            throw new Exception('La imagen no puede ser mayor a 5MB');
+        }
+
+        // Generar nombre único
+        $extension = pathinfo($archivo['name'], PATHINFO_EXTENSION);
+        $nombreArchivo = uniqid() . '_' . time() . '.' . $extension;
+        $rutaCompleta = $directorioDestino . $nombreArchivo;
+
+        // Mover archivo
+        if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
+            return 'uploads/productos/' . $nombreArchivo;
+        } else {
+            throw new Exception('Error al subir la imagen');
+        }
+    }
+
     // 🔹 API: EDITAR PRODUCTO
+    // 🔹 API: EDITAR PRODUCTO (ACTUALIZADO para imágenes)
     public function editarProducto()
     {
         header('Content-Type: application/json');
 
         try {
             $id = intval($_POST['id'] ?? 0);
+
+            if ($id <= 0) {
+                throw new Exception('ID de producto inválido');
+            }
+
+            // Obtener producto actual para mantener la imagen existente
+            $productoActual = $this->productoModel->obtenerPorId($id);
+
             $datos = [
                 'nombre' => $_POST['nombre'] ?? '',
                 'descripcion' => $_POST['descripcion'] ?? '',
                 'precio' => floatval($_POST['precio'] ?? 0),
                 'stock' => intval($_POST['stock'] ?? 0),
                 'categoria_id' => intval($_POST['categoria_id'] ?? 0),
-                'activo' => isset($_POST['activo']) ? 1 : 0
+                'activo' => isset($_POST['activo']) ? 1 : 0,
+                'imagen' => $productoActual['imagen'] ?? '' // Mantener imagen actual por defecto
             ];
 
-            if ($id <= 0) {
-                throw new Exception('ID de producto inválido');
+            // Manejar nueva imagen si se subió
+            if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+                $nuevaImagen = $this->manejarSubidaImagen($_FILES['imagen']);
+                if ($nuevaImagen) {
+                    // Eliminar imagen anterior si existe
+                    if (!empty($productoActual['imagen'])) {
+                        $rutaImagenAnterior = __DIR__ . '/../../' . $productoActual['imagen'];
+                        if (file_exists($rutaImagenAnterior)) {
+                            unlink($rutaImagenAnterior);
+                        }
+                    }
+                    $datos['imagen'] = $nuevaImagen;
+                }
             }
 
             $resultado = $this->productoModel->actualizar($id, $datos);
@@ -276,7 +349,7 @@ class ProductoController
             ]);
         }
     }
-    
+
     // 🔹 API: OBTENER PRODUCTO POR ID
     public function obtenerProducto()
     {
@@ -306,5 +379,229 @@ class ProductoController
             ]);
         }
     }
+    // 🔹 API: LISTAR PRODUCTOS ELIMINADOS
+    public function listarEliminados()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $productos = $this->productoModel->listarEliminados();
+            echo json_encode([
+                'success' => true,
+                'data' => $productos,
+                'total' => count($productos)
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al obtener productos eliminados: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: RESTAURAR PRODUCTO
+    public function restaurarProducto()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $id = intval($_POST['id'] ?? 0);
+
+            if ($id <= 0) {
+                throw new Exception('ID de producto inválido');
+            }
+
+            $resultado = $this->productoModel->restaurar($id);
+
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Producto restaurado exitosamente'
+                ]);
+            } else {
+                throw new Exception('Error al restaurar el producto');
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: ELIMINAR PERMANENTEMENTE
+    public function eliminarPermanentemente()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $id = intval($_POST['id'] ?? 0);
+
+            if ($id <= 0) {
+                throw new Exception('ID de producto inválido');
+            }
+
+            $resultado = $this->productoModel->eliminarPermanentemente($id);
+
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Producto eliminado permanentemente'
+                ]);
+            } else {
+                throw new Exception('Error al eliminar el producto permanentemente');
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: VACIAR PAPELERA
+    public function vaciarPapelera()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $resultado = $this->productoModel->vaciarPapelera();
+
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Papelera vaciada exitosamente'
+                ]);
+            } else {
+                throw new Exception('Error al vaciar la papelera');
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: CONTAR PAPELERA
+    public function contarPapelera()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $total = $this->productoModel->contarPapelera();
+            echo json_encode([
+                'success' => true,
+                'total' => $total
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al contar papelera: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: OBTENER CATEGORÍA POR ID
+    public function obtenerCategoria()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $id = intval($_GET['id'] ?? 0);
+
+            if ($id <= 0) {
+                throw new Exception('ID de categoría inválido');
+            }
+
+            $categoria = $this->categoriaModel->obtenerPorId($id);
+
+            if ($categoria) {
+                echo json_encode([
+                    'success' => true,
+                    'data' => $categoria
+                ]);
+            } else {
+                throw new Exception('Categoría no encontrada');
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: ACTUALIZAR CATEGORÍA
+    public function actualizarCategoria()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $id = intval($_POST['id'] ?? 0);
+            $datos = [
+                'nombre' => $_POST['nombre'] ?? '',
+                'descripcion' => $_POST['descripcion'] ?? '',
+                'activa' => isset($_POST['activa']) ? 1 : 0
+            ];
+
+            if ($id <= 0) {
+                throw new Exception('ID de categoría inválido');
+            }
+
+            if (empty($datos['nombre'])) {
+                throw new Exception('El nombre de la categoría es obligatorio');
+            }
+
+            $resultado = $this->categoriaModel->actualizar($id, $datos);
+
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Categoría actualizada exitosamente'
+                ]);
+            } else {
+                throw new Exception('Error al actualizar la categoría');
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: CREAR CATEGORÍA
+    public function crearCategoria()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $datos = [
+                'nombre' => $_POST['nombre'] ?? '',
+                'descripcion' => $_POST['descripcion'] ?? '',
+                'activa' => isset($_POST['activa']) ? 1 : 0
+            ];
+
+            if (empty($datos['nombre'])) {
+                throw new Exception('El nombre de la categoría es obligatorio');
+            }
+
+            $resultado = $this->categoriaModel->crear($datos);
+
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Categoría creada exitosamente'
+                ]);
+            } else {
+                throw new Exception('Error al crear la categoría');
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
 }
-?>
