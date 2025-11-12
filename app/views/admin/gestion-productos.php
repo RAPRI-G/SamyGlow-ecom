@@ -862,11 +862,23 @@
         }
 
         /* Estilos para el modal de productos por categoría */
+        /* ESTILOS CORREGIDOS PARA LINE CLAMP */
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+
+            /* Fallback para navegadores modernos */
+            display: -webkit-box;
+            display: -moz-box;
+            display: box;
+            -webkit-box-orient: vertical;
+            -moz-box-orient: vertical;
+            box-orient: vertical;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            -moz-line-clamp: 2;
         }
 
         .modal-productos-categoria {
