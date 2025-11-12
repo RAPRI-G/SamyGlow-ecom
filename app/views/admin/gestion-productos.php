@@ -480,21 +480,21 @@
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Imagen del Producto</label>
-                                <div class="border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer hover:border-pink-400 transition-colors" 
-                                     onclick="document.getElementById('producto-imagen').click()"
-                                     ondrop="manejarDrop(event)" 
-                                     ondragover="manejarDragOver(event)">
+                                <div class="border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer hover:border-pink-400 transition-colors"
+                                    onclick="document.getElementById('producto-imagen').click()"
+                                    ondrop="manejarDrop(event)"
+                                    ondragover="manejarDragOver(event)">
                                     <div class="imagen-placeholder">
                                         <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"></i>
                                         <p class="text-sm text-gray-600">Arrastra una imagen o haz clic para subir</p>
                                         <p class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG, GIF, WebP (Max. 5MB)</p>
                                     </div>
-                                    <input type="file" id="producto-imagen" class="hidden" accept="image/*" 
-                                           onchange="previsualizarImagen(this)">
+                                    <input type="file" id="producto-imagen" class="hidden" accept="image/*"
+                                        onchange="previsualizarImagen(this)">
                                 </div>
                                 <div id="imagen-preview-container"></div>
-                                <button type="button" id="btn-eliminar-imagen" class="hidden mt-2 bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded transition-colors text-sm" 
-                                        onclick="eliminarPrevisualizacion('nuevo')">
+                                <button type="button" id="btn-eliminar-imagen" class="hidden mt-2 bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded transition-colors text-sm"
+                                    onclick="eliminarPrevisualizacion('nuevo')">
                                     <i class="fas fa-trash mr-1"></i>Eliminar Imagen
                                 </button>
                             </div>
@@ -519,7 +519,7 @@
             </div>
         </div>
     </div>
-    
+
     <style>
         /* ============================================= */
         /* 🎨 ESTILOS ORIGINALES DEL DISEÑO */
@@ -528,11 +528,6 @@
         :root {
             --primary: #f472b6;
             --secondary: #a78bfa;
-        }
-
-        header {
-            z-index: 100;
-            /* Menor que los modales */
         }
 
         .sidebar {
@@ -937,11 +932,6 @@
             animation: spin 1s linear infinite;
         }
 
-        .custom-notification {
-            min-width: 300px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
         .input-error {
             border-color: #ef4444;
             box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
@@ -950,6 +940,67 @@
         .input-success {
             border-color: #10b981;
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        /* ============================================= */
+        /* 🔔 ESTILOS CORREGIDOS PARA NOTIFICACIONES */
+        /* ============================================= */
+
+        .custom-notification {
+            min-width: 300px;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 12px;
+            z-index: 10001 !important;
+            /* Mayor que el header y modales */
+            position: fixed;
+            top: 100px;
+            /* Debajo del header */
+            right: 20px;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        .custom-notification.fade-out {
+            animation: slideOutRight 0.3s ease-in forwards;
+        }
+
+        /* Asegurar que el header tenga un z-index adecuado */
+        header {
+            z-index: 1000;
+            position: relative;
+        }
+
+        /* Asegurar que los modales tengan z-index alto */
+        .modal {
+            z-index: 9999;
+        }
+
+        .modal-content {
+            z-index: 10000;
         }
     </style>
 </main>
@@ -1146,7 +1197,7 @@
     function mostrarLoading(mensaje = 'Procesando...') {
         // Remover loading existente
         ocultarLoading();
-        
+
         const loadingOverlay = document.createElement('div');
         loadingOverlay.className = 'loading-overlay';
         loadingOverlay.id = 'loading-overlay';
@@ -1173,31 +1224,31 @@
                 document.body.removeChild(notif);
             }
         });
-        
+
         const icons = {
             success: 'fa-check-circle',
-            error: 'fa-exclamation-triangle', 
+            error: 'fa-exclamation-triangle',
             warning: 'fa-exclamation-circle',
             info: 'fa-info-circle'
         };
-        
+
         const notificacion = document.createElement('div');
-        notificacion.className = `custom-notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 ${
-            tipo === 'success' ? 'bg-green-500 text-white' :
-            tipo === 'error' ? 'bg-red-500 text-white' :
-            tipo === 'warning' ? 'bg-yellow-500 text-white' :
-            'bg-blue-500 text-white'
-        }`;
-        
+        notificacion.className = `custom-notification fixed top-20 right-4 p-4 rounded-lg shadow-lg z-[10001] transform transition-all duration-300 ${
+        tipo === 'success' ? 'bg-green-500 text-white' :
+        tipo === 'error' ? 'bg-red-500 text-white' :
+        tipo === 'warning' ? 'bg-yellow-500 text-white' :
+        'bg-blue-500 text-white'
+    }`;
+
         notificacion.innerHTML = `
-            <div class="flex items-center">
-                <i class="fas ${icons[tipo]} mr-3"></i>
-                <span class="font-medium">${mensaje}</span>
-                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `;
+        <div class="flex items-center">
+            <i class="fas ${icons[tipo]} mr-3"></i>
+            <span class="font-medium">${mensaje}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
 
         document.body.appendChild(notificacion);
 
@@ -1245,21 +1296,21 @@
         const placeholder = input.parentNode.querySelector('.imagen-placeholder');
         const previewContainer = document.getElementById('imagen-preview-container');
         const btnEliminar = document.getElementById('btn-eliminar-imagen');
-        
+
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            
+
             // Validar tipo y tamaño de archivo
             const file = input.files[0];
             const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             const maxSize = 5 * 1024 * 1024; // 5MB
-            
+
             if (!validTypes.includes(file.type)) {
                 mostrarNotificacion('Formato no válido. Use JPG, PNG, GIF o WebP', 'error');
                 input.value = '';
                 return;
             }
-            
+
             if (file.size > maxSize) {
                 mostrarNotificacion('La imagen es muy grande (máx. 5MB)', 'error');
                 input.value = '';
@@ -1276,7 +1327,7 @@
                     previewContainer.appendChild(preview);
                 }
                 preview.src = e.target.result;
-                
+
                 // Ocultar placeholder y mostrar botón eliminar
                 if (placeholder) placeholder.style.display = 'none';
                 if (btnEliminar) btnEliminar.classList.remove('hidden');
@@ -1289,19 +1340,19 @@
     function previsualizarImagenEditar(input) {
         const previewContainer = document.getElementById('imagen-preview-editar');
         const btnEliminar = document.getElementById('btn-eliminar-imagen-editar');
-        
+
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             const file = input.files[0];
             const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             const maxSize = 5 * 1024 * 1024;
-            
+
             if (!validTypes.includes(file.type)) {
                 mostrarNotificacion('Formato no válido. Use JPG, PNG, GIF o WebP', 'error');
                 input.value = '';
                 return;
             }
-            
+
             if (file.size > maxSize) {
                 mostrarNotificacion('La imagen es muy grande (máx. 5MB)', 'error');
                 input.value = '';
@@ -1317,7 +1368,7 @@
                     previewContainer.appendChild(preview);
                 }
                 preview.src = e.target.result;
-                
+
                 if (btnEliminar) btnEliminar.classList.remove('hidden');
             };
 
@@ -1329,14 +1380,14 @@
         const previewId = tipo === 'nuevo' ? 'preview-imagen' : 'preview-imagen-editar';
         const btnId = tipo === 'nuevo' ? 'btn-eliminar-imagen' : 'btn-eliminar-imagen-editar';
         const inputId = tipo === 'nuevo' ? 'producto-imagen' : 'edit-producto-imagen';
-        const placeholder = tipo === 'nuevo' ? 
-            document.querySelector('.imagen-placeholder') : 
+        const placeholder = tipo === 'nuevo' ?
+            document.querySelector('.imagen-placeholder') :
             document.querySelector('.imagen-placeholder-editar');
-        
+
         const preview = document.getElementById(previewId);
         const btnEliminar = document.getElementById(btnId);
         const input = document.getElementById(inputId);
-        
+
         if (preview) preview.remove();
         if (btnEliminar) btnEliminar.classList.add('hidden');
         if (input) input.value = '';
@@ -1351,15 +1402,17 @@
     function manejarDrop(e) {
         e.preventDefault();
         e.currentTarget.classList.remove('drag-over');
-        
+
         const files = e.dataTransfer.files;
         if (files.length > 0) {
             const input = e.currentTarget.querySelector('input[type="file"]');
             if (input) {
                 input.files = files;
-                
+
                 // Disparar evento change
-                const event = new Event('change', { bubbles: true });
+                const event = new Event('change', {
+                    bubbles: true
+                });
                 input.dispatchEvent(event);
             }
         }
@@ -1376,7 +1429,7 @@
 
         filas.forEach(fila => {
             const categoriaBadge = fila.querySelector('.categoria-badge');
-            
+
             if (!categoriaBadge) {
                 fila.style.display = 'none';
                 return;
@@ -1384,7 +1437,7 @@
 
             // Obtener ID de categoría del data attribute
             const categoriaId = categoriaBadge.getAttribute('data-categoria-id');
-            
+
             // Mostrar todas las categorías si no hay filtro, o solo la seleccionada
             if (!categoriaFiltro || categoriaId === categoriaFiltro) {
                 fila.style.display = '';
@@ -1399,7 +1452,7 @@
 
     function actualizarVistaFiltros(productosVisibles) {
         document.getElementById('total-productos-text').textContent = productosVisibles;
-        
+
         const sinResultados = document.getElementById('sin-resultados');
         if (productosVisibles === 0) {
             sinResultados.classList.remove('hidden');
@@ -1464,7 +1517,7 @@
             if (result.success) {
                 mostrarNotificacion('✅ Producto creado exitosamente', 'success');
                 limpiarFormularioProducto();
-                
+
                 // Cambiar a la pestaña de lista de productos
                 setTimeout(() => {
                     document.querySelector('[data-tab="lista-productos"]').click();
@@ -1484,13 +1537,13 @@
     async function editarProducto(productoId) {
         try {
             mostrarLoading('Cargando producto...');
-            
+
             const response = await fetch(`index.php?view=api-obtener-producto&id=${productoId}`);
-            
+
             if (!response.ok) {
                 throw new Error(`Error HTTP: ${response.status}`);
             }
-            
+
             const result = await response.json();
             ocultarLoading();
 
@@ -1595,20 +1648,28 @@
     `;
 
         document.getElementById('contenido-modal-producto').innerHTML = html;
-        
+
         setTimeout(() => {
             document.getElementById('modal-editar-producto').classList.add('active');
         }, 10);
     }
 
     function getOpcionesCategorias(categoriaSeleccionada) {
-        const categorias = [
-            { id: 1, nombre: 'Fragancias' },
-            { id: 2, nombre: 'Cremas Corporales' }, 
-            { id: 3, nombre: 'Body Splash' }
+        const categorias = [{
+                id: 1,
+                nombre: 'Fragancias'
+            },
+            {
+                id: 2,
+                nombre: 'Cremas Corporales'
+            },
+            {
+                id: 3,
+                nombre: 'Body Splash'
+            }
         ];
-        
-        return categorias.map(cat => 
+
+        return categorias.map(cat =>
             `<option value="${cat.id}" ${cat.id == categoriaSeleccionada ? 'selected' : ''}>${cat.nombre}</option>`
         ).join('');
     }
@@ -1723,10 +1784,10 @@
         document.getElementById('form-nuevo-producto').reset();
         document.getElementById('producto-stock-minimo').value = '5';
         document.getElementById('producto-activo').checked = true;
-        
+
         // Limpiar previsualización de imagen
         eliminarPrevisualizacion('nuevo');
-        
+
         // Restaurar placeholder
         const placeholder = document.querySelector('.imagen-placeholder');
         if (placeholder) {
@@ -2402,7 +2463,7 @@
                         }
 
                         // Actualizar loading
-                        document.querySelector('.loading-overlay span').textContent = 
+                        document.querySelector('.loading-overlay span').textContent =
                             `Restaurando productos... (${restaurations + errors}/${result.data.length})`;
                     } catch (error) {
                         errors++;
