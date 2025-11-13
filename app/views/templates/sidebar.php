@@ -135,7 +135,7 @@ function activeClass($viewName, $currentView)
         </div>
 
         <!-- MÉTODOS DE PAGO -->
-        <a href="?view=metodos-pago" class="menu-item flex items-center px-6 py-3 text-white <?= activeClass('metodos-pago', $currentView) ?>">
+        <a href="?view=gestion-metodos-pago" class="menu-item flex items-center px-6 py-3 text-white <?= activeClass('metodos-pago', $currentView) ?>">
             <i class="fas fa-credit-card mr-3"></i>
             <span>Métodos de Pago</span>
         </a>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-11-2025 a las 06:10:01
+-- Tiempo de generación: 13-11-2025 a las 11:48:39
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -46,13 +46,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearPedidoConPromocion` (IN `p_nom
         SET v_cliente_id = LAST_INSERT_ID();
     END IF;
     
-    -- 2. Verificar promoción si se proporcionó ID
+    -- 2. Verificar promoción si se proporcionó ID (solo promociones activas y no eliminadas)
     SET v_promocion_id = NULL;
     IF p_promocion_id IS NOT NULL THEN
         SELECT id INTO v_promocion_id 
         FROM promociones 
         WHERE id = p_promocion_id
-          AND activa = TRUE 
+          AND activa = 1 
+          AND fecha_eliminado IS NULL
           AND CURDATE() BETWEEN fecha_inicio AND fecha_fin
           AND (max_usos IS NULL OR usos_actual < max_usos);
     END IF;
@@ -172,7 +173,32 @@ INSERT INTO `clientes` (`id`, `nombres`, `apellidos`, `dni`, `correo`, `telefono
 (7, 'Elena', 'Castillo Rojas', '89012345', 'elena.castillo@email.com', '978901234', '2025-11-09 04:17:40', 0, NULL),
 (8, 'Miguel', 'Vargas Fuentes', '90123456', 'miguel.vargas@email.com', '989012345', '2025-11-09 04:17:40', 0, NULL),
 (9, 'gabriel francis', 'rapri capcha', '72571243', 'gabrielrapri14@gmail.com', '948537363', '2025-11-09 16:17:21', 0, NULL),
-(11, 'samira tayli', 'rivera soller', '73027729', 'sollerriverasamira@gmail.com', '919462329', '2025-11-13 02:48:13', 0, NULL);
+(11, 'samira tayli', 'rivera soller', '73027729', 'sollerriverasamira@gmail.com', '919462329', '2025-11-13 02:48:13', 0, NULL),
+(12, 'mejico', 'asdasd', '73145710', 'sra@gmail.com', '987654321', '2025-11-13 05:13:03', 0, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `configuracion_metodos_pago`
+--
+
+CREATE TABLE `configuracion_metodos_pago` (
+  `id` int(11) NOT NULL,
+  `multiples_metodos` tinyint(1) DEFAULT 1,
+  `notificaciones_pago` tinyint(1) DEFAULT 1,
+  `confirmacion_automatica` tinyint(1) DEFAULT 0,
+  `metodo_predeterminado_id` int(11) DEFAULT NULL,
+  `orden_metodos` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`orden_metodos`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `configuracion_metodos_pago`
+--
+
+INSERT INTO `configuracion_metodos_pago` (`id`, `multiples_metodos`, `notificaciones_pago`, `confirmacion_automatica`, `metodo_predeterminado_id`, `orden_metodos`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 0, 1, '[1, 2, 3, 4, 5]', '2025-11-13 08:29:37', '2025-11-13 08:29:37');
 
 -- --------------------------------------------------------
 
@@ -233,19 +259,24 @@ INSERT INTO `detalle_pedido` (`id`, `pedido_id`, `producto_id`, `cantidad`, `pre
 CREATE TABLE `metodos_pago` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
-  `activo` tinyint(1) DEFAULT 1
+  `activo` tinyint(1) DEFAULT 1,
+  `tipo` enum('digital','card','cash','transfer') DEFAULT 'digital',
+  `descripcion` text DEFAULT NULL,
+  `icono` varchar(50) DEFAULT 'fas fa-credit-card',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `metodos_pago`
 --
 
-INSERT INTO `metodos_pago` (`id`, `nombre`, `activo`) VALUES
-(1, 'Yape', 1),
-(2, 'Plin', 1),
-(3, 'Tarjeta de Crédito', 1),
-(4, 'Transferencia Bancaria', 1),
-(5, 'Efectivo', 1);
+INSERT INTO `metodos_pago` (`id`, `nombre`, `activo`, `tipo`, `descripcion`, `icono`, `created_at`, `updated_at`) VALUES
+(1, 'Yape', 1, 'digital', 'Pago rápido y seguro mediante Yape', 'fab fa-google-wallet', '2025-11-13 08:29:37', '2025-11-13 08:29:37'),
+(2, 'Plin', 1, 'digital', 'Pago mediante Plin de Interbank', 'fas fa-mobile-alt', '2025-11-13 08:29:37', '2025-11-13 08:29:37'),
+(3, 'Tarjeta de Crédito', 1, 'card', 'Pago con tarjetas de crédito Visa, MasterCard y American Express', 'far fa-credit-card', '2025-11-13 08:29:37', '2025-11-13 08:29:37'),
+(4, 'Transferencia Bancaria', 1, 'transfer', 'Transferencia bancaria directa', 'fas fa-university', '2025-11-13 08:29:37', '2025-11-13 08:29:37'),
+(5, 'Efectivo', 1, 'cash', 'Pago en efectivo al momento de la entrega', 'fas fa-money-bill-wave', '2025-11-13 08:29:37', '2025-11-13 08:29:37');
 
 -- --------------------------------------------------------
 
@@ -315,7 +346,7 @@ INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `precio`, `stock`, `imag
 (4, 'Love Spell Fragrance Mist', 'Perfume con durazno, cereza y flor de melocotón', 85.90, 20, NULL, 1, 1, '2025-11-09 04:17:40', 0),
 (5, 'Aqua Kiss Fragrance Mist', 'Notas acuáticas con lilas blancas y algodón de azúcar', 65.00, 14, NULL, 1, 1, '2025-11-09 04:17:40', 0),
 (6, 'Midnight Bloom Fragrance Mist', 'Aroma nocturno con gardenias y ciruelas negras', 92.90, 10, NULL, 1, 1, '2025-11-09 04:17:40', 0),
-(7, 'Coconut Passion Fragrance Mist', 'Fragancia tropical con coco cremoso y piña', 78.90, 16, NULL, 1, 1, '2025-11-09 04:17:40', 0),
+(7, 'Coconut Passion Fragrance Mist', 'Fragancia tropical con coco cremoso y piña', 78.90, 16, 'uploads/productos/691572b6e2a5b_1763013302.png', 1, 1, '2025-11-09 04:17:40', 0),
 (8, 'Strawberries & Champagne Mist', 'Combinación dulce de fresas y champagne', 86.90, 13, NULL, 1, 1, '2025-11-09 04:17:40', 0),
 (9, 'Amber Romance Fragrance Mist', 'Aroma sensual con ámbar y vainilla', 65.00, 9, NULL, 1, 1, '2025-11-09 04:17:40', 0),
 (10, 'Endless Love Fragrance Mist', 'Fragancia romántica con flores blancas', 81.90, 17, NULL, 1, 1, '2025-11-09 04:17:40', 0),
@@ -452,21 +483,23 @@ CREATE TABLE `promociones` (
   `activa` tinyint(1) DEFAULT 1,
   `max_usos` int(11) DEFAULT NULL,
   `usos_actual` int(11) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_eliminado` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `promociones`
 --
 
-INSERT INTO `promociones` (`id`, `nombre`, `descripcion`, `tipo`, `valor_descuento`, `fecha_inicio`, `fecha_fin`, `activa`, `max_usos`, `usos_actual`, `created_at`) VALUES
-(1, 'Descuento 20% Fragancias', '20% de descuento en todas las fragancias', 'descuento_porcentaje', 20.00, '2025-11-08', '2025-12-08', 1, 100, 0, '2025-11-09 04:17:40'),
-(2, 'Envío Gratis +50€', 'Envío gratis en compras mayores a 50€', 'envio_gratis', NULL, '2025-11-08', '2026-01-07', 1, NULL, 0, '2025-11-09 04:17:40'),
-(3, 'Combo Cremas', 'Combo especial de cremas corporales', 'combo', 15.00, '2025-11-08', '2025-11-23', 1, 50, 0, '2025-11-09 04:17:40'),
-(4, 'Lanzamiento Bare Vanilla', '15% descuento en toda la línea Bare Vanilla', 'descuento_porcentaje', 15.00, '2025-11-08', '2025-12-23', 1, 80, 0, '2025-11-09 04:17:40'),
-(5, 'Promo Cremas Nutritivas', '25% off en cremas y body butters', 'descuento_porcentaje', 25.00, '2025-11-08', '2025-11-28', 1, 60, 0, '2025-11-09 04:17:40'),
-(6, 'Combo Fragancias + Splash', 'Compra 2 fragancias y lleva splash 50% off', 'combo', 50.00, '2025-11-08', '2025-12-08', 1, 40, 0, '2025-11-09 04:17:40'),
-(7, 'Pack Aroma Completo', '20% descuento al llevar 3 productos de misma fragancia', 'descuento_porcentaje', 20.00, '2025-11-08', '2026-01-07', 1, NULL, 0, '2025-11-09 04:17:40');
+INSERT INTO `promociones` (`id`, `nombre`, `descripcion`, `tipo`, `valor_descuento`, `fecha_inicio`, `fecha_fin`, `activa`, `max_usos`, `usos_actual`, `created_at`, `fecha_eliminado`) VALUES
+(1, 'Descuento 20% Fragancias', '20% de descuento en todas las fragancias', 'descuento_porcentaje', 20.00, '2025-11-08', '2025-12-08', 1, 100, 0, '2025-11-09 04:17:40', NULL),
+(2, 'Envío Gratis +50€', 'Envío gratis en compras mayores a 50€', 'envio_gratis', NULL, '2025-11-08', '2026-01-07', 1, NULL, 0, '2025-11-09 04:17:40', NULL),
+(3, 'Combo Cremas', 'Combo especial de cremas corporales', 'combo', 15.00, '2025-11-08', '2025-11-23', 1, 50, 0, '2025-11-09 04:17:40', NULL),
+(4, 'Lanzamiento Bare Vanilla', '15% descuento en toda la línea Bare Vanilla', 'descuento_porcentaje', 15.00, '2025-11-08', '2025-12-23', 1, 80, 0, '2025-11-09 04:17:40', NULL),
+(5, 'Promo Cremas Nutritivas', '25% off en cremas y body butters', 'descuento_porcentaje', 25.00, '2025-11-08', '2025-11-28', 1, 60, 0, '2025-11-09 04:17:40', NULL),
+(6, 'Combo Fragancias + Splash', 'Compra 2 fragancias y lleva splash 50% off', 'combo', 50.00, '2025-11-08', '2025-12-08', 1, 40, 0, '2025-11-09 04:17:40', NULL),
+(7, 'Pack Aroma Completo', '20% descuento al llevar 3 productos de misma fragancia', 'descuento_porcentaje', 20.00, '2025-11-08', '2026-01-07', 1, NULL, 0, '2025-11-09 04:17:40', NULL),
+(8, 'descuento de 50%', 'asasdsadasdasdasdasdas', 'descuento_porcentaje', 50.00, '2025-11-13', '2026-12-25', 1, 20, 0, '2025-11-13 06:30:39', NULL);
 
 -- --------------------------------------------------------
 
@@ -511,6 +544,13 @@ ALTER TABLE `clientes`
   ADD UNIQUE KEY `dni` (`dni`),
   ADD KEY `idx_dni` (`dni`),
   ADD KEY `idx_correo` (`correo`);
+
+--
+-- Indices de la tabla `configuracion_metodos_pago`
+--
+ALTER TABLE `configuracion_metodos_pago`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `metodo_predeterminado_id` (`metodo_predeterminado_id`);
 
 --
 -- Indices de la tabla `detalle_pedido`
@@ -560,7 +600,8 @@ ALTER TABLE `productos_promocion`
 ALTER TABLE `promociones`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_fechas` (`fecha_inicio`,`fecha_fin`),
-  ADD KEY `idx_activa` (`activa`);
+  ADD KEY `idx_activa` (`activa`),
+  ADD KEY `idx_promociones_activa_fecha` (`activa`,`fecha_eliminado`);
 
 --
 -- Indices de la tabla `usuarios`
@@ -584,7 +625,13 @@ ALTER TABLE `categorias`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT de la tabla `configuracion_metodos_pago`
+--
+ALTER TABLE `configuracion_metodos_pago`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_pedido`
@@ -596,7 +643,7 @@ ALTER TABLE `detalle_pedido`
 -- AUTO_INCREMENT de la tabla `metodos_pago`
 --
 ALTER TABLE `metodos_pago`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `pedidos`
@@ -620,7 +667,7 @@ ALTER TABLE `productos_promocion`
 -- AUTO_INCREMENT de la tabla `promociones`
 --
 ALTER TABLE `promociones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
@@ -631,6 +678,12 @@ ALTER TABLE `usuarios`
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `configuracion_metodos_pago`
+--
+ALTER TABLE `configuracion_metodos_pago`
+  ADD CONSTRAINT `configuracion_metodos_pago_ibfk_1` FOREIGN KEY (`metodo_predeterminado_id`) REFERENCES `metodos_pago` (`id`);
 
 --
 -- Filtros para la tabla `detalle_pedido`
