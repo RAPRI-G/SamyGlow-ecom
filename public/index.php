@@ -487,7 +487,7 @@ switch ($view) {
         $controller = new PromocionController();
         $controller->listarProductosPromocion();
         break;
-        
+
     // 🔹 PAPELERA DE PROMOCIONES
     case 'api-mover-papelera-promocion':
         require_once __DIR__ . '/../app/controllers/PromocionController.php';
@@ -523,6 +523,64 @@ switch ($view) {
         require_once __DIR__ . '/../app/controllers/PromocionController.php';
         $controller = new PromocionController();
         $controller->vaciarPapelera();
+        break;
+
+    // En el switch case, agrega estas rutas:
+
+    // 🔹 GESTIÓN DE MÉTODOS DE PAGO
+    case 'gestion-metodos-pago':
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: index.php?view=login");
+            exit;
+        }
+        require_once __DIR__ . '/../app/controllers/MetodoPagoController.php';
+        $controller = new MetodoPagoController();
+        $controller->index();
+        break;
+
+    // 🔹 APIs DE MÉTODOS DE PAGO
+    case 'api-listar-metodos-pago':
+        require_once __DIR__ . '/../app/controllers/MetodoPagoController.php';
+        $controller = new MetodoPagoController();
+        $controller->listarMetodos();
+        break;
+
+    case 'api-estadisticas-metodos-pago':
+        require_once __DIR__ . '/../app/controllers/MetodoPagoController.php';
+        $controller = new MetodoPagoController();
+        $controller->obtenerEstadisticas();
+        break;
+
+
+    case 'api-crear-metodo-pago':
+        require_once __DIR__ . '/../app/controllers/MetodoPagoController.php';
+        $controller = new MetodoPagoController();
+        $controller->crearMetodo();
+        break;
+
+    case 'api-actualizar-metodo-pago':
+        require_once __DIR__ . '/../app/controllers/MetodoPagoController.php';
+        $controller = new MetodoPagoController();
+        $controller->actualizarMetodo();
+        break;
+
+    case 'api-configuracion-metodos-pago':
+        require_once __DIR__ . '/../app/controllers/MetodoPagoController.php';
+        $controller = new MetodoPagoController();
+        $controller->obtenerConfiguracion();
+        break;
+
+    case 'api-actualizar-configuracion-metodos':
+        require_once __DIR__ . '/../app/controllers/MetodoPagoController.php';
+        $controller = new MetodoPagoController();
+        $controller->actualizarConfiguracion();
+        break;
+    // En el switch case de tu index.php, agrega:
+
+    case 'api-eliminar-metodo-pago':
+        require_once __DIR__ . '/../app/controllers/MetodoPagoController.php';
+        $controller = new MetodoPagoController();
+        $controller->eliminarMetodo();
         break;
     // =====================================
     // ❌ 404 - Página no encontrada
