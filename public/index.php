@@ -361,6 +361,51 @@ switch ($view) {
         $controller = new ClienteController();
         $controller->contarClientes();
         break;
+    // En el switch case de tu index.php, agrega esta línea:
+    case 'api-registrar-cliente':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->apiRegistrarCliente();
+        break;
+
+    // En el switch case de tu index.php, agrega:
+
+    // 🔹 PAPELERA DE CLIENTES
+    case 'api-mover-papelera-cliente':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->moverPapelera();
+        break;
+
+    case 'api-restaurar-cliente':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->restaurarCliente();
+        break;
+
+    case 'api-eliminar-permanentemente-cliente':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->eliminarPermanentemente();
+        break;
+
+    case 'api-listar-papelera-clientes':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->listarPapelera();
+        break;
+
+    case 'api-contar-papelera-clientes':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->contarPapelera();
+        break;
+
+    case 'api-vaciar-papelera-clientes':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->vaciarPapelera();
+        break;
     // =====================================
     // ❌ 404 - Página no encontrada
     // =====================================

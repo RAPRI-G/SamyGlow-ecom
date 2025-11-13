@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 12-11-2025 a las 01:12:32
+-- Tiempo de generación: 13-11-2025 a las 06:10:01
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -138,8 +138,7 @@ CREATE TABLE `categorias` (
 INSERT INTO `categorias` (`id`, `nombre`, `descripcion`, `activa`, `created_at`) VALUES
 (1, 'Fragancias', 'Fragancias y perfumes para el cuidado personal', 1, '2025-11-09 04:17:40'),
 (2, 'Cremas Corporales', 'Cremas y lociones para hidratación corporal', 1, '2025-11-09 04:17:40'),
-(3, 'Body Splash', 'Sprays corporales refrescantes y aromáticos', 1, '2025-11-09 04:17:40'),
-(4, 'jabones', 'asdsada', 1, '2025-11-11 22:40:14');
+(3, 'Body Splash', 'Sprays corporales refrescantes y aromáticos', 1, '2025-11-09 04:17:40');
 
 -- --------------------------------------------------------
 
@@ -154,23 +153,26 @@ CREATE TABLE `clientes` (
   `dni` char(8) NOT NULL,
   `correo` varchar(150) NOT NULL,
   `telefono` char(9) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `eliminado` tinyint(1) DEFAULT 0,
+  `fecha_eliminado` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `clientes`
 --
 
-INSERT INTO `clientes` (`id`, `nombres`, `apellidos`, `dni`, `correo`, `telefono`, `created_at`) VALUES
-(1, 'María', 'Gonzales López', '23456789', 'maria.gonzales@email.com', '912345678', '2025-11-09 04:17:40'),
-(2, 'Carlos', 'Rodríguez Paz', '34567890', 'carlos.rodriguez@email.com', '923456789', '2025-11-09 04:17:40'),
-(3, 'Ana', 'Martínez Soto', '45678901', 'ana.martinez@email.com', '934567890', '2025-11-09 04:17:40'),
-(4, 'Luis', 'Torres Mendoza', '56789012', 'luis.torres@email.com', '945678901', '2025-11-09 04:17:40'),
-(5, 'Sofia', 'Ramírez Cruz', '67890123', 'sofia.ramirez@email.com', '956789012', '2025-11-09 04:17:40'),
-(6, 'Jorge', 'Díaz Herrera', '78901234', 'jorge.diaz@email.com', '967890123', '2025-11-09 04:17:40'),
-(7, 'Elena', 'Castillo Rojas', '89012345', 'elena.castillo@email.com', '978901234', '2025-11-09 04:17:40'),
-(8, 'Miguel', 'Vargas Fuentes', '90123456', 'miguel.vargas@email.com', '989012345', '2025-11-09 04:17:40'),
-(9, 'gabriel francis', 'rapri capcha', '72571243', 'gabrielrapri14@gmail.com', '948537363', '2025-11-09 16:17:21');
+INSERT INTO `clientes` (`id`, `nombres`, `apellidos`, `dni`, `correo`, `telefono`, `created_at`, `eliminado`, `fecha_eliminado`) VALUES
+(1, 'María', 'Gonzales López', '23456789', 'maria.gonzales@email.com', '912345678', '2025-11-09 04:17:40', 0, NULL),
+(2, 'Carlos', 'Rodríguez Paz', '34567890', 'carlos.rodriguez@email.com', '923456789', '2025-11-09 04:17:40', 0, NULL),
+(3, 'Ana', 'Martínez Soto', '45678901', 'anamartinez@email.com', '934567890', '2025-11-09 04:17:40', 0, NULL),
+(4, 'Luis', 'Torres Mendoza', '56789012', 'luis.torres@email.com', '945678901', '2025-11-09 04:17:40', 0, NULL),
+(5, 'Sofia', 'Ramírez Cruz', '67890123', 'sofia.ramirez@email.com', '956789012', '2025-11-09 04:17:40', 0, NULL),
+(6, 'Jorge', 'Díaz Herrera', '78901234', 'jorge.diaz@email.com', '967890123', '2025-11-09 04:17:40', 0, NULL),
+(7, 'Elena', 'Castillo Rojas', '89012345', 'elena.castillo@email.com', '978901234', '2025-11-09 04:17:40', 0, NULL),
+(8, 'Miguel', 'Vargas Fuentes', '90123456', 'miguel.vargas@email.com', '989012345', '2025-11-09 04:17:40', 0, NULL),
+(9, 'gabriel francis', 'rapri capcha', '72571243', 'gabrielrapri14@gmail.com', '948537363', '2025-11-09 16:17:21', 0, NULL),
+(11, 'samira tayli', 'rivera soller', '73027729', 'sollerriverasamira@gmail.com', '919462329', '2025-11-13 02:48:13', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -218,7 +220,9 @@ INSERT INTO `detalle_pedido` (`id`, `pedido_id`, `producto_id`, `cantidad`, `pre
 (24, 8, 16, 1, 64.90, 64.90),
 (25, 9, 9, 1, 94.90, 94.90),
 (26, 9, 1, 1, 95.90, 95.90),
-(27, 9, 17, 1, 66.90, 66.90);
+(27, 9, 17, 1, 66.90, 66.90),
+(28, 10, 9, 1, 65.00, 65.00),
+(29, 11, 33, 1, 60.90, 60.90);
 
 -- --------------------------------------------------------
 
@@ -277,7 +281,9 @@ INSERT INTO `pedidos` (`id`, `cliente_id`, `fecha`, `subtotal`, `descuento_promo
 (6, 6, '2025-11-09 04:17:40', 295.40, 0.00, 295.40, 'pendiente', 2, NULL, NULL, 0, NULL),
 (7, 7, '2025-11-09 04:17:40', 210.70, 52.67, 158.03, 'entregado', 1, 5, NULL, 0, NULL),
 (8, 8, '2025-11-09 04:17:40', 189.50, 0.00, 189.50, 'entregado', 5, NULL, NULL, 0, NULL),
-(9, 9, '2025-11-09 16:17:21', 257.70, 0.00, 257.70, 'entregado', 1, NULL, 'llevara dos bolsas', 0, NULL);
+(9, 9, '2025-11-09 16:17:21', 257.70, 0.00, 257.70, 'entregado', 1, NULL, 'llevara dos bolsas', 0, NULL),
+(10, 11, '2025-11-13 05:00:15', 65.00, 0.00, 65.00, 'pendiente', 1, NULL, '', 0, NULL),
+(11, 11, '2025-11-13 05:08:04', 60.90, 0.00, 60.90, 'entregado', 1, NULL, '', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -311,7 +317,7 @@ INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `precio`, `stock`, `imag
 (6, 'Midnight Bloom Fragrance Mist', 'Aroma nocturno con gardenias y ciruelas negras', 92.90, 10, NULL, 1, 1, '2025-11-09 04:17:40', 0),
 (7, 'Coconut Passion Fragrance Mist', 'Fragancia tropical con coco cremoso y piña', 78.90, 16, NULL, 1, 1, '2025-11-09 04:17:40', 0),
 (8, 'Strawberries & Champagne Mist', 'Combinación dulce de fresas y champagne', 86.90, 13, NULL, 1, 1, '2025-11-09 04:17:40', 0),
-(9, 'Amber Romance Fragrance Mist', 'Aroma sensual con ámbar y vainilla', 65.00, 10, NULL, 1, 1, '2025-11-09 04:17:40', 0),
+(9, 'Amber Romance Fragrance Mist', 'Aroma sensual con ámbar y vainilla', 65.00, 9, NULL, 1, 1, '2025-11-09 04:17:40', 0),
 (10, 'Endless Love Fragrance Mist', 'Fragancia romántica con flores blancas', 81.90, 17, NULL, 1, 1, '2025-11-09 04:17:40', 0),
 (11, 'Sheer Love Fragrance Mist', 'Perfume ligero con rosas y peonías', 79.90, 19, NULL, 1, 1, '2025-11-09 04:17:40', 0),
 (12, 'Velvet Petals Gold Mist', 'Edición premium con oro y pétalos de seda', 102.90, 8, NULL, 1, 1, '2025-11-09 04:17:40', 0),
@@ -322,7 +328,7 @@ INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `precio`, `stock`, `imag
 (17, 'Aqua Kiss Hydrating Lotion', 'Hidratante ligero con notas acuáticas', 66.90, 15, NULL, 2, 1, '2025-11-09 04:17:40', 0),
 (18, 'Coconut Passion Body Butter', 'Mantequilla corporal con coco tropical', 72.90, 14, NULL, 2, 1, '2025-11-09 04:17:40', 0),
 (19, 'Sheer Love Body Lotion', 'Crema ligera con aroma a rosas blancas', 59.90, 19, NULL, 2, 1, '2025-11-09 04:17:40', 0),
-(20, 'Amber Romance Body Cream', 'Crema rica con notas ámbar y vainilla', 65.00, 10, NULL, 2, 1, '2025-11-09 04:17:40', 0),
+(20, 'Amber Romance Body Cream', 'Crema rica con notas ámbar y vainilla', 65.00, 14, '', 2, 1, '2025-11-09 04:17:40', 0),
 (21, 'Endless Love Body Lotion', 'Hidratante con fragancia floral romántica', 61.90, 17, NULL, 2, 1, '2025-11-09 04:17:40', 0),
 (22, 'Velvet Petals Shea Body Butter', 'Mantequilla corporal nutritiva con shea', 79.90, 11, NULL, 2, 1, '2025-11-09 04:17:40', 0),
 (23, 'Midnight Bloom Body Cream', 'Crema nocturna con gardenias y ciruelas', 69.90, 13, NULL, 2, 1, '2025-11-09 04:17:40', 0),
@@ -335,11 +341,10 @@ INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `precio`, `stock`, `imag
 (30, 'Coconut Passion Hair Shine', 'Spray para brillo y aroma tropical', 59.90, 13, NULL, 3, 1, '2025-11-09 04:17:40', 0),
 (31, 'Midnight Bloom Hair Mist', 'Splash nocturno para cabello seductor', 62.90, 10, NULL, 3, 1, '2025-11-09 04:17:40', 0),
 (32, 'Strawberries & Champagne Hair', 'Spray capilar con aroma dulce y festivo', 57.90, 11, NULL, 3, 1, '2025-11-09 04:17:40', 0),
-(33, 'Amber Romance Hair Fragrance', 'Splash sensual con notas ámbar', 60.90, 9, NULL, 3, 1, '2025-11-09 04:17:40', 0),
+(33, 'Amber Romance Hair Fragrance', 'Splash sensual con notas ámbar', 60.90, 8, NULL, 3, 1, '2025-11-09 04:17:40', 0),
 (34, 'Endless Love Hair Mist', 'Spray romántico para cabello', 53.90, 17, NULL, 3, 1, '2025-11-09 04:17:40', 0),
 (35, 'Sheer Love Refreshing Spray', 'Splash ligero con rosas y peonías', 51.90, 20, NULL, 3, 1, '2025-11-09 04:17:40', 0),
-(36, 'Velvet Petals Luxury Hair Mist', 'Spray capilar premium con seda', 67.90, 8, NULL, 3, 1, '2025-11-09 04:17:40', 0),
-(37, 'jabón coconut', 'te deja suave la piel y con aroma a coco', 45.00, 20, NULL, 1, 1, '2025-11-11 23:43:54', 0);
+(36, 'Velvet Petals Luxury Hair Mist', 'Spray capilar premium con seda', 67.90, 8, NULL, 3, 1, '2025-11-09 04:17:40', 0);
 
 -- --------------------------------------------------------
 
@@ -579,13 +584,13 @@ ALTER TABLE `categorias`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_pedido`
 --
 ALTER TABLE `detalle_pedido`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `metodos_pago`
@@ -597,13 +602,13 @@ ALTER TABLE `metodos_pago`
 -- AUTO_INCREMENT de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `productos_promocion`
