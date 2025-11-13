@@ -296,6 +296,71 @@ switch ($view) {
         $controller = new ProductoController();
         $controller->crearCategoria();
         break;
+
+    // =====================================
+    // 🔹 GESTIÓN DE CLIENTES (VISTA PRINCIPAL)
+    // =====================================
+    case 'gestion-clientes':
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: index.php?view=login");
+            exit;
+        }
+
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->index();
+        break;
+
+    // =====================================
+    // 🔹 APIs PARA GESTIÓN DE CLIENTES (AJAX)
+    // =====================================
+    case 'api-listar-clientes':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->listarClientes();
+        break;
+
+    case 'api-obtener-cliente':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->obtenerCliente();
+        break;
+
+    case 'api-actualizar-cliente':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->actualizarCliente();
+        break;
+
+    case 'api-eliminar-cliente':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->eliminarCliente();
+        break;
+
+    case 'api-clientes-frecuentes':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->clientesFrecuentes();
+        break;
+
+    case 'api-estadisticas-clientes':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->estadisticasClientes();
+        break;
+
+    case 'api-buscar-clientes':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->buscarClientes();
+        break;
+
+    case 'api-contar-clientes':
+        require_once __DIR__ . '/../app/controllers/ClienteController.php';
+        $controller = new ClienteController();
+        $controller->contarClientes();
+        break;
     // =====================================
     // ❌ 404 - Página no encontrada
     // =====================================

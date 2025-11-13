@@ -1,8 +1,10 @@
 <?php
-class Pedido {
+class Pedido
+{
     private $pdo;
 
-    public function __construct($pdo) {
+    public function __construct($pdo)
+    {
         $this->pdo = $pdo;
     }
 
@@ -15,7 +17,8 @@ class Pedido {
      *   "notes" => string
      * ]
      */
-    public function guardar($data) {
+    public function guardar($data)
+    {
         try {
             // Validaciones básicas
             if (!isset($data['cliente']) || !isset($data['items']) || !is_array($data['items']) || count($data['items']) === 0) {
@@ -99,10 +102,56 @@ class Pedido {
 
             $this->pdo->commit();
             return ["ok" => true, "pedido_id" => $pedidoId];
-
         } catch (Exception $e) {
             $this->pdo->rollBack();
             return ["ok" => false, "error" => $e->getMessage()];
         }
+    }
+
+    // 🔹 VERIFICAR SI CLIENTE TIENE PEDIDOS
+    public function clienteTienePedidos($clienteId)
+    {
+        $sql = "SELECT COUNT(*) as total FROM pedidos WHERE cliente_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$clienteId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'] > 0;
+    }
+
+    // 🔹 OBTENER ESTADÍSTICAS DE CLIENTE
+    public function obtenerEstadisticasCliente($clienteId)
+    {
+        $sql = "SELECT 
+            COUNT(*) as total_pedidos,
+            COALESCE(SUM(total), 0) as total_gastado,
+            COALESCE(AVG(total), 0) as promedio_pedido,
+            MIN(fecha) as primer_pedido,
+            MAX(fecha) as ultimo_pedido
+            FROM pedidos 
+            WHERE cliente_id = ?";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$clienteId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // 🔹 OBTENER PEDIDOS POR CLIENTE
+    public function obtenerPorCliente($clienteId)
+    {
+        $sql = "SELECT p.*, 
+                   mp.nombre as metodo_pago,
+                   COUNT(dp.id) as total_items,
+                   GROUP_CONCAT(pr.nombre SEPARATOR ', ') as productos
+            FROM pedidos p
+            LEFT JOIN metodos_pago mp ON p.metodo_pago_id = mp.id
+            LEFT JOIN detalle_pedido dp ON p.id = dp.pedido_id
+            LEFT JOIN productos pr ON dp.producto_id = pr.id
+            WHERE p.cliente_id = ?
+            GROUP BY p.id
+            ORDER BY p.fecha DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$clienteId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

@@ -100,7 +100,7 @@ function activeClass($viewName, $currentView)
                 <i class="fas fa-chevron-down text-xs transition-transform"></i>
             </a>
             <div class="submenu">
-                <a href="?view=clientes" class="menu-item flex items-center px-10 py-2 text-white text-sm opacity-90">
+                <a href="?view=gestion-clientes" class="menu-item flex items-center px-10 py-2 text-white text-sm opacity-90">
                     <i class="fas fa-address-book mr-2"></i> Lista de Clientes
                 </a>
                 <a href="?view=clientes-frecuentes" class="menu-item flex items-center px-10 py-2 text-white text-sm opacity-90">
