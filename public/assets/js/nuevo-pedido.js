@@ -1,584 +1,286 @@
-// public/assets/js/nuevo-pedido.js
-(() => {
-  // Config
-  const API_PRODUCTOS = 'index.php?view=api-productos';
-  const API_CLIENTES = 'index.php?view=api-clientes';
-  const API_CLIENTE_SAVE = 'index.php?view=api-cliente-save';
-  const API_SAVE_PEDIDO = 'index.php?view=api-save-pedido';
+// assets/js/nuevo-pedido.js
+// DEPENDE DE: cart-manager.js y carrito.js (para mostrarNotificacion)
 
-  // Estado UI
-  let products = [];      // traerá todos los productos desde backend
-  let cart = [];          // { producto_id, nombre, precio (opcional), cantidad, stock }
-  let selectedClient = null;
-  let orderNotes = '';
+/**
+ * Función principal que se llama desde carrito.js
+ * Se encarga de construir y mostrar el formulario de checkout.
+ */
+async function iniciarCheckout() {
+  console.log('Iniciando checkout...');
+  const cartContent = document.getElementById('cart-content');
+  if (!cartContent) return;
 
-  // DOM
-  const productsGrid = document.getElementById('productsGrid');
-  const categoryFilter = document.getElementById('categoryFilter');
-  const searchProduct = document.getElementById('searchProduct');
-  const cartItemsEl = document.getElementById('cartItems');
-  const subtotalEl = document.getElementById('subtotal');
-  const discountRow = document.getElementById('discountRow');
-  const discountEl = document.getElementById('discount');
-  const totalEl = document.getElementById('total');
-
-  const searchClientInput = document.getElementById('searchClient');
-  const clientSuggestions = document.getElementById('clientSuggestions');
-  const selectedClientEl = document.getElementById('selectedClient');
-  const clientNameEl = document.getElementById('clientName');
-  const clientInfoEl = document.getElementById('clientInfo');
-
-  const toggleClientFormBtn = document.getElementById('toggleClientForm');
-  const newClientForm = document.getElementById('newClientForm');
-  const saveClientBtn = document.getElementById('saveClientBtn');
-
-  const notesTextarea = document.getElementById('orderNotes');
-  const notesCounter = document.getElementById('notesCounter');
-  const savedNotesEl = document.getElementById('savedNotes');
-  const notesPreview = document.getElementById('notesPreview');
-
-  const selectFragancia = document.getElementById('selectFragancia');
-  const selectCrema = document.getElementById('selectCrema');
-  const promoQuantity = document.getElementById('promoQuantity');
-  const promoCountEl = document.getElementById('promoCount');
-  const addPromoBtn = document.getElementById('addPromoBtn');
-
-  // Inicial
-  document.addEventListener('DOMContentLoaded', () => {
-    loadProducts();
-    setupEventListeners();
-    renderCart();
-    updateNotesCounter();
-  });
-
-  // ---------------------------
-  // Fetch / API
-  // ---------------------------
-  async function loadProducts() {
-    try {
-      const res = await fetch(API_PRODUCTOS);
-      if (!res.ok) throw new Error('Error al cargar productos');
-      products = await res.json();
-      renderProducts();
-    } catch (err) {
-      console.error(err);
-      productsGrid.innerHTML = `<div class="text-red-500 p-4">No se pudieron cargar los productos</div>`;
-    }
-  }
-
-  async function searchClientsAPI(q) {
-    try {
-      const res = await fetch(`${API_CLIENTES}&q=${encodeURIComponent(q)}`);
-      if (!res.ok) throw new Error('Error buscando clientes');
-      return await res.json();
-    } catch (err) {
-      console.error(err);
-      return [];
-    }
-  }
-
-  async function saveClientAPI(formData) {
-    try {
-      const res = await fetch(API_CLIENTE_SAVE, {
-        method: 'POST',
-        body: new URLSearchParams(formData) // tu controller espera $_POST
-      });
-      if (!res.ok) throw new Error('Error guardando cliente');
-      return await res.json();
-    } catch (err) {
-      console.error(err);
-      return { ok: false };
-    }
-  }
-
-  async function saveOrderAPI(payload) {
-    try {
-      const res = await fetch(API_SAVE_PEDIDO, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error('Error guardando pedido');
-      return await res.json();
-    } catch (err) {
-      console.error(err);
-      return { ok: false, error: err.message };
-    }
-  }
-
-  // ---------------------------
-  // Eventos y UI
-  // ---------------------------
-  function setupEventListeners() {
-    categoryFilter?.addEventListener('change', renderProducts);
-    searchProduct?.addEventListener('input', renderProducts);
-
-    // Clientes
-    toggleClientFormBtn?.addEventListener('click', toggleClientForm);
-    searchClientInput?.addEventListener('input', debounce(handleClientSearch, 300));
-    saveClientBtn?.addEventListener('click', handleSaveClient);
-
-    // Notas
-    document.getElementById('toggleNotes')?.addEventListener('click', toggleNotesSection);
-    notesTextarea?.addEventListener('input', updateNotesCounter);
-    document.getElementById('clearNotes')?.addEventListener('click', () => { notesTextarea.value=''; updateNotesCounter(); });
-    document.getElementById('saveNotes')?.addEventListener('click', saveNotes);
-    document.getElementById('editNotes')?.addEventListener('click', editNotes);
-
-    // Promoción
-    document.querySelector('.decrease-promo')?.addEventListener('click', () => { promoQuantity.value = Math.max(1, Number(promoQuantity.value)-1); updatePrecioNormal(); });
-    document.querySelector('.increase-promo')?.addEventListener('click', () => { promoQuantity.value = Math.min(10, Number(promoQuantity.value)+1); updatePrecioNormal(); });
-    promoQuantity?.addEventListener('change', () => { promoQuantity.value = Math.max(1, Math.min(10, Number(promoQuantity.value)||1)); updatePrecioNormal(); });
-    addPromoBtn?.addEventListener('click', addPromoHandler);
-
-    // Finalizar / Cancelar
-    document.getElementById('finalizeOrder')?.addEventListener('click', finalizeOrder);
-    document.getElementById('cancelBtn')?.addEventListener('click', cancelOrder);
-  }
-
-  // ---------------------------
-  // Productos UI
-  // ---------------------------
-  function renderProducts() {
-    if (!productsGrid) return;
-    const cat = categoryFilter?.value || 'all';
-    const term = (searchProduct?.value || '').toLowerCase();
-
-    const filtered = products.filter(p => {
-      if (cat !== 'all' && String(p.categoria_id || p.categoria) !== String(cat)) return false;
-      if (term && !p.nombre.toLowerCase().includes(term)) return false;
-      return true;
+  // 1. Deshabilitar botones de "Proceder al Pago"
+  document.querySelectorAll('button[onclick="procederAlPago()"], button[onclick="proceedToCheckout()"]')
+    .forEach(btn => {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Cargando...';
     });
+  
+  // 2. Ocultar el resumen de pedido original (el de la derecha)
+  const resumenOriginal = document.querySelector('.lg\\:col-span-1 .sticky');
+  if (resumenOriginal) {
+    resumenOriginal.style.display = 'none';
+  }
+  
+  // 3. Ocultar el sticky checkout móvil
+  const mobileCheckout = document.querySelector('.mobile-checkout');
+  if (mobileCheckout) {
+    mobileCheckout.style.display = 'none';
+  }
 
-    if (filtered.length === 0) {
-      productsGrid.innerHTML = `<div class="p-4 text-gray-500">No hay productos</div>`;
-      return;
+  // 4. Buscar métodos de pago
+  let metodosDePago = [];
+  try {
+    const response = await fetch('./api/metodos-pago.php');
+    const data = await response.json();
+    if (data.success && data.data.length > 0) {
+      metodosDePago = data.data;
+    } else {
+      throw new Error(data.message || 'No se cargaron los métodos de pago.');
     }
+  } catch (error) {
+    console.error('Error fetching payment methods:', error);
+    mostrarNotificacion('Error al cargar métodos de pago. Intente de nuevo.', 'error');
+    // Reactivar botones si falla
+    reactivarBotonesPago();
+    return;
+  }
 
-    productsGrid.innerHTML = filtered.map(p => {
-      const stock = p.stock || 0;
-      const badge = stock > 5 ? 'badge-success' : 'badge-warning';
-      return `
-        <div class="product-card p-4 rounded-lg border" data-product-id="${p.id}" role="button">
-          <div class="flex space-x-3">
-            <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
-              <i class="fas fa-cube text-pink-500"></i>
+  // 5. Crear el contenedor del formulario si no existe
+  let formContainer = document.getElementById('checkout-form-container');
+  if (!formContainer) {
+    formContainer = document.createElement('div');
+    formContainer.id = 'checkout-form-container';
+    formContainer.className = 'mt-8'; // Espacio superior
+    
+    // Insertarlo después del listado de productos
+    const productosContainer = document.querySelector('.lg\\:col-span-2');
+    if (productosContainer) {
+      productosContainer.appendChild(formContainer);
+    } else {
+      cartContent.appendChild(formContainer);
+    }
+  }
+  
+  // 6. Renderizar el HTML del formulario
+  formContainer.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+      <h2 class="text-2xl font-bold mb-6 flex items-center">
+        <i class="fas fa-user-check mr-3" style="color: var(--rosa-neon);"></i>
+        Completa tu Información
+      </h2>
+
+      <form id="form-checkout">
+        <!-- Sección Datos del Cliente -->
+        <section class="mb-6">
+          <h3 class="text-lg font-semibold border-b pb-2 mb-4">1. Datos Personales</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="checkout-nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombres *</label>
+              <input type="text" id="checkout-nombre" name="nombre" class="form-input" required>
             </div>
-            <div class="flex-1">
-              <h4 class="font-semibold text-gray-900 text-sm">${escapeHtml(p.nombre)}</h4>
-              <p class="text-xs text-gray-600 mb-2">${escapeHtml((p.categoria || p.categoria_id) ? getCategoryName(p.categoria || p.categoria_id) : '')}</p>
-              <div class="flex justify-between items-center">
-                <span class="font-bold text-pink-600">S/ ${Number(p.precio).toFixed(2)}</span>
-                <span class="badge ${badge}">
-                  ${stock} disponibles
+            <div>
+              <label for="checkout-apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellidos *</label>
+              <input type="text" id="checkout-apellido" name="apellido" class="form-input" required>
+            </div>
+            <div>
+              <label for="checkout-email" class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+              <input type="email" id="checkout-email" name="email" class="form-input" required>
+            </div>
+            <div>
+              <label for="checkout-telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+              <input type="tel" id="checkout-telefono" name="telefono" class="form-input" required>
+            </div>
+            <div>
+              <label for="checkout-documento" class="block text-sm font-medium text-gray-700 mb-1">Documento (DNI/CE) *</label>
+              <input type="text" id="checkout-documento" name="documento" class="form-input" required>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sección Dirección de Envío -->
+        <section class="mb-6">
+          <h3 class="text-lg font-semibold border-b pb-2 mb-4">2. Dirección de Envío</h3>
+          <div>
+            <label for="checkout-direccion" class="block text-sm font-medium text-gray-700 mb-1">Dirección Completa *</label>
+            <input type="text" id="checkout-direccion" name="direccion" class="form-input" placeholder="Ej: Av. Siempre Viva 123, Sprinfield" required>
+          </div>
+          <!-- Aquí podrías agregar campos de Ciudad, Región, etc. si los tienes en tu BD -->
+        </section>
+
+        <!-- Sección Método de Pago -->
+        <section class="mb-6">
+          <h3 class="text-lg font-semibold border-b pb-2 mb-4">3. Método de Pago</h3>
+          <div id="payment-methods-list" class="space-y-3">
+            ${metodosDePago.map((metodo, index) => `
+              <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-[#FF1493] transition">
+                <input type="radio" name="metodo_pago_id" value="${metodo.id}" class="h-5 w-5 text-[#FF1493] focus:ring-[#FF1493]" ${index === 0 ? 'checked' : ''} required>
+                <span class="ml-3 flex-1">
+                  <span class="font-semibold text-gray-800">${escapeHtml(metodo.nombre)}</span>
+                  ${metodo.descripcion ? `<p class="text-sm text-gray-500">${escapeHtml(metodo.descripcion)}</p>` : ''}
                 </span>
-              </div>
-            </div>
+                <i class="${escapeHtml(metodo.icono || 'fas fa-credit-card')} text-2xl" style="color: var(--rosa-neon);"></i>
+              </label>
+            `).join('')}
           </div>
+        </section>
+        
+        <!-- Botón de Finalizar Pedido -->
+        <div class="mt-8 text-right">
+          <button type="submit" id="btn-submit-order" class="btn-primary btn-pulse w-full md:w-auto text-lg px-8 py-3">
+            <i class="fas fa-check-circle mr-2"></i>
+            Finalizar Pedido
+          </button>
         </div>
-      `;
-    }).join('');
+      </form>
+    </div>
+  `;
+  
+  // 7. Añadir el listener al formulario
+  const form = document.getElementById('form-checkout');
+  if (form) {
+    form.addEventListener('submit', handleFormSubmit);
+  }
 
-    // listeners
-    document.querySelectorAll('.product-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const id = Number(card.dataset.productId);
-        addToCart(id, 1);
-      });
+  // 8. Hacer scroll hacia el formulario
+  formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Maneja el envío del formulario de checkout
+ */
+async function handleFormSubmit(event) {
+  event.preventDefault();
+  
+  const submitButton = document.getElementById('btn-submit-order');
+  submitButton.disabled = true;
+  submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Procesando pedido...';
+
+  // Obtener datos del formulario
+  const formData = new FormData(event.target);
+  const clienteData = {
+    nombre: formData.get('nombre'),
+    apellido: formData.get('apellido'),
+    email: formData.get('email'),
+    telefono: formData.get('telefono'),
+    documento: formData.get('documento'),
+    direccion: formData.get('direccion'),
+  };
+  
+  // Obtener datos del carrito (desde cart-manager.js)
+  const items = obtenerCarrito();
+  const totales = calcularTotalCarrito();
+  const metodo_pago_id = formData.get('metodo_pago_id');
+
+  // Construir el payload para la API
+  const payload = {
+    cliente: clienteData,
+    items: items, // Enviamos el carrito completo
+    totales: totales, // Enviamos los totales calculados
+    metodo_pago_id: parseInt(metodo_pago_id, 10),
+  };
+
+  try {
+    // Enviar a la API para guardar el pedido
+    const response = await fetch('./api/guardar-pedido.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
     });
-  }
+    
+    const result = await response.json();
 
-  function getCategoryName(id) {
-    if (id == 1) return 'Fragancia';
-    if (id == 2) return 'Crema Corporal';
-    if (id == 3) return 'Body Splash';
-    return '';
-  }
+    if (response.ok && result.success) {
+      // ÉXITO: Pedido guardado
+      mostrarConfirmacionPedido(result.pedido_id);
+      
+      // Limpiar carrito (de cart-manager.js)
+      limpiarCarrito();
+      
+      // Actualizar el contador del header (de cart-manager.js)
+      actualizarContadorCarrito();
 
-  // ---------------------------
-  // Carrito
-  // ---------------------------
-  function addToCart(producto_id, cantidad) {
-    const prod = products.find(p => Number(p.id) === Number(producto_id));
-    if (!prod) return alert('Producto no encontrado');
-
-    const existing = cart.find(i => Number(i.producto_id) === Number(producto_id) && !i.esPromocion);
-    if (existing) {
-      if (existing.cantidad + cantidad > (prod.stock || 0)) return alert('No hay suficiente stock');
-      existing.cantidad += cantidad;
     } else {
-      if (cantidad > (prod.stock || 0)) return alert('No hay suficiente stock');
-      cart.push({
-        producto_id: Number(prod.id),
-        nombre: prod.nombre,
-        cantidad: cantidad,
-        precio: Number(prod.precio),
-        stock: prod.stock || 0,
-        esPromocion: false
-      });
-    }
-    renderCart();
-  }
-
-  function addPromoHandler() {
-    const frag = Number(selectFragancia.value);
-    const crema = Number(selectCrema.value);
-    const qty = Number(promoQuantity.value) || 1;
-    if (!frag || !crema) return alert('Selecciona fragancia y crema');
-
-    // cada combo se guarda como item con esPromocion=true y productosIncluidos
-    for (let i = 0; i < qty; i++) {
-      cart.push({
-        producto_id: `promo-${Date.now()}-${Math.random().toString(36).slice(2,7)}`, // id único para UI
-        nombre: `PROMO: ${getNameById(frag)} + ${getNameById(crema)}`,
-        cantidad: 1,
-        precio: 125.00,
-        esPromocion: true,
-        productosIncluidos: [frag, crema], // para backend podría descomponerse si se desea
-      });
+      // ERROR: No se guardó el pedido
+      throw new Error(result.message || 'No se pudo completar el pedido.');
     }
 
-    updatePromoCounter();
-    renderCart();
+  } catch (error) {
+    console.error('Error al enviar el pedido:', error);
+    mostrarNotificacion(error.message, 'error');
+    submitButton.disabled = false;
+    submitButton.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Finalizar Pedido';
+  }
+}
 
-    // reset
-    selectFragancia.value = '';
-    selectCrema.value = '';
-    promoQuantity.value = '1';
-    updatePrecioNormal();
+/**
+ * Muestra el mensaje de éxito y oculta el formulario
+ */
+function mostrarConfirmacionPedido(pedidoId) {
+  const cartContent = document.getElementById('cart-content');
+  if (!cartContent) return;
+
+  // Ocultar productos recomendados
+  const recommendedSection = document.querySelector('.bg-pastel-gradient');
+  if (recommendedSection) {
+    recommendedSection.style.display = 'none';
   }
 
-  function getNameById(id) {
-    const p = products.find(x => Number(x.id) === Number(id));
-    return p ? p.nombre : 'Producto';
+  // Ocultar sticky checkout móvil (por si acaso)
+  const mobileCheckout = document.querySelector('.mobile-checkout');
+  if (mobileCheckout) {
+    mobileCheckout.style.display = 'none';
   }
 
-  function updatePromoCounter() {
-    const c = cart.filter(i => i.esPromocion).length;
-    promoCountEl.textContent = c;
-  }
+  // Reemplazar todo el contenido del carrito con el mensaje de éxito
+  cartContent.innerHTML = `
+    <div class="text-center py-16 max-w-2xl mx-auto">
+      <i class="fas fa-check-circle text-6xl mb-4" style="color: var(--rosa-neon);"></i>
+      <h2 class="text-3xl font-bold text-gray-800 mb-3">¡Pedido Registrado con Éxito!</h2>
+      <p class="text-lg text-gray-600 mb-6">
+        Gracias por tu compra. Tu pedido con el ID <strong>#${pedidoId}</strong> ha sido recibido
+        y está siendo procesado. Te enviaremos un email con los detalles.
+      </p>
+      <a href="tienda.html" class="btn-primary inline-block">
+        <i class="fas fa-store mr-2"></i>Seguir Comprando
+      </a>
+    </div>
+  `;
+  
+  // Hacer scroll al inicio del mensaje
+  cartContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
-  function renderCart() {
-    if (!cartItemsEl) return;
-    if (cart.length === 0) {
-      cartItemsEl.innerHTML = `<div class="text-center text-gray-500 py-8"><i class="fas fa-shopping-cart text-3xl mb-2"></i><p>No hay productos agregados</p></div>`;
-      subtotalEl.textContent = 'S/ 0.00';
-      totalEl.textContent = 'S/ 0.00';
-      discountRow.style.display = 'none';
-      return;
-    }
-
-    let subtotal = 0;
-    let discount = 0;
-
-    cartItemsEl.innerHTML = '';
-    cart.forEach(item => {
-      const itemTotal = (item.precio || 0) * item.cantidad;
-      if (!item.esPromocion) subtotal += itemTotal;
-      else discount += ((item.precio === 125) ? (( (item.precio + 0) ) - 125) : 0); // promos handled in UI
-      const node = document.createElement('div');
-      node.className = `cart-item p-3 border rounded-lg ${item.esPromocion ? 'promo-applied' : ''}`;
-      node.innerHTML = `
-        <div class="flex justify-between items-center">
-          <div class="flex-1">
-            <h4 class="font-semibold text-sm ${item.esPromocion ? 'text-green-700' : 'text-gray-900'}">${escapeHtml(item.nombre)} ${item.esPromocion ? '<span class="badge badge-success ml-2">PROMO</span>' : ''}</h4>
-            <p class="text-gray-600 text-sm">S/ ${Number(item.precio).toFixed(2)} c/u</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            ${!item.esPromocion ? `<button class="quantity-btn decrease" data-id="${item.producto_id}">-</button>
-            <input type="number" value="${item.cantidad}" min="1" max="${item.stock || 999}" class="quantity-input" data-id="${item.producto_id}">
-            <button class="quantity-btn increase" data-id="${item.producto_id}">+</button>` : `<span class="text-sm text-gray-500">1 unidad</span>`}
-          </div>
-          <div class="text-right">
-            <p class="font-semibold ${item.esPromocion ? 'text-green-700' : ''}">S/ ${(itemTotal).toFixed(2)}</p>
-            <button class="text-red-500 hover:text-red-700 text-sm remove-item" data-id="${item.producto_id}" data-es-promocion="${item.esPromocion}"><i class="fas fa-trash"></i></button>
-          </div>
-        </div>
-      `;
-      cartItemsEl.appendChild(node);
-    });
-
-    // Notar: la lógica de descuento se muestra en UI si hay promo(s)
-    const total = subtotal - discount;
-    subtotalEl.textContent = `S/ ${subtotal.toFixed(2)}`;
-    if (discount > 0) {
-      discountRow.style.display = 'flex';
-      discountEl.textContent = `- S/ ${discount.toFixed(2)}`;
-    } else {
-      discountRow.style.display = 'none';
-    }
-    totalEl.textContent = `S/ ${total.toFixed(2)}`;
-
-    // attach listeners (delegado simple)
-    attachCartListeners();
-  }
-
-  function attachCartListeners() {
-    // cantidad botones
-    document.querySelectorAll('.quantity-btn.decrease').forEach(btn => btn.onclick = () => {
-      const id = btn.dataset.id;
-      const item = cart.find(i => String(i.producto_id) === String(id) && !i.esPromocion);
-      if (!item) return;
-      if (item.cantidad > 1) item.cantidad--;
-      renderCart();
-    });
-    document.querySelectorAll('.quantity-btn.increase').forEach(btn => btn.onclick = () => {
-      const id = btn.dataset.id;
-      const item = cart.find(i => String(i.producto_id) === String(id) && !i.esPromocion);
-      if (!item) return;
-      if (item.cantidad < (item.stock || 999)) item.cantidad++;
-      renderCart();
-    });
-
-    document.querySelectorAll('.quantity-input').forEach(input => {
-      input.onchange = () => {
-        const id = input.dataset.id;
-        const item = cart.find(i => String(i.producto_id) === String(id) && !i.esPromocion);
-        if (!item) return;
-        const v = Number(input.value) || 1;
-        if (v < 1) input.value = item.cantidad;
-        else {
-          item.cantidad = v;
-          renderCart();
-        }
-      };
-    });
-
-    document.querySelectorAll('.remove-item').forEach(btn => {
-      btn.onclick = () => {
-        const id = btn.dataset.id;
-        const isPromo = btn.dataset.esPromocion === 'true';
-        cart = cart.filter(i => String(i.producto_id) !== String(id));
-        if (isPromo) updatePromoCounter();
-        renderCart();
-      };
-    });
-  }
-
-  // ---------------------------
-  // Clientes
-  // ---------------------------
-  async function handleClientSearch(e) {
-    const q = e.target.value.trim();
-    if (q.length < 2) {
-      clientSuggestions.classList.add('hidden');
-      return;
-    }
-    const list = await searchClientsAPI(q);
-    if (!Array.isArray(list) || list.length === 0) {
-      clientSuggestions.classList.add('hidden');
-      return;
-    }
-    clientSuggestions.innerHTML = list.map(c => `
-      <div class="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 client-suggestion" data-client-id="${c.id}" data-client-nombre="${escapeHtml(c.nombres)}" data-client-apellidos="${escapeHtml(c.apellidos)}" data-client-dni="${escapeHtml(c.dni)}" data-client-correo="${escapeHtml(c.correo)}" data-client-telefono="${escapeHtml(c.telefono)}">
-        <div class="font-medium">${escapeHtml(c.nombres)} ${escapeHtml(c.apellidos)}</div>
-        <div class="text-sm text-gray-600">DNI: ${escapeHtml(c.dni)} | ${escapeHtml(c.correo)}</div>
-      </div>
-    `).join('');
-    clientSuggestions.classList.remove('hidden');
-
-    document.querySelectorAll('.client-suggestion').forEach(el => {
-      el.addEventListener('click', () => {
-        const id = el.dataset.clientId;
-        const nombres = el.dataset.clientNombre;
-        const apellidos = el.dataset.clientApellidos;
-        const dni = el.dataset.clientDni;
-        const correo = el.dataset.clientCorreo;
-        const telefono = el.dataset.clientTelefono;
-        selectedClient = { id, nombres, apellidos, dni, correo, telefono };
-        showSelectedClient();
-        clientSuggestions.classList.add('hidden');
-        searchClientInput.value = '';
-      });
-    });
-  }
-
-  function showSelectedClient() {
-    if (!selectedClient) return;
-    clientNameEl.textContent = `${selectedClient.nombres} ${selectedClient.apellidos}`;
-    clientInfoEl.textContent = `DNI: ${selectedClient.dni} | ${selectedClient.correo} | ${selectedClient.telefono}`;
-    selectedClientEl.classList.remove('hidden');
-  }
-
-  document.getElementById('removeClient')?.addEventListener('click', () => {
-    selectedClient = null;
-    selectedClientEl.classList.add('hidden');
-  });
-
-  function toggleClientForm() {
-    newClientForm.classList.toggle('open');
-    if (newClientForm.classList.contains('open')) {
-      toggleClientFormBtn.innerHTML = '<i class="fas fa-times mr-2"></i>Cerrar Formulario';
-      toggleClientFormBtn.classList.remove('bg-pink-500','hover:bg-pink-600');
-      toggleClientFormBtn.classList.add('bg-gray-500','hover:bg-gray-600');
-    } else {
-      toggleClientFormBtn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Nuevo Cliente';
-      toggleClientFormBtn.classList.remove('bg-gray-500','hover:bg-gray-600');
-      toggleClientFormBtn.classList.add('bg-pink-500','hover:bg-pink-600');
-      // clear
-      document.getElementById('clientNombres').value = '';
-      document.getElementById('clientApellidos').value = '';
-      document.getElementById('clientDni').value = '';
-      document.getElementById('clientTelefono').value = '';
-      document.getElementById('clientCorreo').value = '';
-    }
-  }
-
-  async function handleSaveClient(e) {
-    e.preventDefault();
-    const nombres = document.getElementById('clientNombres').value.trim();
-    const apellidos = document.getElementById('clientApellidos').value.trim();
-    const dni = document.getElementById('clientDni').value.trim();
-    const telefono = document.getElementById('clientTelefono').value.trim();
-    const correo = document.getElementById('clientCorreo').value.trim();
-
-    if (!nombres || !apellidos || !dni || !correo) return alert('Completa campos obligatorios');
-    if (dni.length !== 8) return alert('DNI debe tener 8 dígitos');
-
-    const form = { nombres, apellidos, dni, telefono, correo };
-    const res = await saveClientAPI(form);
-    if (res && res.ok) {
-      // Si el controlador devuelve el nuevo cliente (mejor), úsalo. Si sólo devuelve ok=true, hacemos buscar.
-      selectedClient = res.cliente || { id: res.id || null, nombres, apellidos, dni, correo, telefono };
-      showSelectedClient();
-      toggleClientForm();
-      alert('Cliente guardado exitosamente');
-    } else {
-      alert('Error guardando cliente');
-    }
-  }
-
-  // ---------------------------
-  // Notas
-  // ---------------------------
-  function toggleNotesSection() {
-    const notesSection = document.getElementById('notesSection');
-    const toggleBtn = document.getElementById('toggleNotes');
-    notesSection.classList.toggle('open');
-    if (notesSection.classList.contains('open')) {
-      toggleBtn.innerHTML = '<i class="fas fa-times mr-1"></i>Cerrar Notas';
-      toggleBtn.classList.remove('bg-gray-100','text-gray-700','hover:bg-gray-200');
-      toggleBtn.classList.add('bg-pink-500','text-white','hover:bg-pink-600');
-    } else {
-      toggleBtn.innerHTML = '<i class="fas fa-edit mr-1"></i>Agregar Notas';
-      toggleBtn.classList.remove('bg-pink-500','text-white','hover:bg-pink-600');
-      toggleBtn.classList.add('bg-gray-100','text-gray-700','hover:bg-gray-200');
-    }
-  }
-
-  function updateNotesCounter() {
-    const length = notesTextarea?.value.length || 0;
-    notesCounter.textContent = `${length}/500 caracteres`;
-    if (length > 450) {
-      notesCounter.classList.add('text-red-500');
-      notesCounter.classList.remove('text-gray-500');
-    } else {
-      notesCounter.classList.remove('text-red-500');
-      notesCounter.classList.add('text-gray-500');
-    }
-  }
-
-  function saveNotes() {
-    const txt = notesTextarea.value.trim();
-    if (!txt) return alert('Escribe alguna nota antes de guardar');
-    orderNotes = txt;
-    notesPreview.textContent = txt.length > 100 ? txt.substring(0,100) + '...' : txt;
-    savedNotesEl.classList.remove('hidden');
-    toggleNotesSection();
-    alert('Notas guardadas');
-  }
-
-  function editNotes() {
-    notesTextarea.value = orderNotes;
-    updateNotesCounter();
-    toggleNotesSection();
-  }
-
-  // ---------------------------
-  // Finalizar / Cancelar pedido
-  // ---------------------------
-  async function finalizeOrder() {
-    if (cart.length === 0) return alert('Agrega al menos un producto');
-    if (!selectedClient || !selectedClient.id) return alert('Selecciona o registra un cliente');
-
-    // construir payload: cliente (id), items [{producto_id,cantidad}], payment, notes
-    const items = [];
-    for (const it of cart) {
-      if (it.esPromocion) {
-        // expansion: cada promoción contiene productosIncluidos
-        if (Array.isArray(it.productosIncluidos)) {
-          it.productosIncluidos.forEach(pid => items.push({ producto_id: Number(pid), cantidad: 1 }));
-        } else {
-          // fallback: si no hay desglose, ignorar (no debería pasar)
-        }
+/**
+ * Reactiva los botones de pago si la carga inicial falla
+ */
+function reactivarBotonesPago() {
+  document.querySelectorAll('button[disabled][onclick="procederAlPago()"], button[disabled][onclick="proceedToCheckout()"]')
+    .forEach(btn => {
+      btn.disabled = false;
+      // Revertir el texto
+      if (btn.classList.contains('mobile-checkout')) {
+         btn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Proceder al Pago';
       } else {
-        items.push({ producto_id: Number(it.producto_id), cantidad: Number(it.cantidad) });
+         btn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Proceder al Pago';
       }
-    }
+    });
+}
 
-    const payload = {
-      cliente: Number(selectedClient.id),
-      items: items,
-      payment: Number(document.querySelector('input[name="payment"]:checked').value),
-      notes: orderNotes
-    };
-
-    // enviar
-    const res = await saveOrderAPI(payload);
-    if (res && res.ok) {
-      alert('Pedido guardado. ID: ' + (res.pedido_id || ' — '));
-      // reset
-      cart = [];
-      selectedClient = null;
-      orderNotes = '';
-      renderCart();
-      selectedClientEl.classList.add('hidden');
-      savedNotesEl.classList.add('hidden');
-      notesTextarea.value = '';
-      updateNotesCounter();
-      updatePromoCounter();
-    } else {
-      alert('Error guardando pedido: ' + (res.error || ''));
-      console.error(res);
-    }
-  }
-
-  function cancelOrder() {
-    if (!confirm('¿Estás seguro que quieres cancelar el pedido?')) return;
-    cart = [];
-    selectedClient = null;
-    orderNotes = '';
-    renderCart();
-    selectedClientEl.classList.add('hidden');
-    document.getElementById('newClientForm').classList.remove('open');
-    // limpiar form
-    document.getElementById('clientNombres').value = '';
-    document.getElementById('clientApellidos').value = '';
-    document.getElementById('clientDni').value = '';
-    document.getElementById('clientTelefono').value = '';
-    document.getElementById('clientCorreo').value = '';
-    notesTextarea.value = '';
-    updateNotesCounter();
-  }
-
-  // ---------------------------
-  // Helpers
-  // ---------------------------
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>"'`=\/]/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s]));
-  }
-
-  function debounce(fn, wait) {
-    let t;
-    return (...args) => { clearTimeout(t); t = setTimeout(()=>fn(...args), wait); };
-  }
-
-  function updatePrecioNormal() {
-    const q = Number(promoQuantity.value) || 1;
-    const precioNormalTotal = 130 * q;
-    const el = document.getElementById('precioNormal');
-    if (el) el.textContent = `S/ ${precioNormalTotal.toFixed(2)}`;
-  }
-
-})();
+// Función auxiliar para escapar HTML (prevenir XSS)
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, function(m) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[m];
+  });
+}

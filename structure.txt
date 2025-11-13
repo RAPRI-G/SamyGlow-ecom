@@ -1,5 +1,7 @@
 SamyGlow-ecom (raíz)
 
+test-metodos.php
+
 api/
 	categorias.php
 	productos.php  (modificado: ahora devuelve rutas hacia proxy `image.php`)
@@ -9,6 +11,7 @@ app/
 		AuthController.php
 		ClienteController.php
 		DashboardController.php
+		MetodoPagoController.php
 		PedidoController.php
 		ProductoController.php
 		PromocionController.php
@@ -16,6 +19,7 @@ app/
 		Categoria.php
 		Cliente.php
 		Dashboard.php
+		MetodoPago.php
 		Pedido.php
 		Producto.php
 		Promocion.php
@@ -25,6 +29,7 @@ app/
 		admin/
 			dashboard.php
 			gestion-clientes.php
+			gestion-metodos-pago.php
 			gestion-productos.php
 			gestion-promociones.php
 			nuevo-pedido.php
@@ -38,16 +43,19 @@ config/
 	database.php
 
 models/
+	CategoriaModel.php
 	ProductoModel.php
 
 public/
 	carrito.html
 	contacto.html
 	index.html
+	index.php
 	tienda.html
 	api/
-		categorias.php
+		categorias.php  (wrapper que incluye ../api/categorias.php)
 		productos.php  (wrapper que incluye ../api/productos.php)
+	image.php   (proxy para servir imágenes desde ../uploads/productos)
 	assets/
 		css/
 			carrito.css
@@ -62,12 +70,12 @@ public/
 			logo.png
 		js/
 			carrito.js
+			cart-manager.js
 			contacto.js
 			hero.js
 			home.js
 			nuevo-pedido.js
 			tienda.js  (modificado: placeholder actualizado a `assets/img/logo.png`)
-	image.php   (nuevo: proxy para servir imágenes desde ../uploads/productos)
 	
 sql/
 	DATA-productos.sql
@@ -82,4 +90,4 @@ uploads/
 Notas:
 - El archivo `public/image.php` sirve imágenes ubicadas en `../uploads/productos/` mediante el parámetro `f` (ej: `public/image.php?f=productos/miimagen.jpg`).
 - Si usas `public/` como DocumentRoot, el proxy permite mantener `uploads/` fuera de `public/` y aún así servir las imágenes.
-- Algunos archivos han sido modificados por recientes cambios: `api/productos.php` y `public/assets/js/tienda.js`.
+- Archivos modificados/nuevos: `test-metodos.php`, `app/controllers/MetodoPagoController.php`, `app/models/MetodoPago.php`, `app/views/admin/gestion-metodos-pago.php`, `public/assets/js/cart-manager.js`, `public/index.php`, `public/api/categorias.php`, `api/productos.php` y `public/assets/js/tienda.js`.

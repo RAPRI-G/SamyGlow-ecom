@@ -191,18 +191,29 @@ function actualizarTotales() {
 ============================ */
 window.procederAlPago = function() {
   const carrito = obtenerCarrito();
-  
+
   if (carrito.length === 0) {
     mostrarNotificacion('Tu carrito está vacío', 'warning');
     return;
   }
 
-  const { total } = calcularTotalCarrito();
-  mostrarNotificacion(`Procesando pedido por S/ ${total.toFixed(2)}...`, 'success');
-  
-  // Aquí puedes redirigir a una página de checkout
-  // window.location.href = 'checkout.html';
+  // Llamar al flujo de nuevo-pedido para renderizar el formulario de checkout
+  try {
+    if (typeof iniciarCheckout === 'function') {
+      iniciarCheckout();
+    } else {
+      // Fallback: mostrar notificación y mantener UX
+      const { total } = calcularTotalCarrito();
+      mostrarNotificacion(`Procesando pedido por S/ ${total.toFixed(2)}...`, 'success');
+    }
+  } catch (err) {
+    console.error('Error iniciando checkout:', err);
+    mostrarNotificacion('No se puede iniciar el checkout. Intente de nuevo.', 'error');
+  }
 };
+
+// Compatibilidad: alias en inglés por si algún template usa `proceedToCheckout()`
+window.proceedToCheckout = window.procederAlPago;
 
 /* ============================
    🔹 PRODUCTOS RECOMENDADOS
