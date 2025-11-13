@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-11-2025 a las 09:23:02
+-- Tiempo de generación: 13-11-2025 a las 11:48:39
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -179,6 +179,30 @@ INSERT INTO `clientes` (`id`, `nombres`, `apellidos`, `dni`, `correo`, `telefono
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `configuracion_metodos_pago`
+--
+
+CREATE TABLE `configuracion_metodos_pago` (
+  `id` int(11) NOT NULL,
+  `multiples_metodos` tinyint(1) DEFAULT 1,
+  `notificaciones_pago` tinyint(1) DEFAULT 1,
+  `confirmacion_automatica` tinyint(1) DEFAULT 0,
+  `metodo_predeterminado_id` int(11) DEFAULT NULL,
+  `orden_metodos` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`orden_metodos`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `configuracion_metodos_pago`
+--
+
+INSERT INTO `configuracion_metodos_pago` (`id`, `multiples_metodos`, `notificaciones_pago`, `confirmacion_automatica`, `metodo_predeterminado_id`, `orden_metodos`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 0, 1, '[1, 2, 3, 4, 5]', '2025-11-13 08:29:37', '2025-11-13 08:29:37');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `detalle_pedido`
 --
 
@@ -235,19 +259,24 @@ INSERT INTO `detalle_pedido` (`id`, `pedido_id`, `producto_id`, `cantidad`, `pre
 CREATE TABLE `metodos_pago` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
-  `activo` tinyint(1) DEFAULT 1
+  `activo` tinyint(1) DEFAULT 1,
+  `tipo` enum('digital','card','cash','transfer') DEFAULT 'digital',
+  `descripcion` text DEFAULT NULL,
+  `icono` varchar(50) DEFAULT 'fas fa-credit-card',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `metodos_pago`
 --
 
-INSERT INTO `metodos_pago` (`id`, `nombre`, `activo`) VALUES
-(1, 'Yape', 1),
-(2, 'Plin', 1),
-(3, 'Tarjeta de Crédito', 1),
-(4, 'Transferencia Bancaria', 1),
-(5, 'Efectivo', 1);
+INSERT INTO `metodos_pago` (`id`, `nombre`, `activo`, `tipo`, `descripcion`, `icono`, `created_at`, `updated_at`) VALUES
+(1, 'Yape', 1, 'digital', 'Pago rápido y seguro mediante Yape', 'fab fa-google-wallet', '2025-11-13 08:29:37', '2025-11-13 08:29:37'),
+(2, 'Plin', 1, 'digital', 'Pago mediante Plin de Interbank', 'fas fa-mobile-alt', '2025-11-13 08:29:37', '2025-11-13 08:29:37'),
+(3, 'Tarjeta de Crédito', 1, 'card', 'Pago con tarjetas de crédito Visa, MasterCard y American Express', 'far fa-credit-card', '2025-11-13 08:29:37', '2025-11-13 08:29:37'),
+(4, 'Transferencia Bancaria', 1, 'transfer', 'Transferencia bancaria directa', 'fas fa-university', '2025-11-13 08:29:37', '2025-11-13 08:29:37'),
+(5, 'Efectivo', 1, 'cash', 'Pago en efectivo al momento de la entrega', 'fas fa-money-bill-wave', '2025-11-13 08:29:37', '2025-11-13 08:29:37');
 
 -- --------------------------------------------------------
 
@@ -517,6 +546,13 @@ ALTER TABLE `clientes`
   ADD KEY `idx_correo` (`correo`);
 
 --
+-- Indices de la tabla `configuracion_metodos_pago`
+--
+ALTER TABLE `configuracion_metodos_pago`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `metodo_predeterminado_id` (`metodo_predeterminado_id`);
+
+--
 -- Indices de la tabla `detalle_pedido`
 --
 ALTER TABLE `detalle_pedido`
@@ -592,6 +628,12 @@ ALTER TABLE `clientes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
+-- AUTO_INCREMENT de la tabla `configuracion_metodos_pago`
+--
+ALTER TABLE `configuracion_metodos_pago`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `detalle_pedido`
 --
 ALTER TABLE `detalle_pedido`
@@ -601,7 +643,7 @@ ALTER TABLE `detalle_pedido`
 -- AUTO_INCREMENT de la tabla `metodos_pago`
 --
 ALTER TABLE `metodos_pago`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `pedidos`
@@ -636,6 +678,12 @@ ALTER TABLE `usuarios`
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `configuracion_metodos_pago`
+--
+ALTER TABLE `configuracion_metodos_pago`
+  ADD CONSTRAINT `configuracion_metodos_pago_ibfk_1` FOREIGN KEY (`metodo_predeterminado_id`) REFERENCES `metodos_pago` (`id`);
 
 --
 -- Filtros para la tabla `detalle_pedido`
