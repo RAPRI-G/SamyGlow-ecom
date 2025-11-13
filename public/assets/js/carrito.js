@@ -61,23 +61,18 @@ function renderizarCarrito() {
     return;
   }
 
-  // Layout con items del carrito y resumen
   container.innerHTML = `
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Items del carrito -->
       <div class="lg:col-span-2">
         <div class="bg-white rounded-2xl shadow-lg p-6">
           <h2 class="text-2xl font-bold mb-6 flex items-center">
             <i class="fas fa-shopping-bag mr-3" style="color: var(--rosa-neon);"></i>
             Productos en tu carrito
           </h2>
-          <div id="cart-items-list" class="space-y-4">
-            <!-- Items generados dinámicamente -->
-          </div>
+          <div id="cart-items-list" class="space-y-4"></div>
         </div>
       </div>
 
-      <!-- Resumen del pedido -->
       <div class="lg:col-span-1">
         <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
           <h3 class="text-xl font-bold mb-4">Resumen del pedido</h3>
@@ -130,10 +125,15 @@ function renderizarItems() {
     
     const subtotal = item.precio * item.cantidad;
 
+    // ✅ Usa logo.png si no hay imagen o la ruta no existe
+    const imagenSegura = item.imagen && item.imagen.trim() !== '' 
+      ? escapeHtml(item.imagen) 
+      : 'image.php?f=logo.png';
+
     itemDiv.innerHTML = `
       <div class="w-full sm:w-24 h-24 bg-gradient-to-b from-pink-50 to-white rounded-lg flex items-center justify-center flex-shrink-0">
-        <img src="${escapeHtml(item.imagen)}" alt="${escapeHtml(item.nombre)}" 
-             onerror="this.src='assets/img/placeholder.jpg'" 
+        <img src="${imagenSegura}" alt="${escapeHtml(item.nombre)}" 
+             onerror="this.src='assets/img/logo.png'"
              class="max-h-20 max-w-20 object-contain">
       </div>
 
@@ -181,12 +181,10 @@ window.cambiarCantidad = function(productoId, cambio) {
 
   const nuevaCantidad = item.cantidad + cambio;
 
-  // Validar cantidad mínima
   if (nuevaCantidad < 1) {
     return eliminarDelCarrito(productoId);
   }
 
-  // Validar stock máximo
   if (item.stock && nuevaCantidad > item.stock) {
     mostrarNotificacion('No hay suficiente stock disponible', 'warning');
     return;
@@ -218,7 +216,7 @@ function calcularEnvio(subtotal) {
   return subtotal >= 150 ? 0 : 10;
 }
 
-/** Actualizar totales en el resumen */
+/** Actualizar totales */
 function actualizarTotales() {
   const subtotal = calcularSubtotal();
   const envio = calcularEnvio(subtotal);
@@ -235,7 +233,7 @@ function actualizarTotales() {
   if (mobileTotalEl) mobileTotalEl.textContent = `S/ ${total.toFixed(2)}`;
 }
 
-/** Actualizar contador del carrito en el header */
+/** Actualizar contador del carrito */
 function actualizarContadorCarrito() {
   const countEl = document.getElementById('cart-count');
   if (!countEl) return;
@@ -252,11 +250,7 @@ window.proceedToCheckout = function() {
   }
 
   const total = calcularSubtotal() + calcularEnvio(calcularSubtotal());
-  
-  // Aquí puedes redirigir a una página de checkout real
   mostrarNotificacion(`Procesando pedido por S/ ${total.toFixed(2)}...`, 'success');
-  
-  // Ejemplo: setTimeout(() => window.location.href = 'checkout.html', 1500);
 };
 
 /** Cargar productos recomendados */
@@ -265,14 +259,9 @@ async function cargarProductosRecomendados() {
     const res = await fetch('./api/productos.php');
     if (!res.ok) return;
     const json = await res.json();
-    
     if (!json.success || !json.data) return;
-    
-    // Seleccionar 4 productos aleatorios
-    const productosAleatorios = json.data
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 4);
-    
+
+    const productosAleatorios = json.data.sort(() => Math.random() - 0.5).slice(0, 4);
     renderizarRecomendados(productosAleatorios);
   } catch (err) {
     console.error('Error cargando recomendados:', err);
@@ -291,15 +280,19 @@ function renderizarRecomendados(productos) {
     const descuento = Number(producto.descuento) || 0;
     const sinStock = Number(producto.stock) <= 0;
 
+    // ✅ Logo por defecto si no hay imagen
+    const imagenSegura = producto.imagen && producto.imagen.trim() !== ''
+      ? escapeHtml(producto.imagen)
+      : 'image.php?f=logo.png';
+
     const card = document.createElement('div');
     card.className = 'bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition';
 
     card.innerHTML = `
       <div class="relative h-48 bg-gradient-to-b from-pink-50 to-white flex items-center justify-center">
         ${descuento > 0 ? `<div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">-${descuento}%</div>` : ''}
-        <img src="${escapeHtml(producto.imagen || 'assets/img/placeholder.jpg')}" 
-             alt="${escapeHtml(producto.nombre)}" 
-             onerror="this.src='assets/img/placeholder.jpg'"
+        <img src="${imagenSegura}" alt="${escapeHtml(producto.nombre)}"
+             onerror="this.src='image.php?f=logo.png'"
              class="max-h-40 object-contain">
       </div>
       <div class="p-4">
@@ -323,9 +316,8 @@ window.agregarDesdeRecomendados = async function(productoId) {
     const res = await fetch('./api/productos.php');
     if (!res.ok) return;
     const json = await res.json();
-    
     if (!json.success) return;
-    
+
     const producto = json.data.find(p => Number(p.id) === Number(productoId));
     if (!producto) return;
 
@@ -344,7 +336,9 @@ window.agregarDesdeRecomendados = async function(productoId) {
         id: Number(producto.id),
         nombre: producto.nombre,
         precio: parseFloat(producto.precio_final ?? producto.precio),
-        imagen: producto.imagen || 'assets/img/placeholder.jpg',
+        imagen: producto.imagen && producto.imagen.trim() !== '' 
+          ? producto.imagen 
+          : 'image.php?f=logo.png',
         cantidad: 1,
         stock: Number(producto.stock)
       });
