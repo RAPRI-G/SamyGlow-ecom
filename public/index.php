@@ -406,6 +406,124 @@ switch ($view) {
         $controller = new ClienteController();
         $controller->vaciarPapelera();
         break;
+
+
+    // En el switch case de tu index.php, agrega estas rutas:
+
+    // 🔹 GESTIÓN DE PROMOCIONES
+    case 'gestion-promociones':
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: index.php?view=login");
+            exit;
+        }
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->index();
+        break;
+
+    // 🔹 APIs DE PROMOCIONES
+    case 'api-listar-promociones':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->listarPromociones();
+        break;
+
+    case 'api-obtener-promocion':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->obtenerPromocion();
+        break;
+
+    case 'api-registrar-promocion':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->registrarPromocion();
+        break;
+
+    case 'api-actualizar-promocion':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->actualizarPromocion();
+        break;
+
+    case 'api-eliminar-promocion':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->eliminarPromocion();
+        break;
+
+    case 'api-promociones-activas':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->obtenerPromocionesActivas();
+        break;
+
+    case 'api-productos-promocion':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->obtenerProductosPromocion();
+        break;
+
+    case 'api-estadisticas-promociones':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->obtenerEstadisticas();
+        break;
+
+    case 'api-buscar-promociones':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->buscarPromociones();
+        break;
+
+    case 'api-filtrar-promociones-tipo':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->filtrarPromocionesTipo();
+        break;
+
+    case 'api-listar-productos-promocion':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->listarProductosPromocion();
+        break;
+        
+    // 🔹 PAPELERA DE PROMOCIONES
+    case 'api-mover-papelera-promocion':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->moverPapelera();
+        break;
+
+    case 'api-restaurar-promocion':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->restaurarPromocion();
+        break;
+
+    case 'api-eliminar-permanentemente-promocion':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->eliminarPermanentemente();
+        break;
+
+    case 'api-listar-eliminadas-promociones':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->listarEliminadas();
+        break;
+
+    case 'api-contar-papelera-promociones':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->contarPapelera();
+        break;
+
+    case 'api-vaciar-papelera-promociones':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->vaciarPapelera();
+        break;
     // =====================================
     // ❌ 404 - Página no encontrada
     // =====================================

@@ -36,7 +36,6 @@ class PromocionController
             $promociones = $this->promocionModel->listar();
             $productos = $this->productoModel->listar();
             $estadisticas = $this->promocionModel->obtenerEstadisticas();
-
         } catch (Exception $e) {
             error_log("Error en PromocionController::index(): " . $e->getMessage());
             $promociones = [];
@@ -139,7 +138,7 @@ class PromocionController
             $productos = [];
             if ($datos['tipo'] !== 'envio_gratis' && isset($_POST['productos']) && is_array($_POST['productos'])) {
                 $productos = array_map('intval', $_POST['productos']);
-                
+
                 if (empty($productos)) {
                     throw new Exception('Debes seleccionar al menos un producto para la promoción');
                 }
@@ -152,7 +151,6 @@ class PromocionController
                 'message' => 'Promoción registrada exitosamente',
                 'promocion_id' => $promocionId
             ]);
-
         } catch (Exception $e) {
             echo json_encode([
                 'success' => false,
@@ -202,7 +200,7 @@ class PromocionController
             $productos = [];
             if ($datos['tipo'] !== 'envio_gratis' && isset($_POST['productos']) && is_array($_POST['productos'])) {
                 $productos = array_map('intval', $_POST['productos']);
-                
+
                 if (empty($productos)) {
                     throw new Exception('Debes seleccionar al menos un producto para la promoción');
                 }
@@ -218,7 +216,6 @@ class PromocionController
             } else {
                 throw new Exception('Error al actualizar la promoción');
             }
-
         } catch (Exception $e) {
             echo json_encode([
                 'success' => false,
@@ -249,7 +246,6 @@ class PromocionController
             } else {
                 throw new Exception('Error al eliminar la promoción');
             }
-
         } catch (Exception $e) {
             echo json_encode([
                 'success' => false,
@@ -389,5 +385,153 @@ class PromocionController
             ]);
         }
     }
+    // 🔹 API: MOVER PROMOCIÓN A PAPELERA
+    public function moverPapelera()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $id = intval($_POST['id'] ?? 0);
+
+            if ($id <= 0) {
+                throw new Exception('ID de promoción inválido');
+            }
+
+            $resultado = $this->promocionModel->moverPapelera($id);
+
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Promoción movida a la papelera exitosamente'
+                ]);
+            } else {
+                throw new Exception('Error al mover la promoción a la papelera');
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: RESTAURAR PROMOCIÓN
+    public function restaurarPromocion()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $id = intval($_POST['id'] ?? 0);
+
+            if ($id <= 0) {
+                throw new Exception('ID de promoción inválido');
+            }
+
+            $resultado = $this->promocionModel->restaurar($id);
+
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Promoción restaurada exitosamente'
+                ]);
+            } else {
+                throw new Exception('Error al restaurar la promoción');
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: ELIMINAR PERMANENTEMENTE
+    public function eliminarPermanentemente()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $id = intval($_POST['id'] ?? 0);
+
+            if ($id <= 0) {
+                throw new Exception('ID de promoción inválido');
+            }
+
+            $resultado = $this->promocionModel->eliminarPermanentemente($id);
+
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Promoción eliminada permanentemente'
+                ]);
+            } else {
+                throw new Exception('Error al eliminar permanentemente la promoción');
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: LISTAR PROMOCIONES ELIMINADAS
+    public function listarEliminadas()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $promociones = $this->promocionModel->listarEliminadas();
+            echo json_encode([
+                'success' => true,
+                'data' => $promociones,
+                'total' => count($promociones)
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al obtener promociones eliminadas: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: CONTAR PAPELERA
+    public function contarPapelera()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $total = $this->promocionModel->contarPapelera();
+            echo json_encode([
+                'success' => true,
+                'total' => $total
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al contar papelera: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // 🔹 API: VACIAR PAPELERA
+    public function vaciarPapelera()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $eliminadas = $this->promocionModel->vaciarPapelera();
+
+            echo json_encode([
+                'success' => true,
+                'message' => "Papelera vaciada exitosamente. Se eliminaron {$eliminadas} promociones.",
+                'eliminadas' => $eliminadas
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
 }
-?>
