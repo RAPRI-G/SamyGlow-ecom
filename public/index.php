@@ -582,6 +582,42 @@ switch ($view) {
         $controller = new MetodoPagoController();
         $controller->eliminarMetodo();
         break;
+      // En tu public/index.php, agrega estas rutas si no las tienes:
+
+case 'reportes-analytics':
+    if (!isset($_SESSION['usuario'])) {
+        header("Location: index.php?view=login");
+        exit;
+    }
+    
+    require_once __DIR__ . '/../app/controllers/ReporteController.php';
+    $controller = new ReporteController();
+    $controller->index();
+    break;
+
+case 'api-reporte-ventas':
+    require_once __DIR__ . '/../app/controllers/ReporteController.php';
+    $controller = new ReporteController();
+    $controller->reporteVentas();
+    break;
+
+case 'api-reporte-productos':
+    require_once __DIR__ . '/../app/controllers/ReporteController.php';
+    $controller = new ReporteController();
+    $controller->reporteProductos();
+    break;
+
+case 'api-reporte-clientes':
+    require_once __DIR__ . '/../app/controllers/ReporteController.php';
+    $controller = new ReporteController();
+    $controller->reporteClientes();
+    break;
+
+case 'api-reporte-inventario':
+    require_once __DIR__ . '/../app/controllers/ReporteController.php';
+    $controller = new ReporteController();
+    $controller->reporteInventario();
+    break;
     // =====================================
     // ❌ 404 - Página no encontrada
     // =====================================

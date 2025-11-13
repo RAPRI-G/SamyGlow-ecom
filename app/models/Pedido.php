@@ -154,4 +154,37 @@ class Pedido
         $stmt->execute([$clienteId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function obtenerVentasPorDia($fecha_inicio, $fecha_fin) {
+    $sql = "SELECT 
+        DATE(fecha) as fecha,
+        SUM(total) as total_ventas,
+        COUNT(*) as cantidad_pedidos
+    FROM pedidos 
+    WHERE DATE(fecha) BETWEEN ? AND ?
+    AND eliminado = 0
+    GROUP BY DATE(fecha)
+    ORDER BY fecha";
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([$fecha_inicio, $fecha_fin]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function obtenerVentasPorCategoria($fecha_inicio, $fecha_fin) {
+    $sql = "SELECT 
+        c.nombre as categoria,
+        SUM(dp.subtotal) as total_ventas,
+        COUNT(DISTINCT p.id) as pedidos
+    FROM detalle_pedido dp
+    INNER JOIN pedidos p ON dp.pedido_id = p.id
+    INNER JOIN productos prod ON dp.producto_id = prod.id
+    INNER JOIN categorias c ON prod.categoria_id = c.id
+    WHERE DATE(p.fecha) BETWEEN ? AND ?
+    AND p.eliminado = 0
+    GROUP BY c.id, c.nombre";
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([$fecha_inicio, $fecha_fin]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }
