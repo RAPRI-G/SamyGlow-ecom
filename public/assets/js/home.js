@@ -12,7 +12,20 @@ async function cargarCategorias() {
   try {
     const res = await fetch('./api/categorias.php');
     if (!res.ok) throw new Error('Error al obtener categorías (HTTP ' + res.status + ')');
-    const json = await res.json();
+    
+    // Leer primero como texto para debug
+    const texto = await res.text();
+    console.log('Respuesta cruda de categorias.php:', texto);
+    
+    // Intentar parsear JSON
+    let json;
+    try {
+      json = JSON.parse(texto);
+    } catch (parseError) {
+      console.error('Error parseando JSON:', parseError);
+      console.error('Contenido recibido:', texto.substring(0, 500));
+      throw new Error('La API devolvió contenido inválido (probablemente un error de PHP)');
+    }
     
     console.log('API /api/categorias.php response:', json);
     
@@ -89,7 +102,20 @@ async function cargarProductosDestacados() {
   try {
     const res = await fetch('./api/productos.php');
     if (!res.ok) throw new Error('Error al obtener productos (HTTP ' + res.status + ')');
-    const json = await res.json();
+    
+    // Leer primero como texto para debug
+    const texto = await res.text();
+    console.log('Respuesta cruda de productos.php:', texto);
+    
+    // Intentar parsear JSON
+    let json;
+    try {
+      json = JSON.parse(texto);
+    } catch (parseError) {
+      console.error('Error parseando JSON:', parseError);
+      console.error('Contenido recibido:', texto.substring(0, 500));
+      throw new Error('La API devolvió contenido inválido (probablemente un error de PHP)');
+    }
     
     console.log('API /api/productos.php response:', json);
     
