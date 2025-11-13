@@ -1,18 +1,30 @@
 <?php
-// Wrapper para exponer el endpoint de API cuando el servidor sirva desde el directorio `public/`.
-// Incluye el archivo real ubicado en la raíz del proyecto: /api/productos.php
+/**
+ * Endpoint público para acceder a la API de productos.
+ * Redirige la solicitud al archivo real ubicado en /api/productos.php.
+ * 
+ * Se recomienda usar este wrapper cuando el servidor sirve desde /public/
+ * y la API está en la raíz del proyecto (fuera del alcance público).
+ */
 
-// Evitar errores si se accede directamente
-$realPath = __DIR__ . '/../../api/productos.php';
-if (file_exists($realPath)) {
-    require_once $realPath;
-} else {
-    header('Content-Type: application/json; charset=utf-8');
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'data' => null,
-        'total' => 0,
-        'message' => 'API no encontrada en el servidor (archivo faltante)'
-    ]);
+// Asegurar respuesta JSON siempre
+header('Content-Type: application/json; charset=utf-8');
+
+// Ruta real del archivo de la API
+$apiPath = realpath(__DIR__ . '/../../api/productos.php');
+
+// Verificar si el archivo existe y es accesible
+if ($apiPath && file_exists($apiPath)) {
+    require_once $apiPath;
+    exit;
 }
+
+// Si el archivo no existe o hay un error de ruta
+http_response_code(500);
+echo json_encode([
+    'success' => false,
+    'data' => null,
+    'total' => 0,
+    'message' => 'Error: no se encontró el archivo de la API de productos en el servidor.'
+]);
+exit;

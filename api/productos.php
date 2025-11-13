@@ -14,6 +14,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/../models/ProductoModel.php';
 
+// Usaremos un proxy público (`public/image.php`) que sirve archivos desde
+// la carpeta `uploads/` ubicada fuera de `public/`. Devolveremos URLs
+// relativas que serán resueltas por las páginas dentro de `public/`.
+// Ejemplo resultante: `image.php?f=productos/miimagen.jpg`
+$IMAGE_PROXY_PREFIX = 'image.php?f=';
+
 try {
 	$model = new ProductoModel();
 
@@ -32,6 +38,21 @@ try {
 			exit;
 		}
 
+		// 🔗 Agregar la URL al proxy público `image.php` (si la imagen no es URL absoluta)
+		if (!empty($producto['imagen'])) {
+			if (!preg_match('#^https?://#i', $producto['imagen'])) {
+				$img = str_replace('\\', '/', $producto['imagen']);
+				// Normalizar si la BD guarda rutas con `uploads/` o `uploads/productos/`
+				$img = preg_replace('#.*/uploads/productos/#i', '', $img);
+				$img = preg_replace('#.*/uploads/#i', '', $img);
+				$img = ltrim($img, '/');
+				// codificar cada segmento para URLs seguras
+				$segments = explode('/', $img);
+				$enc = implode('/', array_map('rawurlencode', $segments));
+				$producto['imagen'] = $IMAGE_PROXY_PREFIX . $enc;
+			}
+		}
+
 		echo json_encode([
 			'success' => true,
 			'data' => $producto,
@@ -41,14 +62,31 @@ try {
 		exit;
 	}
 
-	// Obtener todos
+	// Obtener todos los productos
 	$productos = $model->obtenerProductos();
+
+	// 🔗 Agregar la URL completa a cada imagen
+	foreach ($productos as &$p) {
+		if (!empty($p['imagen'])) {
+			if (!preg_match('#^https?://#i', $p['imagen'])) {
+				$img = str_replace('\\', '/', $p['imagen']);
+				$img = preg_replace('#.*/uploads/productos/#i', '', $img);
+				$img = preg_replace('#.*/uploads/#i', '', $img);
+				$img = ltrim($img, '/');
+				$segments = explode('/', $img);
+				$enc = implode('/', array_map('rawurlencode', $segments));
+				$p['imagen'] = $IMAGE_PROXY_PREFIX . $enc;
+			}
+		}
+	}
+	unset($p);
 
 	// Filtrado opcional: solo con descuento
 	$discounted = isset($_GET['discounted']) ? (int)$_GET['discounted'] : 0;
 	if ($discounted === 1) {
 		$productos = array_values(array_filter($productos, function ($p) {
-			return (isset($p['descuento']) && (float)$p['descuento'] > 0) || (isset($p['tipo_descuento']) && $p['tipo_descuento'] !== null);
+			return (isset($p['descuento']) && (float)$p['descuento'] > 0) ||
+				   (isset($p['tipo_descuento']) && $p['tipo_descuento'] !== null);
 		}));
 	}
 
