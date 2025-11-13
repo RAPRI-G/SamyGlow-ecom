@@ -43,6 +43,21 @@ try {
 
 	// Obtener todos
 	$productos = $model->obtenerProductos();
+
+	// Filtrado opcional: solo con descuento
+	$discounted = isset($_GET['discounted']) ? (int)$_GET['discounted'] : 0;
+	if ($discounted === 1) {
+		$productos = array_values(array_filter($productos, function ($p) {
+			return (isset($p['descuento']) && (float)$p['descuento'] > 0) || (isset($p['tipo_descuento']) && $p['tipo_descuento'] !== null);
+		}));
+	}
+
+	// Límite opcional
+	$limit = filter_input(INPUT_GET, 'limit', FILTER_VALIDATE_INT);
+	if ($limit !== false && $limit !== null && $limit > 0) {
+		$productos = array_slice($productos, 0, $limit);
+	}
+
 	echo json_encode([
 		'success' => true,
 		'data' => $productos,
