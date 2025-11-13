@@ -1,0 +1,85 @@
+SamyGlow-ecom (raíz)
+
+api/
+	categorias.php
+	productos.php  (modificado: ahora devuelve rutas hacia proxy `image.php`)
+
+app/
+	controllers/
+		AuthController.php
+		ClienteController.php
+		DashboardController.php
+		PedidoController.php
+		ProductoController.php
+		PromocionController.php
+	models/
+		Categoria.php
+		Cliente.php
+		Dashboard.php
+		Pedido.php
+		Producto.php
+		Promocion.php
+		Usuario.php
+	views/
+		login.php
+		admin/
+			dashboard.php
+			gestion-clientes.php
+			gestion-productos.php
+			gestion-promociones.php
+			nuevo-pedido.php
+		templates/
+			footer.php
+			header.php
+			sidebar.php
+
+config/
+	conexion.php
+	database.php
+
+models/
+	ProductoModel.php
+
+public/
+	carrito.html
+	contacto.html
+	index.html
+	tienda.html
+	api/
+		categorias.php
+		productos.php  (wrapper que incluye ../api/productos.php)
+	assets/
+		css/
+			carrito.css
+			contacto.css
+			login.css
+			main.css
+			styles.css
+			tienda.css
+		img/
+			bg.jpg
+			logo copy.png
+			logo.png
+		js/
+			carrito.js
+			contacto.js
+			hero.js
+			home.js
+			nuevo-pedido.js
+			tienda.js  (modificado: placeholder actualizado a `assets/img/logo.png`)
+	image.php   (nuevo: proxy para servir imágenes desde ../uploads/productos)
+	
+sql/
+	DATA-productos.sql
+	PA-pedidos.sql
+	tienda_samyglow.sql
+
+uploads/
+	productos/
+		(quí van las imágenes subidas por el administrador; folder fuera de `public/`)
+
+
+Notas:
+- El archivo `public/image.php` sirve imágenes ubicadas en `../uploads/productos/` mediante el parámetro `f` (ej: `public/image.php?f=productos/miimagen.jpg`).
+- Si usas `public/` como DocumentRoot, el proxy permite mantener `uploads/` fuera de `public/` y aún así servir las imágenes.
+- Algunos archivos han sido modificados por recientes cambios: `api/productos.php` y `public/assets/js/tienda.js`.

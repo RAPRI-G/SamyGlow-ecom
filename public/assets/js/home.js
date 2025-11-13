@@ -1,10 +1,11 @@
-// home.js - carga dinámica de categorías y productos destacados + carrito + animaciones + menú móvil
+// home.js - Lógica específica de la página principal
+// DEPENDE DE: cart-manager.js (debe cargarse ANTES)
+
 document.addEventListener('DOMContentLoaded', () => {
   cargarCategorias();
   cargarProductosDestacados();
   configurarMenuMobile();
   inicializarAnimaciones();
-  actualizarContadorCarrito();
 });
 
 /* ============================
@@ -130,7 +131,7 @@ async function cargarProductosDestacados() {
       const descuento = Number(prod.descuento) || 0;
       const sinStock = Number(prod.stock) <= 0;
       const imagenUrl = prod.imagen
-        ? `uploads/productos/${escapeHtml(prod.imagen)}`
+        ? `image.php?f=uploads/productos/${escapeHtml(prod.imagen)}`
         : 'assets/img/logo.png';
 
       const card = document.createElement('div');
@@ -184,7 +185,7 @@ async function cargarProductosDestacados() {
               : `<p class="text-sm text-gray-600 mb-2"><i class="fas fa-check-circle mr-1 text-green-500"></i>Disponible</p>`
           }
 
-          <button onclick="agregarAlCarritoDesdeHome(${Number(prod.id)})"
+          <button onclick="agregarProductoDesdeHome(${Number(prod.id)})"
                   ${sinStock ? 'disabled' : ''}
                   class="btn-primary w-full text-sm md:text-base ${
                     sinStock ? 'opacity-50 cursor-not-allowed' : ''
@@ -209,9 +210,9 @@ async function cargarProductosDestacados() {
 }
 
 /* ============================
-   🔹 CARRITO
+   🔹 AGREGAR AL CARRITO (HOME)
 ============================ */
-window.agregarAlCarritoDesdeHome = async function (id) {
+window.agregarProductoDesdeHome = async function (id) {
   try {
     const res = await fetch('./api/productos.php');
     if (!res.ok) throw new Error('Error HTTP ' + res.status);
@@ -219,46 +220,26 @@ window.agregarAlCarritoDesdeHome = async function (id) {
     if (!success) throw new Error('Error en la API');
 
     const producto = data.find(p => Number(p.id) === Number(id));
-    if (!producto) return mostrarNotificacion('Producto no encontrado', 'error');
-
-    if (Number(producto.stock) <= 0)
-      return mostrarNotificacion('Producto sin stock', 'warning');
-
-    let carrito = JSON.parse(localStorage.getItem('carrito_samyglow') || '[]');
-
-    const existe = carrito.find(i => Number(i.id) === Number(id));
-    if (existe) {
-      if (existe.cantidad + 1 > Number(producto.stock))
-        return mostrarNotificacion('Stock insuficiente', 'warning');
-      existe.cantidad += 1;
-    } else {
-      carrito.push({
-        id: Number(producto.id),
-        nombre: producto.nombre,
-        precio: parseFloat(producto.precio_final ?? producto.precio),
-        imagen: producto.imagen || 'assets/img/logo.png',
-        cantidad: 1,
-        stock: Number(producto.stock)
-      });
+    if (!producto) {
+      mostrarNotificacion('Producto no encontrado', 'error');
+      return;
     }
 
-    localStorage.setItem('carrito_samyglow', JSON.stringify(carrito));
-    actualizarContadorCarrito();
-    mostrarNotificacion('¡Producto agregado al carrito!', 'success');
+    // Usar el gestor centralizado
+    const resultado = agregarAlCarrito({
+      id: producto.id,
+      nombre: producto.nombre,
+      precio: parseFloat(producto.precio_final ?? producto.precio),
+      imagen: producto.imagen || 'assets/img/logo.png',
+      stock: Number(producto.stock)
+    });
+
+    mostrarNotificacion(resultado.message, resultado.success ? 'success' : 'warning');
   } catch (err) {
     console.error('Error agregando producto:', err);
     mostrarNotificacion('Error al agregar producto', 'error');
   }
 };
-
-function actualizarContadorCarrito() {
-  const el = document.getElementById('cart-count');
-  if (!el) return;
-  const carrito = JSON.parse(localStorage.getItem('carrito_samyglow') || '[]');
-  const total = carrito.reduce((s, p) => s + (p.cantidad || 0), 0);
-  el.textContent = total;
-  el.style.display = total > 0 ? 'flex' : 'none';
-}
 
 /* ============================
    🔹 MENÚ MÓVIL
@@ -271,44 +252,8 @@ function configurarMenuMobile() {
 }
 
 /* ============================
-   🔹 NOTIFICACIONES
+   🔹 ANIMACIONES
 ============================ */
-function mostrarNotificacion(msg, tipo = 'success') {
-  const colores = {
-    success: 'bg-green-500',
-    warning: 'bg-orange-500',
-    error: 'bg-red-500'
-  };
-  const iconos = {
-    success: 'fa-check-circle',
-    warning: 'fa-exclamation-triangle',
-    error: 'fa-times-circle'
-  };
-
-  const div = document.createElement('div');
-  div.className = `fixed top-20 right-4 ${colores[tipo]} text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2`;
-  div.innerHTML = `<i class="fas ${iconos[tipo]}"></i><span>${msg}</span>`;
-  document.body.appendChild(div);
-  setTimeout(() => {
-    div.style.opacity = '0';
-    div.style.transition = 'opacity 0.3s';
-    setTimeout(() => div.remove(), 300);
-  }, 3000);
-}
-
-/* ============================
-   🔹 UTILIDADES
-============================ */
-function escapeHtml(str) {
-  if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 function inicializarAnimaciones() {
   const elementos = document.querySelectorAll('.fade-in-up');
   const observer = new IntersectionObserver(

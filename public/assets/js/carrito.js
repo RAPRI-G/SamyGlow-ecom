@@ -1,51 +1,22 @@
-// carrito.js - Gestión del carrito de compras
-let carrito = [];
+// carrito.js - Lógica específica de la página del carrito
+// DEPENDE DE: cart-manager.js (debe cargarse ANTES)
 
-/** Utilidades */
-const escapeHtml = (str) => {
-  if (str === null || str === undefined) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-};
-
-/** Inicialización */
+/* ============================
+   🔹 INICIALIZACIÓN
+============================ */
 document.addEventListener('DOMContentLoaded', () => {
-  cargarCarritoLocalStorage();
   renderizarCarrito();
-  actualizarContadorCarrito();
   cargarProductosRecomendados();
 });
 
-/** Cargar carrito desde localStorage */
-function cargarCarritoLocalStorage() {
-  try {
-    const raw = localStorage.getItem('carrito_samyglow');
-    if (!raw) return;
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) carrito = parsed;
-  } catch (err) {
-    console.error('Error cargando carrito:', err);
-    carrito = [];
-  }
-}
-
-/** Guardar carrito en localStorage */
-function guardarCarritoLocalStorage() {
-  try {
-    localStorage.setItem('carrito_samyglow', JSON.stringify(carrito));
-  } catch (err) {
-    console.error('Error guardando carrito:', err);
-  }
-}
-
-/** Renderizar el carrito completo */
+/* ============================
+   🔹 RENDERIZAR CARRITO
+============================ */
 function renderizarCarrito() {
   const container = document.getElementById('cart-content');
   if (!container) return;
+
+  const carrito = obtenerCarrito(); // Desde cart-manager.js
 
   if (carrito.length === 0) {
     container.innerHTML = `
@@ -96,7 +67,7 @@ function renderizarCarrito() {
             <span id="total" style="color: var(--rosa-neon);">S/ 0.00</span>
           </div>
 
-          <button onclick="proceedToCheckout()" class="btn-primary w-full mb-3 btn-pulse">
+          <button onclick="procederAlPago()" class="btn-primary w-full mb-3 btn-pulse">
             <i class="fas fa-credit-card mr-2"></i>Proceder al Pago
           </button>
 
@@ -112,11 +83,14 @@ function renderizarCarrito() {
   actualizarTotales();
 }
 
-/** Renderizar items individuales del carrito */
+/* ============================
+   🔹 RENDERIZAR ITEMS
+============================ */
 function renderizarItems() {
   const itemsList = document.getElementById('cart-items-list');
   if (!itemsList) return;
 
+  const carrito = obtenerCarrito(); // Desde cart-manager.js
   itemsList.innerHTML = '';
 
   carrito.forEach(item => {
@@ -124,11 +98,9 @@ function renderizarItems() {
     itemDiv.className = 'flex flex-col sm:flex-row gap-4 p-4 border-2 rounded-xl hover:border-[#FF1493] transition';
     
     const subtotal = item.precio * item.cantidad;
-
-    // ✅ Usa logo.png si no hay imagen o la ruta no existe
     const imagenSegura = item.imagen && item.imagen.trim() !== '' 
       ? escapeHtml(item.imagen) 
-      : 'image.php?f=logo.png';
+      : 'assets/img/logo.png';
 
     itemDiv.innerHTML = `
       <div class="w-full sm:w-24 h-24 bg-gradient-to-b from-pink-50 to-white rounded-lg flex items-center justify-center flex-shrink-0">
@@ -144,12 +116,12 @@ function renderizarItems() {
         <div class="flex items-center gap-3">
           <span class="text-sm text-gray-500">Cantidad:</span>
           <div class="flex items-center gap-2">
-            <button onclick="cambiarCantidad(${item.id}, -1)" 
+            <button onclick="cambiarCantidadItem(${item.id}, ${item.cantidad - 1})" 
                     class="w-8 h-8 rounded-full bg-gray-200 hover:bg-[#FF1493] hover:text-white transition">
               <i class="fas fa-minus text-xs"></i>
             </button>
             <span class="font-semibold w-8 text-center">${item.cantidad}</span>
-            <button onclick="cambiarCantidad(${item.id}, 1)" 
+            <button onclick="cambiarCantidadItem(${item.id}, ${item.cantidad + 1})" 
                     class="w-8 h-8 rounded-full bg-gray-200 hover:bg-[#FF1493] hover:text-white transition">
               <i class="fas fa-plus text-xs"></i>
             </button>
@@ -163,7 +135,7 @@ function renderizarItems() {
 
       <div class="flex flex-row sm:flex-col justify-between sm:justify-start items-end sm:items-end gap-2">
         <p class="text-xl font-bold" style="color: var(--rosa-neon);">S/ ${subtotal.toFixed(2)}</p>
-        <button onclick="eliminarDelCarrito(${item.id})" 
+        <button onclick="eliminarItem(${item.id})" 
                 class="text-red-500 hover:text-red-700 transition">
           <i class="fas fa-trash-alt"></i>
         </button>
@@ -174,86 +146,67 @@ function renderizarItems() {
   });
 }
 
-/** Cambiar cantidad de un producto */
-window.cambiarCantidad = function(productoId, cambio) {
-  const item = carrito.find(i => Number(i.id) === Number(productoId));
-  if (!item) return;
-
-  const nuevaCantidad = item.cantidad + cambio;
-
-  if (nuevaCantidad < 1) {
-    return eliminarDelCarrito(productoId);
+/* ============================
+   🔹 CAMBIAR CANTIDAD
+============================ */
+window.cambiarCantidadItem = function(productoId, nuevaCantidad) {
+  const resultado = actualizarCantidadCarrito(productoId, nuevaCantidad); // Desde cart-manager.js
+  
+  if (!resultado.success) {
+    mostrarNotificacion(resultado.message, 'warning');
   }
-
-  if (item.stock && nuevaCantidad > item.stock) {
-    mostrarNotificacion('No hay suficiente stock disponible', 'warning');
-    return;
-  }
-
-  item.cantidad = nuevaCantidad;
-  guardarCarritoLocalStorage();
-  renderizarItems();
-  actualizarTotales();
-  actualizarContadorCarrito();
-};
-
-/** Eliminar producto del carrito */
-window.eliminarDelCarrito = function(productoId) {
-  carrito = carrito.filter(i => Number(i.id) !== Number(productoId));
-  guardarCarritoLocalStorage();
+  
   renderizarCarrito();
-  actualizarContadorCarrito();
-  mostrarNotificacion('Producto eliminado del carrito');
 };
 
-/** Calcular subtotal */
-function calcularSubtotal() {
-  return carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-}
+/* ============================
+   🔹 ELIMINAR ITEM
+============================ */
+window.eliminarItem = function(productoId) {
+  const resultado = eliminarDelCarrito(productoId); // Desde cart-manager.js
+  
+  if (resultado.success) {
+    mostrarNotificacion(resultado.message, 'success');
+    renderizarCarrito();
+  }
+};
 
-/** Calcular envío */
-function calcularEnvio(subtotal) {
-  return subtotal >= 150 ? 0 : 10;
-}
-
-/** Actualizar totales */
+/* ============================
+   🔹 ACTUALIZAR TOTALES
+============================ */
 function actualizarTotales() {
-  const subtotal = calcularSubtotal();
-  const envio = calcularEnvio(subtotal);
-  const total = subtotal + envio;
+  const { subtotal, envio, total } = calcularTotalCarrito(); // Desde cart-manager.js
 
   const subtotalEl = document.getElementById('subtotal');
   const shippingEl = document.getElementById('shipping');
   const totalEl = document.getElementById('total');
-  const mobileTotalEl = document.getElementById('mobile-total');
 
   if (subtotalEl) subtotalEl.textContent = `S/ ${subtotal.toFixed(2)}`;
   if (shippingEl) shippingEl.textContent = envio === 0 ? 'Gratis' : `S/ ${envio.toFixed(2)}`;
   if (totalEl) totalEl.textContent = `S/ ${total.toFixed(2)}`;
-  if (mobileTotalEl) mobileTotalEl.textContent = `S/ ${total.toFixed(2)}`;
 }
 
-/** Actualizar contador del carrito */
-function actualizarContadorCarrito() {
-  const countEl = document.getElementById('cart-count');
-  if (!countEl) return;
-  const total = carrito.reduce((sum, item) => sum + (Number(item.cantidad) || 0), 0);
-  countEl.textContent = String(total);
-  countEl.style.display = total > 0 ? 'flex' : 'none';
-}
-
-/** Proceder al checkout */
-window.proceedToCheckout = function() {
+/* ============================
+   🔹 PROCEDER AL PAGO
+============================ */
+window.procederAlPago = function() {
+  const carrito = obtenerCarrito();
+  
   if (carrito.length === 0) {
     mostrarNotificacion('Tu carrito está vacío', 'warning');
     return;
   }
 
-  const total = calcularSubtotal() + calcularEnvio(calcularSubtotal());
+  const { total } = calcularTotalCarrito();
   mostrarNotificacion(`Procesando pedido por S/ ${total.toFixed(2)}...`, 'success');
+  
+  // Aquí puedes redirigir a una página de checkout
+  // window.location.href = 'checkout.html';
 };
 
-/** Cargar productos recomendados */
+/* ============================
+   🔹 PRODUCTOS RECOMENDADOS
+============================ */
 async function cargarProductosRecomendados() {
   try {
     const res = await fetch('./api/productos.php');
@@ -261,14 +214,16 @@ async function cargarProductosRecomendados() {
     const json = await res.json();
     if (!json.success || !json.data) return;
 
-    const productosAleatorios = json.data.sort(() => Math.random() - 0.5).slice(0, 4);
+    const productosAleatorios = json.data
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 4);
+    
     renderizarRecomendados(productosAleatorios);
   } catch (err) {
     console.error('Error cargando recomendados:', err);
   }
 }
 
-/** Renderizar productos recomendados */
 function renderizarRecomendados(productos) {
   const grid = document.getElementById('recommended-grid');
   if (!grid || productos.length === 0) return;
@@ -279,11 +234,9 @@ function renderizarRecomendados(productos) {
     const precioFinal = parseFloat(producto.precio_final ?? producto.precio);
     const descuento = Number(producto.descuento) || 0;
     const sinStock = Number(producto.stock) <= 0;
-
-    // ✅ Logo por defecto si no hay imagen
     const imagenSegura = producto.imagen && producto.imagen.trim() !== ''
-      ? escapeHtml(producto.imagen)
-      : 'image.php?f=logo.png';
+      ? `uploads/productos/${escapeHtml(producto.imagen)}`
+      : 'assets/img/logo.png';
 
     const card = document.createElement('div');
     card.className = 'bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition';
@@ -292,13 +245,13 @@ function renderizarRecomendados(productos) {
       <div class="relative h-48 bg-gradient-to-b from-pink-50 to-white flex items-center justify-center">
         ${descuento > 0 ? `<div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">-${descuento}%</div>` : ''}
         <img src="${imagenSegura}" alt="${escapeHtml(producto.nombre)}"
-             onerror="this.src='image.php?f=logo.png'"
+             onerror="this.src='assets/img/logo.png'"
              class="max-h-40 object-contain">
       </div>
       <div class="p-4">
-        <h4 class="font-semibold mb-2">${escapeHtml(producto.nombre)}</h4>
+        <h4 class="font-semibold mb-2 line-clamp-2">${escapeHtml(producto.nombre)}</h4>
         <p class="text-xl font-bold mb-3" style="color: var(--rosa-neon);">S/ ${precioFinal.toFixed(2)}</p>
-        <button onclick="agregarDesdeRecomendados(${Number(producto.id)})" 
+        <button onclick="agregarRecomendado(${Number(producto.id)})" 
                 ${sinStock ? 'disabled' : ''}
                 class="btn-primary w-full text-sm">
           ${sinStock ? 'Agotado' : 'Agregar al carrito'}
@@ -310,8 +263,10 @@ function renderizarRecomendados(productos) {
   });
 }
 
-/** Agregar producto desde recomendados */
-window.agregarDesdeRecomendados = async function(productoId) {
+/* ============================
+   🔹 AGREGAR RECOMENDADO
+============================ */
+window.agregarRecomendado = async function(productoId) {
   try {
     const res = await fetch('./api/productos.php');
     if (!res.ok) return;
@@ -321,54 +276,21 @@ window.agregarDesdeRecomendados = async function(productoId) {
     const producto = json.data.find(p => Number(p.id) === Number(productoId));
     if (!producto) return;
 
-    if (Number(producto.stock) <= 0) {
-      return mostrarNotificacion('Producto sin stock', 'warning');
-    }
+    // Usar el gestor centralizado
+    const resultado = agregarAlCarrito({
+      id: producto.id,
+      nombre: producto.nombre,
+      precio: parseFloat(producto.precio_final ?? producto.precio),
+      imagen: producto.imagen || 'assets/img/logo.png',
+      stock: Number(producto.stock)
+    });
 
-    const existente = carrito.find(i => Number(i.id) === Number(productoId));
-    if (existente) {
-      if ((existente.cantidad + 1) > Number(producto.stock)) {
-        return mostrarNotificacion('No hay suficiente stock', 'warning');
-      }
-      existente.cantidad += 1;
-    } else {
-      carrito.push({
-        id: Number(producto.id),
-        nombre: producto.nombre,
-        precio: parseFloat(producto.precio_final ?? producto.precio),
-        imagen: producto.imagen && producto.imagen.trim() !== '' 
-          ? producto.imagen 
-          : 'image.php?f=logo.png',
-        cantidad: 1,
-        stock: Number(producto.stock)
-      });
+    mostrarNotificacion(resultado.message, resultado.success ? 'success' : 'warning');
+    
+    if (resultado.success) {
+      renderizarCarrito();
     }
-
-    guardarCarritoLocalStorage();
-    renderizarCarrito();
-    actualizarContadorCarrito();
-    mostrarNotificacion('Producto agregado al carrito', 'success');
   } catch (err) {
     console.error('Error agregando producto:', err);
   }
 };
-
-/** Mostrar notificación */
-function mostrarNotificacion(mensaje, tipo = 'success') {
-  const colores = {
-    success: 'bg-green-500',
-    warning: 'bg-orange-500',
-    error: 'bg-red-500'
-  };
-
-  const div = document.createElement('div');
-  div.textContent = mensaje;
-  div.className = `fixed top-20 right-4 ${colores[tipo]} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in`;
-  document.body.appendChild(div);
-  
-  setTimeout(() => {
-    div.style.opacity = '0';
-    div.style.transition = 'opacity 0.3s';
-    setTimeout(() => div.remove(), 300);
-  }, 3000);
-}
