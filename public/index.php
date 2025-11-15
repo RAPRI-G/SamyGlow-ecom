@@ -582,42 +582,96 @@ switch ($view) {
         $controller = new MetodoPagoController();
         $controller->eliminarMetodo();
         break;
-      // En tu public/index.php, agrega estas rutas si no las tienes:
+    // En tu public/index.php, agrega estas rutas si no las tienes:
 
-case 'reportes-analytics':
-    if (!isset($_SESSION['usuario'])) {
-        header("Location: index.php?view=login");
-        exit;
-    }
-    
-    require_once __DIR__ . '/../app/controllers/ReporteController.php';
-    $controller = new ReporteController();
-    $controller->index();
-    break;
+    case 'reportes-analytics':
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: index.php?view=login");
+            exit;
+        }
 
-case 'api-reporte-ventas':
-    require_once __DIR__ . '/../app/controllers/ReporteController.php';
-    $controller = new ReporteController();
-    $controller->reporteVentas();
-    break;
+        require_once __DIR__ . '/../app/controllers/ReporteController.php';
+        $controller = new ReporteController();
+        $controller->index();
+        break;
 
-case 'api-reporte-productos':
-    require_once __DIR__ . '/../app/controllers/ReporteController.php';
-    $controller = new ReporteController();
-    $controller->reporteProductos();
-    break;
+    case 'api-reporte-ventas':
+        require_once __DIR__ . '/../app/controllers/ReporteController.php';
+        $controller = new ReporteController();
+        $controller->reporteVentas();
+        break;
 
-case 'api-reporte-clientes':
-    require_once __DIR__ . '/../app/controllers/ReporteController.php';
-    $controller = new ReporteController();
-    $controller->reporteClientes();
-    break;
+    case 'api-reporte-productos':
+        require_once __DIR__ . '/../app/controllers/ReporteController.php';
+        $controller = new ReporteController();
+        $controller->reporteProductos();
+        break;
 
-case 'api-reporte-inventario':
-    require_once __DIR__ . '/../app/controllers/ReporteController.php';
-    $controller = new ReporteController();
-    $controller->reporteInventario();
-    break;
+    case 'api-reporte-clientes':
+        require_once __DIR__ . '/../app/controllers/ReporteController.php';
+        $controller = new ReporteController();
+        $controller->reporteClientes();
+        break;
+
+    case 'api-reporte-inventario':
+        require_once __DIR__ . '/../app/controllers/ReporteController.php';
+        $controller = new ReporteController();
+        $controller->reporteInventario();
+        break;
+        
+    // 🔹 CONFIGURACIÓN DEL SISTEMA
+    case 'configuracion':
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: index.php?view=login");
+            exit;
+        }
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->index();
+        break;
+
+    // 🔹 APIs DE CONFIGURACIÓN
+    case 'api-listar-usuarios':
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiListarUsuarios();
+        break;
+
+    case 'api-crear-usuario':
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiCrearUsuario();
+        break;
+
+    case 'api-actualizar-usuario':
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiActualizarUsuario();
+        break;
+
+    case 'api-eliminar-usuario':
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiEliminarUsuario();
+        break;
+
+    case 'api-realizar-backup':
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiRealizarBackup();
+        break;
+
+    case 'api-guardar-config-backup':
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiGuardarConfigBackup();
+        break;
+
+    case 'api-guardar-config-general':
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiGuardarConfigGeneral();
+        break;
     // =====================================
     // ❌ 404 - Página no encontrada
     // =====================================

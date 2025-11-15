@@ -15,10 +15,22 @@ class MetodoPagoController
     // Vista principal de gestión de métodos de pago
     public function index()
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         if (!isset($_SESSION['usuario'])) {
             header("Location: index.php?view=login");
             exit;
         }
+
+        // Obtener datos iniciales para filtros
+        global $pdo;
+        $stmt = $pdo->query("SELECT id, nombre FROM categorias WHERE activa = 1");
+        $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $title = "Métodos de Pago - SamyGlow";
+        $pageTitle = "Métodos de Pago";
 
         require_once __DIR__ . '/../views/templates/header.php';
         require_once __DIR__ . '/../views/templates/sidebar.php';
