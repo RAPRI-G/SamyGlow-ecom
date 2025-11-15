@@ -618,7 +618,7 @@ switch ($view) {
         $controller = new ReporteController();
         $controller->reporteInventario();
         break;
-        
+
     // 🔹 CONFIGURACIÓN DEL SISTEMA
     case 'configuracion':
         if (!isset($_SESSION['usuario'])) {
@@ -630,48 +630,6 @@ switch ($view) {
         $controller->index();
         break;
 
-    // 🔹 APIs DE CONFIGURACIÓN
-    case 'api-listar-usuarios':
-        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
-        $controller = new ConfiguracionController();
-        $controller->apiListarUsuarios();
-        break;
-
-    case 'api-crear-usuario':
-        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
-        $controller = new ConfiguracionController();
-        $controller->apiCrearUsuario();
-        break;
-
-    case 'api-actualizar-usuario':
-        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
-        $controller = new ConfiguracionController();
-        $controller->apiActualizarUsuario();
-        break;
-
-    case 'api-eliminar-usuario':
-        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
-        $controller = new ConfiguracionController();
-        $controller->apiEliminarUsuario();
-        break;
-
-    case 'api-realizar-backup':
-        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
-        $controller = new ConfiguracionController();
-        $controller->apiRealizarBackup();
-        break;
-
-    case 'api-guardar-config-backup':
-        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
-        $controller = new ConfiguracionController();
-        $controller->apiGuardarConfigBackup();
-        break;
-
-    case 'api-guardar-config-general':
-        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
-        $controller = new ConfiguracionController();
-        $controller->apiGuardarConfigGeneral();
-        break;
     // =====================================
     // ❌ 404 - Página no encontrada
     // =====================================
