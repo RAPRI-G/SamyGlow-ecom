@@ -1,0 +1,104 @@
+/* ===== ESTILOS ADICIONALES PARA LA MODAL DE ÉXITO ===== */
+
+/* Animaciones de cierre */
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideOut {
+  from { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to { 
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+}
+
+/* Efecto de brillo adicional para el icono */
+.fa-check-circle {
+  filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.5));
+  transition: all 0.3s ease;
+}
+
+/* Hover effect para el icono */
+.modal-content:hover .fa-check-circle {
+  filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.8));
+  transform: scale(1.05);
+}
+
+/* Mejora en los botones de la modal */
+.modal-content .btn-primary,
+.modal-content .btn-secondary {
+  transition: all 0.3s ease;
+}
+
+.modal-content .btn-primary:hover,
+.modal-content .btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Efecto de escala en el contenido */
+.modal-content {
+  transition: all 0.3s ease;
+}
+
+/* Personalización del scrollbar si aparece en la modal */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--rosa-neon);
+  border-radius: 3px;
+}
+
+/* Media query para pantallas pequeñas */
+@media (max-width: 640px) {
+  .modal-content {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .check-animation {
+    font-size: 4rem;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Clase para deshabilitar el scroll del body cuando la modal está abierta */
+body.modal-open {
+  overflow: hidden;
+}
+/* Mejora visual de los inputs del formulario */
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: var(--rosa-neon);
+  box-shadow: 0 0 8px rgba(255, 20, 147, 0.4);
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: #888;
+}
