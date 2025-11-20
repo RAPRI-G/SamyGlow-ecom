@@ -81,6 +81,7 @@
 body.modal-open {
   overflow: hidden;
 }
+
 /* Mejora visual de los inputs del formulario */
 .form-input {
   width: 100%;
@@ -102,3 +103,249 @@ body.modal-open {
 .form-input::placeholder {
   color: #888;
 }
+
+/* ===== ESTILOS MEJORADOS PARA EL FORMULARIO DE CHECKOUT ===== */
+
+/* Contenedor principal del formulario */
+#checkout-form-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Estilos mejorados para las secciones del formulario */
+#checkout-form-container section {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 105, 180, 0.2);
+  box-shadow: 0 4px 15px rgba(255, 20, 147, 0.1);
+  transition: all 0.3s ease;
+}
+
+#checkout-form-container section:hover {
+  box-shadow: 0 6px 20px rgba(255, 20, 147, 0.15);
+  border-color: rgba(255, 105, 180, 0.3);
+}
+
+/* Títulos de sección mejorados */
+#checkout-form-container h3 {
+  color: var(--purpura-intenso);
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-bottom: 2px solid var(--rosa-pastel);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Labels mejorados */
+#checkout-form-container label {
+  color: var(--texto-oscuro);
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Contenedor de inputs */
+#checkout-form-container .grid > div {
+  margin-bottom: 1rem;
+}
+
+/* Inputs y selects mejorados */
+.form-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: var(--texto-oscuro);
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.form-input:focus {
+  border-color: var(--rosa-neon);
+  box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.1), 
+              0 4px 12px rgba(255, 20, 147, 0.2);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.form-input:hover {
+  border-color: #cbd5e0;
+}
+
+/* Placeholder mejorado */
+.form-input::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Select específico */
+#checkout-form-container select.form-input {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23FF1493' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 16px 12px;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
+/* Estilos para los métodos de pago */
+.payment-method-label {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.payment-method-label:hover {
+  border-color: var(--rosa-neon);
+  box-shadow: 0 4px 12px rgba(255, 20, 147, 0.15);
+  transform: translateY(-2px);
+}
+
+.payment-method-label:has(input:checked) {
+  border-color: var(--rosa-neon);
+  background: linear-gradient(135deg, rgba(255, 20, 147, 0.05) 0%, rgba(139, 58, 156, 0.05) 100%);
+  box-shadow: 0 4px 15px rgba(255, 20, 147, 0.2);
+}
+
+/* Radio buttons personalizados */
+.payment-method-label input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #cbd5e0;
+  border-radius: 50%;
+  appearance: none;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.payment-method-label input[type="radio"]:checked {
+  border-color: var(--rosa-neon);
+  background-color: white;
+}
+
+.payment-method-label input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: var(--rosa-neon);
+  border-radius: 50%;
+}
+
+/* Sección de resumen mejorada */
+#checkout-resumen {
+  font-size: 0.9rem;
+}
+
+#checkout-resumen > div {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+#checkout-total {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+/* Botones del formulario */
+#checkout-form-container .btn-primary,
+#checkout-form-container .btn-secondary {
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+#checkout-form-container .btn-primary {
+  background: linear-gradient(135deg, var(--rosa-neon) 0%, var(--purpura-intenso) 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+}
+
+#checkout-form-container .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 20, 147, 0.6);
+}
+
+#checkout-form-container .btn-secondary {
+  background: white;
+  color: var(--rosa-neon);
+  border: 2px solid var(--rosa-neon);
+}
+
+#checkout-form-container .btn-secondary:hover {
+  background: var(--rosa-neon);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+}
+
+/* Indicadores de campo requerido */
+#checkout-form-container label:has(+ input[required])::after,
+#checkout-form-container label:has(+ select[required])::after {
+  content: " *";
+  color: #ef4444;
+}
+
+/* Estados de validación */
+.form-input:invalid:not(:focus):not(:placeholder-shown) {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input:valid:not(:focus):not(:placeholder-shown) {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #checkout-form-container section {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-input {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  #checkout-form-container h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Animación de entrada para los campos */
+@keyframes slideInField {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+#checkout-form-container .grid > div {
+  animation: slideInField 0.5s ease-out forwards;
+}
+
+/* Retraso escalonado para la animación de los campos */
+#checkout-form-container .grid > div:nth-child(1) { animation-delay: 0.1s; }
+#checkout-form-container .grid > div:nth-child(2) { animation-delay: 0.2s; }
+#checkout-form-container .grid > div:nth-child(3) { animation-delay: 0.3s; }
+#checkout-form-container .grid > div:nth-child(4) { animation-delay: 0.4s; }
+#checkout-form-container .grid > div:nth-child(5) { animation-delay: 0.5s; }
