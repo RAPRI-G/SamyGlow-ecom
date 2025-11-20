@@ -97,3 +97,16 @@ function activeClass($viewName, $currentView)
         </a>
     </div>
 </div>
+
+<!-- JS SIMPLIFICADO -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Marcar menú activo
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('bg-white', 'bg-opacity-25', 'font-semibold', 'border-r-4'));
+                this.classList.add('bg-white', 'bg-opacity-25', 'font-semibold', 'border-r-4');
+            });
+        });
+    });
+</script>
