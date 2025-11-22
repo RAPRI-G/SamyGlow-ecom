@@ -500,8 +500,8 @@ function reactivarBotonesPago() {
  */
 function mostrarNotificacion(mensaje, tipo = 'info') {
   // Verificar si ya existe la función en carrito.js
-  if (typeof window.mostrarNotificacion === 'function') {
-    window.mostrarNotificacion(mensaje, tipo);
+  if (typeof window.mostrarNotificacionOriginal === 'function') {
+    window.mostrarNotificacionOriginal(mensaje, tipo);
     return;
   }
   

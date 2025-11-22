@@ -15,7 +15,7 @@ $response = ['success' => false, 'data' => [], 'message' => ''];
 try {
     // Incluir la clase de conexión y el modelo
     require_once BASE_PATH . 'config/conexion.php';
-    require_once BASE_PATH . 'models/MetodoPagoModel.php';
+    require_once BASE_PATH . 'app/models/MetodoPago.php';
 
     // Obtener la conexión PDO desde la clase Database
     if (!class_exists('Database')) {

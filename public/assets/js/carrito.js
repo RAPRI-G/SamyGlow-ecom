@@ -153,7 +153,7 @@ window.cambiarCantidadItem = function(productoId, nuevaCantidad) {
   const resultado = actualizarCantidadCarrito(productoId, nuevaCantidad); // Desde cart-manager.js
   
   if (!resultado.success) {
-    mostrarNotificacion(resultado.message, 'warning');
+    mostrarNotificacionOriginal(resultado.message, 'warning');
   }
   
   renderizarCarrito();
@@ -166,7 +166,7 @@ window.eliminarItem = function(productoId) {
   const resultado = eliminarDelCarrito(productoId); // Desde cart-manager.js
   
   if (resultado.success) {
-    mostrarNotificacion(resultado.message, 'success');
+    mostrarNotificacionOriginal(resultado.message, 'success');
     renderizarCarrito();
   }
 };
@@ -193,7 +193,7 @@ window.procederAlPago = function() {
   const carrito = obtenerCarrito();
 
   if (carrito.length === 0) {
-    mostrarNotificacion('Tu carrito está vacío', 'warning');
+    mostrarNotificacionOriginal('Tu carrito está vacío', 'warning');
     return;
   }
 
@@ -204,11 +204,11 @@ window.procederAlPago = function() {
     } else {
       // Fallback: mostrar notificación y mantener UX
       const { total } = calcularTotalCarrito();
-      mostrarNotificacion(`Procesando pedido por S/ ${total.toFixed(2)}...`, 'success');
+      mostrarNotificacionOriginal(`Procesando pedido por S/ ${total.toFixed(2)}...`, 'success');
     }
   } catch (err) {
     console.error('Error iniciando checkout:', err);
-    mostrarNotificacion('No se puede iniciar el checkout. Intente de nuevo.', 'error');
+    mostrarNotificacionOriginal('No se puede iniciar el checkout. Intente de nuevo.', 'error');
   }
 };
 
@@ -296,7 +296,7 @@ window.agregarRecomendado = async function(productoId) {
       stock: Number(producto.stock)
     });
 
-    mostrarNotificacion(resultado.message, resultado.success ? 'success' : 'warning');
+    mostrarNotificacionOriginal(resultado.message, resultado.success ? 'success' : 'warning');
     
     if (resultado.success) {
       renderizarCarrito();
