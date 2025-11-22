@@ -7,6 +7,10 @@ define('BASE_PATH', __DIR__ . '/../../');
 // ✅ Forzar JSON como tipo de respuesta
 header('Content-Type: application/json; charset=utf-8');
 
+// ✅ MOSTRAR ERRORES EN DESARROLLO (quitar en producción)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $response = ['success' => false, 'message' => '', 'pedido_id' => null];
 
 try {
@@ -110,3 +114,5 @@ try {
     $response['message'] = 'Error interno: ' . $e->getMessage();
     error_log('public/api/guardar-pedido.php error: ' . $e->getMessage());
 }
+
+echo json_encode($response);
