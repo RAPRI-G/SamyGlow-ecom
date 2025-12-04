@@ -9,7 +9,7 @@ const API_METODOS_PAGO = './api/metodos-pago.php';
 const API_GUARDAR_PEDIDO = './api/guardar-pedido.php';
 const DEP_CART_MANAGER = './assets/js/cart-manager.js';
 const DEP_CARRITO = './assets/js/carrito.js';
-const INDEX_PAGE = 'index.html';
+const INDEX_PAGE = '../index.html';
 const STORAGE_KEY_CARRITO = 'carrito';
 
 
