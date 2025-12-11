@@ -144,9 +144,10 @@ class ProductoController
     }
 
     // 🔹 MÉTODO PARA MANEJAR SUBIDA DE IMAGEN
+    // En ProductoController.php, modifica el método manejarSubidaImagen:
     private function manejarSubidaImagen($archivo)
     {
-        $directorioDestino = __DIR__ . '/../../uploads/productos/';
+        $directorioDestino = __DIR__ . '/../../public/uploads/productos/';
 
         // Crear directorio si no existe
         if (!is_dir($directorioDestino)) {
@@ -167,21 +168,58 @@ class ProductoController
             throw new Exception('La imagen no puede ser mayor a 5MB');
         }
 
-        // Generar nombre único
-        $extension = pathinfo($archivo['name'], PATHINFO_EXTENSION);
-        $nombreArchivo = uniqid() . '_' . time() . '.' . $extension;
+        // 🔴 CAMBIO AQUÍ: Usar solo el nombre original del archivo
+        $nombreOriginal = pathinfo($archivo['name'], PATHINFO_FILENAME);
+        $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+
+        // Limpiar y formatear nombre del archivo
+        $nombreLimpio = $this->sanitizarNombreArchivo($nombreOriginal);
+
+        // Si el nombre está vacío después de limpiar, usar un nombre por defecto
+        if (empty($nombreLimpio)) {
+            $nombreLimpio = 'producto';
+        }
+
+        $nombreArchivo = $nombreLimpio . '.' . $extension;
         $rutaCompleta = $directorioDestino . $nombreArchivo;
+
+        // Si ya existe, agregar un número incremental
+        $contador = 1;
+        while (file_exists($rutaCompleta)) {
+            $nombreArchivo = $nombreLimpio . '_' . $contador . '.' . $extension;
+            $rutaCompleta = $directorioDestino . $nombreArchivo;
+            $contador++;
+        }
 
         // Mover archivo
         if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
+            // 🔴 Importante: Retornar solo 'uploads/productos/nombre_archivo.ext'
             return 'uploads/productos/' . $nombreArchivo;
         } else {
-            throw new Exception('Error al subir la imagen');
+            throw new Exception('Error al subir la imagen. Verifica los permisos de la carpeta uploads/');
         }
     }
 
+    // Asegúrate de que el método sanitizarNombreArchivo esté presente:
+    private function sanitizarNombreArchivo($nombre)
+    {
+        // Reemplazar espacios por guiones
+        $nombre = str_replace(' ', '-', $nombre);
+        // Eliminar caracteres especiales excepto guiones
+        $nombre = preg_replace('/[^A-Za-z0-9\-]/', '', $nombre);
+        // Convertir a minúsculas
+        $nombre = strtolower($nombre);
+        // Eliminar múltiples guiones consecutivos
+        $nombre = preg_replace('/-+/', '-', $nombre);
+        // Eliminar guiones al inicio y final
+        $nombre = trim($nombre, '-');
+        // Limitar longitud
+        $nombre = substr($nombre, 0, 100);
+
+        return $nombre;
+    }
+
     // 🔹 API: EDITAR PRODUCTO
-    // 🔹 API: EDITAR PRODUCTO (ACTUALIZADO para imágenes)
     public function editarProducto()
     {
         header('Content-Type: application/json');
