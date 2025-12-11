@@ -66,6 +66,10 @@ window.agregarAlCarrito = function(producto) {
     return { success: false, message: 'Producto sin stock' };
   }
 
+  // Saneamos la URL de la imagen antes de guardar
+  const imagenSaneada = sanearUrlImagen(producto.imagen);
+  console.log('🖼️ Imagen después de saneamiento:', imagenSaneada);
+
   // Buscar si ya existe en el carrito
   const existente = carrito.find(item => Number(item.id) === Number(producto.id));
 
@@ -76,12 +80,12 @@ window.agregarAlCarrito = function(producto) {
     }
     existente.cantidad += 1;
   } else {
-    // Agregar nuevo producto
+    // Agregar nuevo producto con imagen saneada
     carrito.push({
       id: Number(producto.id),
       nombre: producto.nombre,
       precio: parseFloat(producto.precio),
-      imagen: producto.imagen || 'assets/img/logo.png',
+      imagen: imagenSaneada,  // ← USAR IMAGEN SANEADA
       cantidad: 1,
       stock: Number(producto.stock)
     });
@@ -91,6 +95,39 @@ window.agregarAlCarrito = function(producto) {
   actualizarContadorCarrito();
   
   return { success: true, message: 'Producto agregado al carrito' };
+};
+// Agrega esta función al inicio de cart-manager.js
+window.sanearUrlImagen = function(url) {
+  if (!url || typeof url !== 'string') return 'assets/img/logo.png';
+  
+  console.log('🔧 Sanear URL recibida:', url);
+  
+  // Si ya es una URL completa (http, https, data:)
+  if (url.startsWith('http') || url.startsWith('data:')) {
+    return url;
+  }
+  
+  // Si ya contiene "image.php?f=", asegurarnos que no esté duplicada
+  if (url.includes('image.php?f=')) {
+    // Extraer la parte después del último "image.php?f="
+    const partes = url.split('image.php?f=');
+    const ultimaParte = partes[partes.length - 1];
+    
+    // Remover "uploads/" si está presente
+    const rutaFinal = ultimaParte.replace(/^uploads\//, '');
+    
+    return 'image.php?f=' + rutaFinal;
+  }
+  
+  // Si es solo un nombre de archivo o ruta relativa
+  if (url.includes('/') || url.includes('\\')) {
+    // Extraer solo el nombre del archivo
+    const nombreArchivo = url.split('/').pop().split('\\').pop();
+    return 'image.php?f=productos/' + nombreArchivo;
+  }
+  
+  // Si es solo un nombre de archivo
+  return 'image.php?f=productos/' + url;
 };
 
 /**
@@ -248,4 +285,4 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
     actualizarContadorCarrito();
   }
-});
+}); 

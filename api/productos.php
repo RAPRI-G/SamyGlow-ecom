@@ -69,13 +69,9 @@ try {
 	foreach ($productos as &$p) {
 		if (!empty($p['imagen'])) {
 			if (!preg_match('#^https?://#i', $p['imagen'])) {
-				$img = str_replace('\\', '/', $p['imagen']);
-				$img = preg_replace('#.*/uploads/productos/#i', '', $img);
-				$img = preg_replace('#.*/uploads/#i', '', $img);
-				$img = ltrim($img, '/');
-				$segments = explode('/', $img);
-				$enc = implode('/', array_map('rawurlencode', $segments));
-				$p['imagen'] = $IMAGE_PROXY_PREFIX . $enc;
+				// Extraer solo el nombre del archivo
+				$img = basename($p['imagen']);  // Ej: "6915b016469b9_1763029014.jpg"
+				$p['imagen'] = 'image.php?f=productos/' . $img;
 			}
 		}
 	}

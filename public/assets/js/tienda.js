@@ -4,6 +4,40 @@
 let productos = [];
 
 /* ============================
+   🔹 FUNCIÓN PARA CORREGIR URLS DE IMAGEN
+============================ */
+function corregirUrlImagen(url) {
+  if (!url || typeof url !== 'string') return 'assets/img/logo.png';
+  
+  console.log('🔧 URL original:', url);
+  
+  // Si ya es una URL correcta y no tiene duplicación
+  if (url.startsWith('image.php?f=productos/') && !url.includes('image.php?f=uploads/')) {
+    console.log('✅ URL ya está correcta');
+    return url;
+  }
+  
+  // Si tiene duplicación (image.php?f= dentro de image.php?f=)
+  if (url.includes('image.php?f=') && url.split('image.php?f=').length > 2) {
+    console.log('🔄 Corrigiendo URL duplicada');
+    // Tomar solo la última parte después del último image.php?f=
+    const partes = url.split('image.php?f=');
+    const ultimaParte = partes[partes.length - 1];
+    const urlCorregida = 'image.php?f=' + ultimaParte.replace(/^uploads\//, '');
+    console.log('✅ URL corregida:', urlCorregida);
+    return urlCorregida;
+  }
+  
+  // Si es un nombre simple (solo el archivo)
+  if (!url.includes('/') && !url.includes('\\')) {
+    return 'image.php?f=productos/' + url;
+  }
+  
+  // Si es otra cosa, devolver tal cual
+  return url;
+}
+
+/* ============================
    🔹 INICIALIZACIÓN
 ============================ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -62,6 +96,23 @@ async function cargarProductos() {
       throw new Error('La respuesta no contiene un array de productos en "data"');
     }
 
+    // DEBUG: Ver las URLs que vienen del API
+    console.log('🔍 Primer producto recibido:', {
+      nombre: json.data[0]?.nombre,
+      imagen: json.data[0]?.imagen,
+      tipo: typeof json.data[0]?.imagen
+    });
+    
+    // Verificar URLs
+    console.log('🔍 Verificando URLs de los primeros 3 productos:');
+    json.data.slice(0, 3).forEach((p, i) => {
+      console.log(`Producto ${i+1}:`, {
+        nombre: p.nombre,
+        imagen: p.imagen,
+        tieneDuplicacion: p.imagen?.includes('image.php?f=uploads/productos/image.php?f=')
+      });
+    });
+
     // Guardar productos en la variable global
     productos = json.data;
     console.log(`✅ ${productos.length} productos cargados exitosamente`);
@@ -111,16 +162,18 @@ function renderizarProductos(listaProductos) {
       ? `<div class="absolute top-4 right-4 bg-red-500 text-white text-sm px-2 py-1 rounded z-10">-${escapeHtml(String(descuento))}%</div>`
       : '';
 
-    const imgSrc = producto.imagen 
-      ? `image.php?f=uploads/productos/${escapeHtml(producto.imagen)}`
-      : 'assets/img/logo.png';
+    // CORRECCIÓN IMPORTANTE: Usar corregirUrlImagen
+    const imgSrc = corregirUrlImagen(producto.imagen) || 'assets/img/logo.png';
+    console.log(`🖼️ Producto: ${producto.nombre}`);
+    console.log(`   Imagen original: ${producto.imagen}`);
+    console.log(`   Imagen corregida: ${imgSrc}`);
 
     card.innerHTML = `
       <div class="relative">
         ${badgeHtml}
         <div class="relative h-64 bg-gradient-to-b from-pink-50 to-white flex items-center justify-center">
-          <img src="${imgSrc}" alt="${escapeHtml(producto.nombre)}" 
-               onerror="this.src='assets/img/logo.png'" 
+          <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(producto.nombre)}" 
+               onerror="this.src='assets/img/logo.png'; console.error('❌ Error cargando imagen: ${escapeHtml(imgSrc)}')" 
                class="max-h-60 object-contain" />
         </div>
       </div>
@@ -166,12 +219,20 @@ window.agregarProductoDesdeTienda = function (productoId) {
     return;
   }
 
-  // Usar el gestor centralizado
+  console.log('📤 Agregando producto al carrito:');
+  console.log('   Nombre:', producto.nombre);
+  console.log('   Imagen antes de sanear:', producto.imagen);
+
+  // CORRECCIÓN: Usar corregirUrlImagen también aquí
+  const imagenCorregida = corregirUrlImagen(producto.imagen);
+  console.log('   Imagen corregida:', imagenCorregida);
+
+  // Usar el gestor centralizado con imagen corregida
   const resultado = agregarAlCarrito({
     id: producto.id,
     nombre: producto.nombre,
     precio: parseFloat(producto.precio_final ?? producto.precio),
-    imagen: producto.imagen || 'assets/img/logo.png',
+    imagen: imagenCorregida || 'assets/img/logo.png',
     stock: Number(producto.stock)
   });
 
@@ -194,4 +255,4 @@ function configurarMenuMobile() {
   const menu = document.getElementById('mobile-menu');
   if (!btn || !menu) return;
   btn.addEventListener('click', () => menu.classList.toggle('active'));
-} 
+}

@@ -9,15 +9,56 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ============================
+   🔹 FUNCIÓN PARA CORREGIR URLS DE IMAGEN
+============================ */
+function corregirUrlImagen(url) {
+  if (!url || typeof url !== 'string') return 'assets/img/logo.png';
+  
+  console.log('🔧 URL original recibida:', url);
+  
+  // Si ya es una URL correcta (viene del API procesada)
+  if (url.startsWith('image.php?f=productos/')) {
+    console.log('✅ URL ya procesada por API');
+    return url;
+  }
+  
+  // Si tiene duplicación (el problema original)
+  if (url.includes('image.php?f=uploads/productos/image.php?f=')) {
+    console.log('🔄 Corrigiendo URL duplicada');
+    const partes = url.split('image.php?f=');
+    const ultimaParte = partes[partes.length - 1];
+    const urlCorregida = 'image.php?f=' + ultimaParte;
+    console.log('✅ URL corregida:', urlCorregida);
+    return urlCorregida;
+  }
+  
+  // Si es solo el nombre del archivo
+  if (!url.includes('/') && !url.includes('\\')) {
+    return 'image.php?f=productos/' + url;
+  }
+  
+  // Si viene de la BD con "uploads/productos/archivo.jpg"
+  if (url.includes('uploads/productos/')) {
+    const nombreArchivo = url.split('uploads/productos/').pop();
+    return 'image.php?f=productos/' + nombreArchivo;
+  }
+  
+  // Para cualquier otro caso
+  console.log('⚠️ URL no reconocida, devolviendo tal cual:', url);
+  return url;
+}
+
+/* ============================
    🔹 CATEGORÍAS
 ============================ */
 async function cargarCategorias() {
   try {
-    const res = await fetch('./api/categorias.php');
+    console.log('📦 Cargando categorías desde: ../api/categorias.php');
+    const res = await fetch('../api/categorias.php'); // Agregar ../
     if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
 
     const texto = await res.text();
-    console.log('Respuesta cruda de categorias.php:', texto);
+    console.log('📄 Respuesta cruda de categorias.php:', texto);
 
     let json;
     try {
@@ -54,6 +95,7 @@ async function cargarCategorias() {
         <h3 class="font-semibold text-base md:text-lg">${escapeHtml(cat.nombre)}</h3>
       `;
 
+      // CORRECCIÓN: Cambiar ruta de redirección (sin public/)
       div.addEventListener('click', () => {
         window.location.href = `tienda.html?categoria=${encodeURIComponent(cat.nombre)}`;
       });
@@ -74,7 +116,7 @@ async function cargarCategorias() {
       }
     }
   } catch (err) {
-    console.error('Error cargando categorías:', err);
+    console.error('❌ Error cargando categorías:', err);
     const grid = document.getElementById('categories-grid');
     if (grid) {
       grid.innerHTML = `
@@ -91,11 +133,12 @@ async function cargarCategorias() {
 ============================ */
 async function cargarProductosDestacados() {
   try {
-    const res = await fetch('./api/productos.php');
+    console.log('📦 Cargando productos desde: ../api/productos.php');
+    const res = await fetch('../api/productos.php'); // Agregar ../
     if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
 
     const texto = await res.text();
-    console.log('Respuesta cruda de productos.php:', texto);
+    console.log('📄 Respuesta cruda de productos.php:', texto.substring(0, 300));
 
     let json;
     try {
@@ -111,6 +154,15 @@ async function cargarProductosDestacados() {
     const grid = document.getElementById('products-grid');
     if (!grid) return;
     grid.innerHTML = '';
+
+    // Debug: Ver qué URLs vienen del API
+    console.log('🔍 Analizando primeras 3 imágenes del API:');
+    json.data.slice(0, 3).forEach((p, i) => {
+      console.log(`Producto ${i+1}: "${p.nombre}"`);
+      console.log(`  Imagen del API: "${p.imagen}"`);
+      console.log(`  Tipo: ${typeof p.imagen}`);
+      console.log(`  ¿Contiene "image.php"? ${p.imagen?.includes('image.php')}`);
+    });
 
     // Mostrar hasta 8 productos con descuento
     const destacados = json.data.filter(p => Number(p.descuento) > 0).slice(0, 8);
@@ -130,9 +182,14 @@ async function cargarProductosDestacados() {
       const precioFinal = parseFloat(prod.precio_final ?? prod.precio);
       const descuento = Number(prod.descuento) || 0;
       const sinStock = Number(prod.stock) <= 0;
-      const imagenUrl = prod.imagen
-        ? `image.php?f=uploads/productos/${escapeHtml(prod.imagen)}`
-        : 'assets/img/logo.png';
+      
+      // CORRECCIÓN: Usar corregirUrlImagen y debug
+      const imagenOriginal = prod.imagen;
+      const imagenUrl = corregirUrlImagen(imagenOriginal);
+      
+      console.log(`🖼️ Procesando: "${prod.nombre}"`);
+      console.log(`  Original: ${imagenOriginal}`);
+      console.log(`  Corregida: ${imagenUrl}`);
 
       const card = document.createElement('div');
       card.className =
@@ -146,15 +203,16 @@ async function cargarProductosDestacados() {
               : ''
           }
           <div class="h-48 md:h-64 bg-gradient-to-b from-pink-50 to-white flex items-center justify-center">
-            <img src="${imagenUrl}" alt="${escapeHtml(prod.nombre)}"
-                 onerror="this.src='assets/img/logo.png'"
-                 class="max-h-40 md:max-h-56 object-contain" />
+            <img src="${escapeHtml(imagenUrl)}" alt="${escapeHtml(prod.nombre)}"
+                 onerror="console.error('❌ Error cargando imagen:', this.src); this.src='assets/img/logo.png'"
+                 class="max-h-40 md:max-h-56 object-contain"
+                 data-original="${escapeHtml(imagenOriginal)}" />
           </div>
         </div>
 
         <div class="p-4 md:p-6">
           <span class="text-xs bg-gray-100 px-2 py-1 rounded">${escapeHtml(
-            prod.categoria
+            prod.categoria || 'General'
           )}</span>
           <h3 class="font-semibold text-base md:text-lg mb-2 mt-2">${escapeHtml(
             prod.nombre
@@ -167,15 +225,9 @@ async function cargarProductosDestacados() {
             ${
               descuento > 0
                 ? `
-                <p class="text-sm text-gray-400 line-through">S/ ${precioOriginal.toFixed(
-                  2
-                )}</p>
-                <p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">S/ ${precioFinal.toFixed(
-                  2
-                )}</p>`
-                : `<p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">S/ ${precioFinal.toFixed(
-                    2
-                  )}</p>`
+                <p class="text-sm text-gray-400 line-through">S/ ${precioOriginal.toFixed(2)}</p>
+                <p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">S/ ${precioFinal.toFixed(2)}</p>`
+                : `<p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">S/ ${precioFinal.toFixed(2)}</p>`
             }
           </div>
 
@@ -197,12 +249,13 @@ async function cargarProductosDestacados() {
       grid.appendChild(card);
     });
   } catch (err) {
-    console.error('Error cargando productos destacados:', err);
+    console.error('❌ Error cargando productos destacados:', err);
     const grid = document.getElementById('products-grid');
     if (grid) {
       grid.innerHTML = `
         <div class="col-span-full text-center py-12">
           <p class="text-red-500">Error al cargar productos: ${escapeHtml(err.message)}</p>
+          <!-- CORRECCIÓN: Cambiar ruta (sin public/) -->
           <a href="tienda.html" class="btn-primary mt-4 inline-block">Ir a la Tienda</a>
         </div>`;
     }
@@ -214,7 +267,8 @@ async function cargarProductosDestacados() {
 ============================ */
 window.agregarProductoDesdeHome = async function (id) {
   try {
-    const res = await fetch('./api/productos.php');
+    console.log(`🛒 Agregando producto ${id} al carrito`);
+    const res = await fetch('../api/productos.php'); // Agregar ../
     if (!res.ok) throw new Error('Error HTTP ' + res.status);
     const { success, data } = await res.json();
     if (!success) throw new Error('Error en la API');
@@ -225,18 +279,22 @@ window.agregarProductoDesdeHome = async function (id) {
       return;
     }
 
-    // Usar el gestor centralizado
+    // CORRECCIÓN: Usar corregirUrlImagen también aquí
+    const imagenCorregida = corregirUrlImagen(producto.imagen);
+    console.log(`  Imagen para carrito: ${imagenCorregida}`);
+
+    // Usar el gestor centralizado con imagen corregida
     const resultado = agregarAlCarrito({
       id: producto.id,
       nombre: producto.nombre,
       precio: parseFloat(producto.precio_final ?? producto.precio),
-      imagen: producto.imagen || 'assets/img/logo.png',
+      imagen: imagenCorregida || 'assets/img/logo.png', // Cambiar ruta
       stock: Number(producto.stock)
     });
 
     mostrarNotificacion(resultado.message, resultado.success ? 'success' : 'warning');
   } catch (err) {
-    console.error('Error agregando producto:', err);
+    console.error('❌ Error agregando producto:', err);
     mostrarNotificacion('Error al agregar producto', 'error');
   }
 };

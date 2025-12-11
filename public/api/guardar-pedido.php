@@ -1,6 +1,5 @@
 <?php
-// public/api/guardar-pedido.php - VERSIÓN DESARROLLO
-// Wrapper público que utiliza el modelo Pedido.php
+// public/api/guardar-pedido.php - VERSIÓN CORREGIDA
 
 define('BASE_PATH', __DIR__ . '/../../');
 
@@ -30,10 +29,10 @@ try {
     $raw = file_get_contents('php://input');
     $data = json_decode($raw, true);
 
-    // Validar datos de entrada
+    // Validar datos de entrada de manera más robusta
     if (!$data || !isset($data['cliente']) || !isset($data['items']) || !isset($data['metodo_pago_id'])) {
         http_response_code(400);
-        $response['message'] = 'Datos incompletos para procesar el pedido. Recibido: ' . $raw;
+        $response['message'] = 'Datos incompletos para procesar el pedido. Recibido: ' . substr($raw, 0, 200);
         echo json_encode($response);
         exit;
     }
@@ -49,23 +48,59 @@ try {
     $cliente = $data['cliente'];
     $cliente_id = null;
 
-    // ✅ Cambio aquí: correo en lugar de email, dni en lugar de documento
+    // ✅ VALIDACIONES PARA PERÚ
+    // Validar DNI (8 dígitos)
+    if (isset($cliente['documento']) && !preg_match('/^[0-9]{8}$/', $cliente['documento'])) {
+        http_response_code(400);
+        $response['message'] = 'El DNI debe tener exactamente 8 dígitos numéricos.';
+        echo json_encode($response);
+        exit;
+    }
+
+    // Validar teléfono (9 dígitos, empieza con 9)
+    if (isset($cliente['telefono']) && !preg_match('/^9[0-9]{8}$/', $cliente['telefono'])) {
+        http_response_code(400);
+        $response['message'] = 'El teléfono debe tener 9 dígitos y comenzar con 9. Ejemplo: 912345678';
+        echo json_encode($response);
+        exit;
+    }
+
+    // ✅ CORREGIDO: Manejar ambos casos (email/correo)
+    $email_cliente = $cliente['correo'] ?? $cliente['email'] ?? '';
+    
+    if (empty($email_cliente) || !filter_var($email_cliente, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(400);
+        $response['message'] = 'El correo electrónico no es válido.';
+        echo json_encode($response);
+        exit;
+    }
+
+    // Buscar cliente por correo o DNI
     $sql_find_cliente = "SELECT id FROM clientes WHERE correo = ? OR dni = ?";
     $stmt_find = $pdo->prepare($sql_find_cliente);
-    $stmt_find->execute([$cliente['email'], $cliente['documento']]);
+    $stmt_find->execute([$email_cliente, $cliente['documento']]);
     $result_cliente = $stmt_find->fetch(PDO::FETCH_ASSOC);
 
     if ($result_cliente) {
         $cliente_id = $result_cliente['id'];
+        // Actualizar datos del cliente si es necesario
+        $sql_update_cliente = "UPDATE clientes SET nombres = ?, apellidos = ?, telefono = ? WHERE id = ?";
+        $stmt_update = $pdo->prepare($sql_update_cliente);
+        $stmt_update->execute([
+            $cliente['nombre'],
+            $cliente['apellido'],
+            $cliente['telefono'],
+            $cliente_id
+        ]);
     } else {
-        // ✅ Cambio aquí: nombres, apellidos, dni, correo, telefono
+        // ✅ CORREGIDO: nombres, apellidos, dni, correo, telefono
         $sql_create_cliente = "INSERT INTO clientes (nombres, apellidos, dni, correo, telefono) VALUES (?, ?, ?, ?, ?)";
         $stmt_create = $pdo->prepare($sql_create_cliente);
         $stmt_create->execute([
             $cliente['nombre'],
             $cliente['apellido'],
             $cliente['documento'],
-            $cliente['email'],
+            $email_cliente,
             $cliente['telefono']
         ]);
         $cliente_id = $pdo->lastInsertId();

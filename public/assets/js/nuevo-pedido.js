@@ -1,4 +1,4 @@
-// assets/js/nuevo-pedido.js - VERSIÓN CON MODAL DE ÉXITO
+// assets/js/nuevo-pedido.js - VERSIÓN CORREGIDA
 // DEPENDE DE: cart-manager.js y carrito.js
 
 /*
@@ -9,9 +9,9 @@ const API_METODOS_PAGO = './api/metodos-pago.php';
 const API_GUARDAR_PEDIDO = './api/guardar-pedido.php';
 const DEP_CART_MANAGER = './assets/js/cart-manager.js';
 const DEP_CARRITO = './assets/js/carrito.js';
-const INDEX_PAGE = '../index.html';
-const STORAGE_KEY_CARRITO = 'carrito';
-
+const INDEX_PAGE = 'index.html';
+// CORRECCIÓN: Usar la misma clave que cart-manager.js
+const STORAGE_KEY_CARRITO = 'carrito_samyglow';
 
 /**
  * Función principal que se llama desde carrito.js
@@ -85,11 +85,11 @@ async function iniciarCheckout() {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label for="checkout-nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombres *</label>
-              <input type="text" id="checkout-nombre" name="nombre" class="form-input" required>
+              <input type="text" id="checkout-nombre" name="nombre" class="form-input" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios" required>
             </div>
             <div>
               <label for="checkout-apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellidos *</label>
-              <input type="text" id="checkout-apellido" name="apellido" class="form-input" required>
+              <input type="text" id="checkout-apellido" name="apellido" class="form-input" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios" required>
             </div>
             <div>
               <label for="checkout-email" class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
@@ -97,11 +97,11 @@ async function iniciarCheckout() {
             </div>
             <div>
               <label for="checkout-telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
-              <input type="tel" id="checkout-telefono" name="telefono" class="form-input" required>
+              <input type="tel" id="checkout-telefono" name="telefono" class="form-input" pattern="9[0-9]{8}" title="9 dígitos, comenzando con 9" maxlength="9" placeholder="912345678" required>
             </div>
             <div>
-              <label for="checkout-documento" class="block text-sm font-medium text-gray-700 mb-1">Documento (DNI/CE) *</label>
-              <input type="text" id="checkout-documento" name="documento" class="form-input" required>
+              <label for="checkout-documento" class="block text-sm font-medium text-gray-700 mb-1">Documento (DNI) *</label>
+              <input type="text" id="checkout-documento" name="documento" class="form-input" pattern="[0-9]{8}" title="8 dígitos numéricos" maxlength="8" required>
             </div>
           </div>
         </section>
@@ -134,7 +134,7 @@ async function iniciarCheckout() {
             </div>
             <div>
               <label for="checkout-codigo-postal" class="block text-sm font-medium text-gray-700 mb-1">Código Postal *</label>
-              <input type="text" id="checkout-codigo-postal" name="codigo_postal" class="form-input" required>
+              <input type="text" id="checkout-codigo-postal" name="codigo_postal" class="form-input" pattern="[0-9]{5}" title="5 dígitos numéricos" maxlength="5" required>
             </div>
           </div>
         </section>
@@ -181,22 +181,262 @@ async function iniciarCheckout() {
       </form>
     </div>
   `;
-
+  
   // 6. Llenar el resumen del pedido en el formulario
   llenarResumenCheckout();
   
   // 7. Agregar event listener al formulario
   document.getElementById('form-checkout').addEventListener('submit', procesarPedido);
   
-  // 8. Hacer scroll suave al formulario
+  // 8. Agregar validación en tiempo real
+  agregarValidacionEnTiempoReal();
+  
+  // 9. Hacer scroll suave al formulario
   formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Validar datos específicos de Perú
+ */
+function validarDatosPeru(formData) {
+  const errores = [];
+  
+  // Validar DNI (8 dígitos)
+  const dni = formData.get('documento');
+  if (!/^[0-9]{8}$/.test(dni)) {
+    errores.push('El DNI debe tener exactamente 8 dígitos numéricos.');
+  }
+  
+  // Validar teléfono (9 dígitos, empieza con 9)
+  const telefono = formData.get('telefono');
+  if (!/^9[0-9]{8}$/.test(telefono)) {
+    errores.push('El teléfono debe tener 9 dígitos y comenzar con 9. Ejemplo: 912345678');
+  }
+  
+  // Validar email
+  const email = formData.get('email');
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    errores.push('Por favor ingresa un correo electrónico válido.');
+  }
+  
+  // Validar nombres y apellidos (solo letras y espacios)
+  const nombre = formData.get('nombre');
+  const apellido = formData.get('apellido');
+  const nombreRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,}$/;
+  
+  if (!nombreRegex.test(nombre)) {
+    errores.push('El nombre solo puede contener letras y espacios (mínimo 2 caracteres).');
+  }
+  
+  if (!nombreRegex.test(apellido)) {
+    errores.push('El apellido solo puede contener letras y espacios (mínimo 2 caracteres).');
+  }
+  
+  // Validar código postal (5 dígitos para Perú)
+  const codigoPostal = formData.get('codigo_postal');
+  if (!/^[0-9]{5}$/.test(codigoPostal)) {
+    errores.push('El código postal debe tener 5 dígitos numéricos.');
+  }
+  
+  return errores;
+}
+
+/**
+ * Agregar validación en tiempo real a los campos del formulario
+ */
+function agregarValidacionEnTiempoReal() {
+  const formulario = document.getElementById('form-checkout');
+  if (!formulario) return;
+  
+  // Validar teléfono en tiempo real
+  const telefonoInput = formulario.querySelector('#checkout-telefono');
+  if (telefonoInput) {
+    telefonoInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 9) value = value.substring(0, 9);
+      e.target.value = value;
+      
+      // Limpiar error mientras escribe (solo validar cuando termine)
+      limpiarErrorCampo(e.target);
+      e.target.setCustomValidity('');
+    });
+    
+    // Validar al perder el foco
+    telefonoInput.addEventListener('blur', function(e) {
+      const value = e.target.value;
+      if (value.length > 0 && value.length !== 9) {
+        e.target.setCustomValidity('El teléfono debe tener 9 dígitos');
+        mostrarErrorCampo(e.target, 'El teléfono debe tener 9 dígitos');
+      } else if (value.length > 0 && value.charAt(0) !== '9') {
+        e.target.setCustomValidity('El teléfono debe comenzar con 9');
+        mostrarErrorCampo(e.target, 'El teléfono debe comenzar con 9');
+      } else if (value.length === 9 && value.charAt(0) === '9') {
+        e.target.setCustomValidity('');
+        mostrarCampoValido(e.target);
+      } else {
+        e.target.setCustomValidity('');
+        limpiarErrorCampo(e.target);
+      }
+    });
+  }
+  
+  // Validar DNI en tiempo real - CORREGIDO
+  const dniInput = formulario.querySelector('#checkout-documento');
+  if (dniInput) {
+    dniInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 8) value = value.substring(0, 8);
+      e.target.value = value;
+      
+      // NO mostrar error mientras escribe - solo limpiar errores previos
+      limpiarErrorCampo(e.target);
+      e.target.setCustomValidity('');
+    });
+    
+    // Validar solo cuando el usuario termine de escribir (al perder foco)
+    dniInput.addEventListener('blur', function(e) {
+      const value = e.target.value;
+      if (value.length > 0 && value.length !== 8) {
+        e.target.setCustomValidity('El DNI debe tener 8 dígitos');
+        mostrarErrorCampo(e.target, 'El DNI debe tener 8 dígitos');
+      } else if (value.length === 8) {
+        e.target.setCustomValidity('');
+        mostrarCampoValido(e.target);
+      } else {
+        e.target.setCustomValidity('');
+        limpiarErrorCampo(e.target);
+      }
+    });
+  }
+  
+  // Validar código postal en tiempo real
+  const codigoPostalInput = formulario.querySelector('#checkout-codigo-postal');
+  if (codigoPostalInput) {
+    codigoPostalInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 5) value = value.substring(0, 5);
+      e.target.value = value;
+      
+      // Limpiar error mientras escribe
+      limpiarErrorCampo(e.target);
+      e.target.setCustomValidity('');
+    });
+    
+    // Validar al perder el foco
+    codigoPostalInput.addEventListener('blur', function(e) {
+      const value = e.target.value;
+      if (value.length > 0 && value.length !== 5) {
+        e.target.setCustomValidity('El código postal debe tener 5 dígitos');
+        mostrarErrorCampo(e.target, 'El código postal debe tener 5 dígitos');
+      } else if (value.length === 5) {
+        e.target.setCustomValidity('');
+        mostrarCampoValido(e.target);
+      } else {
+        e.target.setCustomValidity('');
+        limpiarErrorCampo(e.target);
+      }
+    });
+  }
+  
+  // Validar solo letras en nombres y apellidos
+  const nombreInputs = formulario.querySelectorAll('#checkout-nombre, #checkout-apellido');
+  nombreInputs.forEach(input => {
+    input.addEventListener('input', function(e) {
+      // Permitir solo letras, espacios y tildes
+      e.target.value = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+      limpiarErrorCampo(e.target);
+      e.target.setCustomValidity('');
+    });
+    
+    // Validar al perder el foco
+    input.addEventListener('blur', function(e) {
+      const value = e.target.value;
+      const nombreRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,}$/;
+      
+      if (value.length > 0 && !nombreRegex.test(value)) {
+        e.target.setCustomValidity('Solo letras y espacios (mínimo 2 caracteres)');
+        mostrarErrorCampo(e.target, 'Solo letras y espacios (mínimo 2 caracteres)');
+      } else if (value.length >= 2) {
+        e.target.setCustomValidity('');
+        mostrarCampoValido(e.target);
+      } else {
+        e.target.setCustomValidity('');
+        limpiarErrorCampo(e.target);
+      }
+    });
+  });
+  
+  // Validar email en tiempo real
+  const emailInput = formulario.querySelector('#checkout-email');
+  if (emailInput) {
+    emailInput.addEventListener('input', function(e) {
+      limpiarErrorCampo(e.target);
+      e.target.setCustomValidity('');
+    });
+    
+    emailInput.addEventListener('blur', function(e) {
+      const value = e.target.value;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (value.length > 0 && !emailRegex.test(value)) {
+        e.target.setCustomValidity('Ingresa un correo electrónico válido');
+        mostrarErrorCampo(e.target, 'Ingresa un correo electrónico válido');
+      } else if (value.length > 0 && emailRegex.test(value)) {
+        e.target.setCustomValidity('');
+        mostrarCampoValido(e.target);
+      } else {
+        e.target.setCustomValidity('');
+        limpiarErrorCampo(e.target);
+      }
+    });
+  }
+}
+
+/**
+ * Mostrar que un campo es válido
+ */
+function mostrarCampoValido(input) {
+  limpiarErrorCampo(input);
+  input.classList.add('border-green-500');
+}
+
+/**
+ * Mostrar error en un campo específico
+ */
+function mostrarErrorCampo(input, mensaje) {
+  limpiarErrorCampo(input);
+  
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'text-red-500 text-xs mt-1';
+  errorDiv.innerHTML = `<i class="fas fa-exclamation-circle mr-1"></i>${mensaje}`;
+  
+  input.classList.add('border-red-500');
+  input.classList.remove('border-green-500');
+  input.parentNode.appendChild(errorDiv);
+  input.dataset.errorId = 'error-' + Date.now();
+}
+
+/**
+ * Limpiar error de un campo
+ */
+function limpiarErrorCampo(input) {
+  if (input.dataset.errorId) {
+    const errorElement = document.querySelector(`[data-error-id="${input.dataset.errorId}"]`);
+    if (errorElement) {
+      errorElement.remove();
+    }
+    delete input.dataset.errorId;
+  }
+  input.classList.remove('border-red-500', 'border-green-500');
 }
 
 /**
  * Llena el resumen del pedido en el formulario de checkout
  */
 function llenarResumenCheckout() {
-  const carrito = obtenerCarrito();
+  // CORRECCIÓN: Usar la función global de cart-manager.js
+  const carrito = window.obtenerCarrito ? window.obtenerCarrito() : obtenerCarritoLocal();
   const resumenContainer = document.getElementById('checkout-resumen');
   const totalContainer = document.getElementById('checkout-total');
   
@@ -240,17 +480,27 @@ function llenarResumenCheckout() {
 }
 
 /**
- * Función mejorada para procesar el pedido
+ * Función mejorada para procesar el pedido CON VALIDACIÓN
  */
 async function procesarPedido(event) {
   event.preventDefault();
   
   const formData = new FormData(event.target);
-  const carrito = obtenerCarrito();
+  // CORRECCIÓN: Usar la función global de cart-manager.js
+  const carrito = window.obtenerCarrito ? window.obtenerCarrito() : obtenerCarritoLocal();
   
   // Validar que hay productos en el carrito
   if (carrito.length === 0) {
     mostrarNotificacion('No hay productos en el carrito.', 'error');
+    return;
+  }
+  
+  // Validar datos de Perú
+  const errores = validarDatosPeru(formData);
+  if (errores.length > 0) {
+    errores.forEach(error => {
+      mostrarNotificacion(error, 'error');
+    });
     return;
   }
   
@@ -266,11 +516,12 @@ async function procesarPedido(event) {
     const shipping = subtotal >= 150 ? 0 : 10;
     const total = subtotal + shipping;
     
+    // IMPORTANTE: Usar "correo" en lugar de "email" para coincidir con la base de datos
     const pedidoData = {
       cliente: {
         nombre: formData.get('nombre'),
         apellido: formData.get('apellido'),
-        email: formData.get('email'),
+        correo: formData.get('email'), // Cambiado a "correo" para coincidir con BD
         telefono: formData.get('telefono'),
         documento: formData.get('documento'),
         direccion: `${formData.get('direccion')} ${formData.get('referencia') || ''}, ${formData.get('ciudad')}`.trim()
@@ -305,12 +556,20 @@ async function procesarPedido(event) {
     console.log('Respuesta del servidor:', resultado);
     
     if (resultado.success) {
-      // Limpiar carrito
-      localStorage.removeItem(STORAGE_KEY_CARRITO);
+      // Limpiar carrito usando la función global
+      if (window.vaciarCarrito) {
+        window.vaciarCarrito();
+      } else {
+        localStorage.removeItem(STORAGE_KEY_CARRITO);
+      }
       
       // Mostrar modal de éxito en lugar de mensaje simple
       mostrarModalExito({
-        cliente: pedidoData.cliente,
+        cliente: {
+          nombre: pedidoData.cliente.nombre,
+          email: pedidoData.cliente.correo, // Usar correo aquí también
+          telefono: pedidoData.cliente.telefono
+        },
         pedido_id: resultado.pedido_id
       });
     } else {
@@ -324,6 +583,19 @@ async function procesarPedido(event) {
     // Restaurar botón
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalText;
+  }
+}
+
+/**
+ * Función auxiliar para obtener carrito si no existe la función global
+ */
+function obtenerCarritoLocal() {
+  try {
+    const carritoStr = localStorage.getItem(STORAGE_KEY_CARRITO);
+    return carritoStr ? JSON.parse(carritoStr) : [];
+  } catch (error) {
+    console.error('Error al obtener carrito local:', error);
+    return [];
   }
 }
 
@@ -500,25 +772,17 @@ function reactivarBotonesPago() {
  */
 function mostrarNotificacion(mensaje, tipo = 'info') {
   // Verificar si ya existe la función en carrito.js
-  if (typeof window.mostrarNotificacionOriginal === 'function') {
-    window.mostrarNotificacionOriginal(mensaje, tipo);
+  if (typeof window.mostrarNotificacion === 'function') {
+    window.mostrarNotificacion(mensaje, tipo);
     return;
   }
   
   // Crear notificación temporal si no existe la función
   const notification = document.createElement('div');
-  notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-    tipo === 'success' ? 'bg-green-500 text-white' :
-    tipo === 'error' ? 'bg-red-500 text-white' :
-    'bg-blue-500 text-white'
-  }`;
+  notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${tipo === 'success' ? 'bg-green-500 text-white' : tipo === 'error' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`;
   notification.innerHTML = `
     <div class="flex items-center">
-      <i class="fas ${
-        tipo === 'success' ? 'fa-check-circle' :
-        tipo === 'error' ? 'fa-exclamation-circle' :
-        'fa-info-circle'
-      } mr-2"></i>
+      <i class="fas ${tipo === 'success' ? 'fa-check-circle' : tipo === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2"></i>
       ${mensaje}
     </div>
   `;

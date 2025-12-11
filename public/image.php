@@ -1,65 +1,79 @@
 <?php
-declare(strict_types=1);
+// public/image.php
+/**
+ * Proxy de imágenes seguro
+ * Sirve archivos desde ../uploads/ sin exponer la ruta completa
+ */
 
-// image.php — Sirve imágenes desde ../uploads/productos/
-// Uso: /public/image.php?f=uploads/productos/imagen.webp
+// Configuración básica
+$baseDir = realpath(__DIR__ . '/../uploads');
+$allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+$defaultImage = realpath(__DIR__ . '/assets/default.jpg');
 
-// Permitir acceso público (CORS)
-header('Access-Control-Allow-Origin: *');
+// Obtener archivo solicitado
+$file = $_GET['f'] ?? '';
+if (strpos($file, 'uploads/') === 0) {
+    $file = substr($file, 8); // Quita "uploads/"
+}
 
-// Obtener parámetro
-$f = $_GET['f'] ?? '';
-if (!is_string($f) || $f === '') {
-    http_response_code(400);
-    echo 'Bad Request: parámetro f ausente.';
+// Decodificar y sanitizar
+$file = urldecode($file);
+$file = ltrim($file, '/');
+$path = realpath($baseDir . '/' . $file);
+
+// Verificar seguridad
+if ($path === false || strpos($path, $baseDir) !== 0) {
+    // Archivo no encontrado o fuera del directorio permitido
+    serveDefaultImage();
     exit;
 }
 
-// Normalizar separadores
-$f = str_replace('\\', '/', $f);
-
-// Evitar intentos de traversal (../)
-if (strpos($f, '..') !== false) {
-    http_response_code(400);
-    echo 'Bad Request: ruta no permitida.';
+// Verificar extensión
+$ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+if (!in_array($ext, $allowedExtensions)) {
+    serveDefaultImage();
     exit;
 }
 
-// Asegurar que solo se sirvan archivos dentro de /uploads/productos/
-$allowedPrefix = 'uploads/productos/';
-if (stripos($f, $allowedPrefix) !== 0) {
-    http_response_code(400);
-    echo 'Bad Request: solo se permiten imágenes en uploads/productos/.';
-    exit;
-}
-
-// Ruta base absoluta (sube un nivel desde /public/)
-$baseUploads = realpath(__DIR__ . '/../uploads');
-if ($baseUploads === false) {
-    http_response_code(500);
-    echo 'Server misconfiguration: carpeta uploads no encontrada.';
-    exit;
-}
-
-// Ruta completa del archivo solicitado
-$fullPath = realpath(__DIR__ . '/../' . $f);
-
-// Validar ruta y existencia del archivo
-if ($fullPath === false || strpos($fullPath, $baseUploads) !== 0 || !is_file($fullPath)) {
-    http_response_code(404);
-    echo 'Archivo no encontrado.';
+// Verificar que exista
+if (!file_exists($path) || !is_file($path)) {
+    serveDefaultImage();
     exit;
 }
 
 // Determinar tipo MIME
-$mime = mime_content_type($fullPath) ?: 'application/octet-stream';
-$size = filesize($fullPath);
+$mimeTypes = [
+    'jpg' => 'image/jpeg',
+    'jpeg' => 'image/jpeg',
+    'png' => 'image/png',
+    'gif' => 'image/gif',
+    'webp' => 'image/webp'
+];
 
-// Enviar cabeceras
-header('Content-Type: ' . $mime);
-header('Content-Length: ' . $size);
-header('Cache-Control: public, max-age=86400');
+$contentType = $mimeTypes[$ext] ?? 'application/octet-stream';
 
-// Enviar imagen al navegador
-readfile($fullPath);
+// Enviar imagen
+header('Content-Type: ' . $contentType);
+header('Content-Length: ' . filesize($path));
+header('Cache-Control: public, max-age=86400'); // Cache por 24 horas
+
+readfile($path);
 exit;
+
+function serveDefaultImage()
+{
+    global $defaultImage;
+    
+    if ($defaultImage && file_exists($defaultImage)) {
+        header('Content-Type: image/jpeg');
+        header('Cache-Control: public, max-age=3600');
+        readfile($defaultImage);
+    } else {
+        http_response_code(404);
+        header('Content-Type: image/svg+xml');
+        echo '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+                <rect width="100" height="100" fill="#ddd"/>
+                <text x="50" y="50" text-anchor="middle" fill="#666" font-size="10">Imagen no encontrada</text>
+              </svg>';
+    }
+}
