@@ -4,9 +4,9 @@ class Database {
     private $pdo;
     
     private $host = 'localhost';
-    private $dbname = 'vjetvzgr_samyglow';
-    private $user = 'vjetvzgr_samyglow';
-    private $pass = 'samyglow.qatunas.com/';
+    private $dbname = 'tienda_samyglow';
+    private $user = 'root';
+    private $pass = '';
     
     private function __construct() {
         try {

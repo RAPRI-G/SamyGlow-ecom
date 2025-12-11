@@ -71,11 +71,29 @@
                             <tbody class="bg-white divide-y divide-gray-200" id="tabla-productos">
                                 <?php foreach ($productos as $producto): ?>
                                     <tr class="fade-in">
+
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10 bg-pink-100 rounded-lg flex items-center justify-center">
-                                                    <?php if (!empty($producto['imagen_url'])): ?>
-                                                        <img src="<?= htmlspecialchars($producto['imagen_url']) ?>" alt="<?= htmlspecialchars($producto['nombre']) ?>" class="h-8 w-8 rounded-lg object-cover">
+                                                    <?php if (!empty($producto['imagen'])): ?>
+                                                        <?php
+                                                        $imagenPath = $producto['imagen'];
+                                                        if (!str_starts_with($imagenPath, 'uploads/')) {
+                                                            $imagenPath = 'uploads/productos/' . $imagenPath;
+                                                        }
+
+                                                        // Verificar si la imagen existe físicamente
+                                                        $rutaAbsoluta = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($imagenPath, '/');
+                                                        $imagenExiste = file_exists($rutaAbsoluta);
+                                                        ?>
+
+                                                        <?php if ($imagenExiste): ?>
+                                                            <img src="<?= htmlspecialchars($imagenPath) ?>"
+                                                                alt="<?= htmlspecialchars($producto['nombre']) ?>"
+                                                                class="h-8 w-8 rounded-lg object-cover">
+                                                        <?php else: ?>
+                                                            <i class="fas fa-cube text-pink-600"></i>
+                                                        <?php endif; ?>
                                                     <?php else: ?>
                                                         <i class="fas fa-cube text-pink-600"></i>
                                                     <?php endif; ?>
@@ -1631,13 +1649,18 @@
                        onchange="previsualizarImagenEditar(this)">
             </div>
             <div id="imagen-preview-editar">
-                ${producto.imagen_url ? `
-                    <div class="mt-2">
-                        <p class="text-sm text-gray-600 mb-2">Imagen actual:</p>
-                        <img src="${producto.imagen_url}" alt="${escapeHtml(producto.nombre)}" 
-                             class="w-32 h-32 object-cover rounded-lg border">
-                    </div>
-                ` : '<p class="text-sm text-gray-500 mt-2">No hay imagen actual</p>'}
+${producto.imagen ? `
+    <div class="mt-2">
+        <p class="text-sm text-gray-600 mb-2">Imagen actual:</p>
+        <img src="${producto.imagen}" alt="${escapeHtml(producto.nombre)}" 
+             class="w-32 h-32 object-cover rounded-lg border"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <p class="text-sm text-gray-500 mt-2" style="display:none;">
+            <i class="fas fa-exclamation-triangle text-yellow-500 mr-1"></i>
+            No se pudo cargar la imagen
+        </p>
+    </div>
+` : '<p class="text-sm text-gray-500 mt-2">No hay imagen actual</p>'}
             </div>
         </div>
         
