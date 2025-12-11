@@ -147,7 +147,7 @@ class ProductoController
     // En ProductoController.php, modifica el método manejarSubidaImagen:
     private function manejarSubidaImagen($archivo)
     {
-        $directorioDestino = __DIR__ . '/../../public/uploads/productos/';
+        $directorioDestino = __DIR__ . '/../../uploads/productos/';
 
         // Crear directorio si no existe
         if (!is_dir($directorioDestino)) {
