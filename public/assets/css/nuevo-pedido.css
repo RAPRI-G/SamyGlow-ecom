@@ -1,6 +1,76 @@
-/* ===== ESTILOS ADICIONALES PARA LA MODAL DE ÉXITO ===== */
+/* ============ NUEVO PEDIDO ELEGANTE VICTORIA'S SECRET - COLORES SUAVES ============ */
 
-/* Animaciones de cierre */
+:root {
+  /* Colores Pastel Suaves */
+  --rosa-principal: #FFB6D9;
+  --rosa-secundario: #FFC9E0;
+  --rosa-claro: #FFE8F5;
+  --rosa-muy-claro: #FFF5FA;
+  --rosa-pastel: #FFD6E8;
+  --perla: #FFFCFD;
+  --blanco-puro: #FFFFFF;
+  
+  /* Texto */
+  --texto-principal: #4A4A4A;
+  --texto-secundario: #6B6B6B;
+  --texto-suave: #8A8A8A;
+  
+  /* Gradientes Suaves */
+  --gradient-principal: linear-gradient(135deg, #FFB6D9 0%, #FFC9E0 50%, #FFE8F5 100%);
+  
+  /* Sombras Suaves */
+  --sombra-suave: 0 4px 20px rgba(255, 182, 217, 0.12);
+  --sombra-media: 0 8px 30px rgba(255, 182, 217, 0.15);
+  --sombra-hover: 0 12px 40px rgba(255, 182, 217, 0.2);
+}
+
+/* ===== MODAL DE ÉXITO ELEGANTE ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 182, 217, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 32px;
+  padding: 3rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(255, 182, 217, 0.3);
+  text-align: center;
+  position: relative;
+  border: 2px solid rgba(255, 201, 224, 0.3);
+  animation: slideUpScale 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideUpScale {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Animación de cierre */
 @keyframes fadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
@@ -17,218 +87,272 @@
   }
 }
 
-/* Efecto de brillo adicional para el icono */
-.fa-check-circle {
-  filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.5));
-  transition: all 0.3s ease;
+.modal-overlay.closing {
+  animation: fadeOut 0.3s ease forwards;
 }
 
-/* Hover effect para el icono */
-.modal-content:hover .fa-check-circle {
-  filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.8));
-  transform: scale(1.05);
+.modal-overlay.closing .modal-content {
+  animation: slideOut 0.3s ease forwards;
 }
 
-/* Mejora en los botones de la modal */
+/* Ícono de éxito */
+.check-animation {
+  font-size: 5rem;
+  color: #10B981;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.4));
+  animation: checkPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes checkPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.4));
+  }
+  50% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.6));
+  }
+}
+
+.modal-content h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--texto-principal);
+  margin-bottom: 1rem;
+}
+
+.modal-content p {
+  color: var(--texto-secundario);
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* Botones de la modal */
 .modal-content .btn-primary,
 .modal-content .btn-secondary {
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
   transition: all 0.3s ease;
+  border: none;
+  min-width: 150px;
 }
 
-.modal-content .btn-primary:hover,
-.modal-content .btn-secondary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-/* Efecto de escala en el contenido */
-.modal-content {
-  transition: all 0.3s ease;
-}
-
-/* Personalización del scrollbar si aparece en la modal */
-.modal-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-  background: var(--rosa-neon);
-  border-radius: 3px;
-}
-
-/* Media query para pantallas pequeñas */
-@media (max-width: 640px) {
-  .modal-content {
-    margin: 1rem;
-    padding: 1.5rem;
-  }
-  
-  .check-animation {
-    font-size: 4rem;
-  }
-  
-  .modal-content h2 {
-    font-size: 1.5rem;
-  }
-}
-
-/* Clase para deshabilitar el scroll del body cuando la modal está abierta */
-body.modal-open {
+.modal-content .btn-primary {
+  background: var(--gradient-principal);
+  color: white;
+  box-shadow: var(--sombra-suave);
+  position: relative;
   overflow: hidden;
 }
 
-/* Mejora visual de los inputs del formulario */
-.form-input {
+.modal-content .btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  background-color: #fff;
-  color: #333;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: 0.6s;
 }
 
-.form-input:focus {
-  border-color: var(--rosa-neon);
-  box-shadow: 0 0 8px rgba(255, 20, 147, 0.4);
-  outline: none;
+.modal-content .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-hover);
 }
 
-.form-input::placeholder {
-  color: #888;
+.modal-content .btn-primary:hover::before {
+  left: 100%;
 }
 
-/* ===== ESTILOS MEJORADOS PARA EL FORMULARIO DE CHECKOUT ===== */
+.modal-content .btn-secondary {
+  background: transparent;
+  color: var(--rosa-principal);
+  border: 2px solid var(--rosa-principal);
+}
 
-/* Contenedor principal del formulario */
+.modal-content .btn-secondary:hover {
+  background: rgba(255, 182, 217, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ===== FORMULARIO DE CHECKOUT ELEGANTE ===== */
 #checkout-form-container {
   animation: fadeInUp 0.6s ease-out;
 }
 
-/* Estilos mejorados para las secciones del formulario */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Secciones del formulario */
 #checkout-form-container section {
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid rgba(255, 105, 180, 0.2);
-  box-shadow: 0 4px 15px rgba(255, 20, 147, 0.1);
+  background: white;
+  border-radius: 24px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 201, 224, 0.2);
+  box-shadow: var(--sombra-suave);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+#checkout-form-container section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--gradient-principal);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
 }
 
 #checkout-form-container section:hover {
-  box-shadow: 0 6px 20px rgba(255, 20, 147, 0.15);
-  border-color: rgba(255, 105, 180, 0.3);
+  box-shadow: var(--sombra-media);
+  border-color: rgba(255, 182, 217, 0.4);
 }
 
-/* Títulos de sección mejorados */
+#checkout-form-container section:hover::before {
+  transform: scaleX(1);
+}
+
+/* Títulos de sección */
 #checkout-form-container h3 {
-  color: var(--purpura-intenso);
-  font-size: 1.25rem;
-  font-weight: 600;
-  border-bottom: 2px solid var(--rosa-pastel);
-  padding-bottom: 0.75rem;
-  margin-bottom: 1rem;
+  font-family: 'Playfair Display', serif;
+  color: var(--texto-principal);
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(255, 214, 232, 0.3);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-/* Labels mejorados */
+/* Labels */
 #checkout-form-container label {
-  color: var(--texto-oscuro);
-  font-weight: 500;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  color: var(--texto-principal);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
   display: block;
 }
 
-/* Contenedor de inputs */
-#checkout-form-container .grid > div {
-  margin-bottom: 1rem;
-}
-
-/* Inputs y selects mejorados */
+/* Inputs y selects */
 .form-input {
   width: 100%;
-  padding: 0.875rem 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  background-color: #ffffff;
-  color: var(--texto-oscuro);
+  padding: 1rem 1.25rem;
+  border: 2px solid rgba(255, 201, 224, 0.3);
+  border-radius: 16px;
+  background-color: white;
+  color: var(--texto-principal);
   font-size: 1rem;
   font-family: 'Poppins', sans-serif;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(255, 182, 217, 0.05);
 }
 
 .form-input:focus {
-  border-color: var(--rosa-neon);
-  box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.1), 
-              0 4px 12px rgba(255, 20, 147, 0.2);
+  border-color: var(--rosa-principal);
+  box-shadow: 0 0 0 4px rgba(255, 182, 217, 0.1);
   outline: none;
-  transform: translateY(-1px);
-}
-
-.form-input:hover {
-  border-color: #cbd5e0;
-}
-
-/* Placeholder mejorado */
-.form-input::placeholder {
-  color: #9ca3af;
-  font-style: italic;
-}
-
-/* Select específico */
-#checkout-form-container select.form-input {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23FF1493' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.75rem center;
-  background-repeat: no-repeat;
-  background-size: 16px 12px;
-  padding-right: 2.5rem;
-  appearance: none;
-}
-
-/* Estilos para los métodos de pago */
-.payment-method-label {
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 1rem;
-  transition: all 0.3s ease;
-  background: white;
-}
-
-.payment-method-label:hover {
-  border-color: var(--rosa-neon);
-  box-shadow: 0 4px 12px rgba(255, 20, 147, 0.15);
   transform: translateY(-2px);
 }
 
+.form-input:hover {
+  border-color: rgba(255, 182, 217, 0.5);
+}
+
+/* Placeholder */
+.form-input::placeholder {
+  color: var(--texto-suave);
+  font-style: italic;
+}
+
+/* Select personalizado */
+#checkout-form-container select.form-input {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23FFB6D9' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  background-size: 18px 14px;
+  padding-right: 3rem;
+  appearance: none;
+}
+
+/* Métodos de pago */
+.payment-method-label {
+  border: 2px solid rgba(255, 201, 224, 0.3);
+  border-radius: 16px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+  background: white;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.payment-method-label::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gradient-principal);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.payment-method-label:hover {
+  border-color: rgba(255, 182, 217, 0.5);
+  box-shadow: var(--sombra-suave);
+  transform: translateY(-2px);
+}
+
+.payment-method-label:hover::before {
+  transform: scaleY(1);
+}
+
 .payment-method-label:has(input:checked) {
-  border-color: var(--rosa-neon);
-  background: linear-gradient(135deg, rgba(255, 20, 147, 0.05) 0%, rgba(139, 58, 156, 0.05) 100%);
-  box-shadow: 0 4px 15px rgba(255, 20, 147, 0.2);
+  border-color: var(--rosa-principal);
+  background: linear-gradient(135deg, rgba(255, 182, 217, 0.08) 0%, rgba(255, 201, 224, 0.08) 100%);
+  box-shadow: var(--sombra-suave);
+}
+
+.payment-method-label:has(input:checked)::before {
+  transform: scaleY(1);
 }
 
 /* Radio buttons personalizados */
 .payment-method-label input[type="radio"] {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #cbd5e0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 182, 217, 0.5);
   border-radius: 50%;
   appearance: none;
   position: relative;
   cursor: pointer;
   transition: all 0.3s ease;
+  background: white;
 }
 
 .payment-method-label input[type="radio"]:checked {
-  border-color: var(--rosa-neon);
-  background-color: white;
+  border-color: var(--rosa-principal);
+  background: white;
 }
 
 .payment-method-label input[type="radio"]:checked::after {
@@ -237,97 +361,116 @@ body.modal-open {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 8px;
-  height: 8px;
-  background: var(--rosa-neon);
+  width: 10px;
+  height: 10px;
+  background: var(--gradient-principal);
   border-radius: 50%;
+  animation: radioCheck 0.3s ease;
 }
 
-/* Sección de resumen mejorada */
+@keyframes radioCheck {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Sección de resumen */
 #checkout-resumen {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 #checkout-resumen > div {
-  padding: 0.25rem 0;
-  border-bottom: 1px solid #f1f1f1;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 214, 232, 0.3);
 }
 
 #checkout-total {
-  font-size: 1.25rem;
-  font-weight: bold;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--gradient-principal);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Botones del formulario */
 #checkout-form-container .btn-primary,
 #checkout-form-container .btn-secondary {
-  padding: 0.875rem 1.5rem;
-  font-size: 1rem;
+  padding: 1rem 2rem;
+  font-size: 1.05rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: 50px;
   transition: all 0.3s ease;
 }
 
 #checkout-form-container .btn-primary {
-  background: linear-gradient(135deg, var(--rosa-neon) 0%, var(--purpura-intenso) 100%);
+  background: var(--gradient-principal);
   color: white;
   border: none;
-  box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+  box-shadow: var(--sombra-suave);
+  position: relative;
+  overflow: hidden;
+}
+
+#checkout-form-container .btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: 0.6s;
 }
 
 #checkout-form-container .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 20, 147, 0.6);
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-hover);
+}
+
+#checkout-form-container .btn-primary:hover::before {
+  left: 100%;
 }
 
 #checkout-form-container .btn-secondary {
   background: white;
-  color: var(--rosa-neon);
-  border: 2px solid var(--rosa-neon);
+  color: var(--rosa-principal);
+  border: 2px solid var(--rosa-principal);
 }
 
 #checkout-form-container .btn-secondary:hover {
-  background: var(--rosa-neon);
-  color: white;
-  box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+  background: rgba(255, 182, 217, 0.1);
+  transform: translateY(-2px);
 }
 
 /* Indicadores de campo requerido */
 #checkout-form-container label:has(+ input[required])::after,
 #checkout-form-container label:has(+ select[required])::after {
   content: " *";
-  color: #ef4444;
+  color: #EF4444;
+  font-weight: 700;
 }
 
 /* Estados de validación */
 .form-input:invalid:not(:focus):not(:placeholder-shown) {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  border-color: #EF4444;
+  background: rgba(239, 68, 68, 0.05);
 }
 
 .form-input:valid:not(:focus):not(:placeholder-shown) {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  border-color: #10B981;
+  background: rgba(16, 185, 129, 0.05);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  #checkout-form-container section {
-    padding: 1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .form-input {
-    padding: 0.75rem;
-    font-size: 0.9rem;
-  }
-  
-  #checkout-form-container h3 {
-    font-size: 1.1rem;
-  }
+/* Body con modal abierta */
+body.modal-open {
+  overflow: hidden;
 }
 
-/* Animación de entrada para los campos */
+/* ===== ANIMACIÓN DE CAMPOS ===== */
 @keyframes slideInField {
   from {
     opacity: 0;
@@ -343,9 +486,67 @@ body.modal-open {
   animation: slideInField 0.5s ease-out forwards;
 }
 
-/* Retraso escalonado para la animación de los campos */
-#checkout-form-container .grid > div:nth-child(1) { animation-delay: 0.1s; }
-#checkout-form-container .grid > div:nth-child(2) { animation-delay: 0.2s; }
-#checkout-form-container .grid > div:nth-child(3) { animation-delay: 0.3s; }
-#checkout-form-container .grid > div:nth-child(4) { animation-delay: 0.4s; }
-#checkout-form-container .grid > div:nth-child(5) { animation-delay: 0.5s; }
+/* Retraso escalonado */
+#checkout-form-container .grid > div:nth-child(1) { animation-delay: 0.05s; }
+#checkout-form-container .grid > div:nth-child(2) { animation-delay: 0.1s; }
+#checkout-form-container .grid > div:nth-child(3) { animation-delay: 0.15s; }
+#checkout-form-container .grid > div:nth-child(4) { animation-delay: 0.2s; }
+#checkout-form-container .grid > div:nth-child(5) { animation-delay: 0.25s; }
+#checkout-form-container .grid > div:nth-child(6) { animation-delay: 0.3s; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 2rem;
+    border-radius: 24px;
+  }
+  
+  .check-animation {
+    font-size: 4rem;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.65rem;
+  }
+
+  #checkout-form-container section {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-input {
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+  }
+  
+  #checkout-form-container h3 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
+  
+  .check-animation {
+    font-size: 3.5rem;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .modal-content p {
+    font-size: 0.95rem;
+  }
+
+  #checkout-form-container section {
+    padding: 1.25rem;
+  }
+
+  .payment-method-label {
+    padding: 1rem;
+  }
+}

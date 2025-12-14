@@ -1,20 +1,36 @@
-/* main.css - Librería Base de Estilos Comunes */
+/* ============ DISEÑO ELEGANTE VICTORIA'S SECRET - COLORES SUAVES ============ */
 
-/* ============================================
-   VARIABLES CSS
-   ============================================ */
 :root {
+  /* Colores Pastel Suaves */
+  --rosa-principal: #FFB6D9;
+  --rosa-secundario: #FFC9E0;
+  --rosa-claro: #FFE8F5;
+  --rosa-muy-claro: #FFF5FA;
   --rosa-pastel: #FFD6E8;
-  --rosa-neon: #FF1493;
-  --rosa-neon-light: #FF69B4;
-  --purpura-intenso: #8B3A9C;
-  --rosa-vibrante: #FF6BB5;
-  --fondo: #FFFFFF;
-  --texto-oscuro: #2D2D2D;
+  --lila-suave: #E8D5F2;
+  --perla: #FFFCFD;
+  --blanco-puro: #FFFFFF;
+  
+  /* Texto */
+  --texto-principal: #4A4A4A;
+  --texto-secundario: #6B6B6B;
+  --texto-suave: #8A8A8A;
+  
+  /* Gradientes Suaves */
+  --gradient-principal: linear-gradient(135deg, #FFB6D9 0%, #FFC9E0 50%, #FFE8F5 100%);
+  --gradient-secundario: linear-gradient(135deg, #FFD6E8 0%, #FFE8F5 100%);
+  --gradient-sutil: linear-gradient(180deg, #FFFFFF 0%, #FFF5FA 100%);
+  
+  /* Sombras Suaves */
+  --sombra-suave: 0 4px 20px rgba(255, 182, 217, 0.12);
+  --sombra-media: 0 8px 30px rgba(255, 182, 217, 0.15);
+  --sombra-hover: 0 12px 40px rgba(255, 182, 217, 0.2);
+  
+  /* Efectos de Vidrio */
+  --glass-white: rgba(255, 255, 255, 0.95);
 }
-/* ============================================
-   RESET Y BASE
-   ============================================ */
+
+/* Reset y Base */
 * {
   margin: 0;
   padding: 0;
@@ -22,91 +38,325 @@
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  color: var(--texto-oscuro);
-  background: var(--fondo);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--perla);
+  color: var(--texto-principal);
   overflow-x: hidden;
+  line-height: 1.6;
+  position: relative;
 }
 
-h1, h2, h3 {
-  font-family: 'Playfair Display', serif;
+/* Fondo Decorativo Sutil */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(255, 182, 217, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(255, 201, 224, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(255, 232, 245, 0.03) 0%, transparent 50%);
+  z-index: -1;
+  pointer-events: none;
 }
 
-/* ============================================
-   EFECTOS DE GLOW E ICONOS
-   ============================================ */
-.glow-icon {
+/* ===== HEADER ELEGANTE ===== */
+header {
+  background: var(--glass-white);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 2px 20px rgba(255, 182, 217, 0.08);
+  border-bottom: 1px solid rgba(255, 201, 224, 0.2);
   transition: all 0.3s ease;
-  color: var(--rosa-neon);
+}
+
+/* Logo Style */
+.logo-victoria {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  background: var(--gradient-principal);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.5px;
+}
+
+/* Iconos con Efecto Suave */
+.glow-icon {
+  color: var(--rosa-principal);
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .glow-icon:hover {
-  filter: drop-shadow(0 0 8px var(--rosa-neon)) drop-shadow(0 0 16px var(--rosa-neon-light));
+  color: var(--rosa-secundario);
+  transform: scale(1.1);
+  filter: drop-shadow(0 4px 8px rgba(255, 182, 217, 0.3));
+}
+
+/* ===== HERO SECTION ELEGANTE ===== */
+.hero-victoria {
+  min-height: 85vh;
+  background: var(--gradient-sutil);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+/* Slideshow Mejorado */
+.slideshow-victoria {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+}
+
+.slide-victoria {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(1.15) saturate(1.1);
+}
+
+.slide-victoria.active {
+  opacity: 1;
+}
+
+/* Contenido del Hero */
+.hero-content-victoria {
+  position: relative;
+  z-index: 2;
+  padding: 4rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.hero-title-victoria {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--texto-principal);
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.hero-title-victoria span {
+  background: var(--gradient-principal);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+/* ===== BOTONES ELEGANTES ===== */
+.btn-victoria {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1rem 2.5rem;
+  background: var(--gradient-principal);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: var(--sombra-suave);
+}
+
+.btn-victoria::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: 0.6s;
+}
+
+.btn-victoria:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-hover);
+}
+
+.btn-victoria:hover::before {
+  left: 100%;
+}
+
+.btn-victoria-outline {
+  background: transparent;
+  border: 2px solid var(--rosa-principal);
+  color: var(--rosa-principal);
+  box-shadow: none;
+}
+
+.btn-victoria-outline:hover {
+  background: var(--rosa-principal);
+  color: white;
+  border-color: var(--rosa-principal);
+}
+
+/* ===== SECCIÓN BENEFICIOS MODERNA ===== */
+.section-beneficios {
+  background: var(--perla);
+  padding: 5rem 0;
+  position: relative;
+}
+
+.section-beneficios::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 182, 217, 0.3) 50%, 
+    transparent 100%);
+}
+
+.beneficios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.beneficio-card {
+  background: white;
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 201, 224, 0.2);
+  box-shadow: var(--sombra-suave);
+  position: relative;
+  overflow: hidden;
+}
+
+.beneficio-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-principal);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.beneficio-card:hover::before {
+  transform: scaleX(1);
+}
+
+.beneficio-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--sombra-hover);
+  border-color: rgba(255, 182, 217, 0.3);
+}
+
+.beneficio-icon {
+  font-size: 2.5rem;
+  color: var(--rosa-principal);
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.beneficio-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 182, 217, 0.1);
+  border-radius: 50%;
+  z-index: -1;
+  transition: all 0.3s ease;
+}
+
+.beneficio-card:hover .beneficio-icon {
   transform: scale(1.1);
 }
 
-/* ============================================
-   BORDES Y FONDOS
-   ============================================ */
-.border-neon {
-  border: 2px solid var(--rosa-neon);
-  box-shadow: 0 0 15px rgba(255, 20, 147, 0.3);
+.beneficio-card:hover .beneficio-icon::after {
+  width: 85px;
+  height: 85px;
+  background: rgba(255, 182, 217, 0.15);
 }
 
-.border-neon-light {
-  border: 1px solid var(--rosa-neon-light);
+.beneficio-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--texto-principal);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.3px;
 }
 
-.bg-pastel {
-  background: var(--rosa-pastel);
+.beneficio-desc {
+  color: var(--texto-secundario);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ===== SECCIONES GENERALES ===== */
+.section-border-top {
+  border-top: 1px solid rgba(255, 201, 224, 0.2);
 }
 
 .bg-pastel-gradient {
-  background: linear-gradient(135deg, var(--rosa-pastel) 0%, #FFFFFF 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF5FA 50%, #FFFFFF 100%);
 }
 
-/* ============================================
-   SISTEMA DE BOTONES
-   ============================================ */
-.btn-primary {
-  background: linear-gradient(135deg, var(--rosa-neon) 0%, var(--purpura-intenso) 100%);
-  color: white;
-  padding: 0.75rem 2rem;
-  border-radius: 50px;
-  font-weight: 600;
-  display: inline-block;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
-  border: none;
-  cursor: pointer;
+/* ===== CARDS DE PRODUCTOS ===== */
+.pulse-glam {
+  animation: pulse-soft 3s ease-in-out infinite;
 }
 
-.btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 25px var(--rosa-neon), 0 0 50px var(--rosa-neon-light);
+@keyframes pulse-soft {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 182, 217, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 10px rgba(255, 182, 217, 0.1);
+  }
 }
 
-.btn-secondary {
-  background: white;
-  color: var(--rosa-neon);
-  padding: 0.5rem 1.5rem;
-  border-radius: 50px;
-  font-weight: 500;
-  border: 2px solid var(--rosa-neon);
-  transition: all 0.3s ease;
-  cursor: pointer;
+.border-neon {
+  border: 2px solid rgba(255, 182, 217, 0.3);
 }
 
-.btn-secondary:hover {
-  background: var(--rosa-neon);
-  color: white;
-  box-shadow: 0 0 20px var(--rosa-neon);
+.border-neon-light {
+  border: 1px solid rgba(255, 201, 224, 0.2);
 }
 
-/* ============================================
-   ANIMACIONES
-   ============================================ */
-@keyframes fadeInUp {
+/* ===== ANIMACIONES SUAVES ===== */
+@keyframes fadeInUpVictoria {
   from {
     opacity: 0;
     transform: translateY(30px);
@@ -117,33 +367,73 @@ h1, h2, h3 {
   }
 }
 
-.fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
+.fade-in-victoria {
+  animation: fadeInUpVictoria 0.8s ease-out forwards;
+  opacity: 0;
 }
 
-/* ============================================
-   MENÚ MÓVIL
-   ============================================ */
-#mobile-menu {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
+@keyframes floatSoft {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
-#mobile-menu.active {
-  max-height: 500px;
+.float-soft {
+  animation: floatSoft 6s ease-in-out infinite;
 }
 
-/* ============================================
-   TARJETAS DE PRODUCTO
-   ============================================ */
-.card-product {
+/* ===== SCROLLBAR ELEGANTE ===== */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--rosa-muy-claro);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-principal);
+  border-radius: 10px;
   transition: all 0.3s ease;
-  cursor: pointer;
 }
 
-.card-product:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 40px rgba(255, 20, 147, 0.4);
-  border: 2px solid var(--rosa-neon);
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--rosa-secundario), var(--rosa-principal));
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero-victoria {
+    min-height: 75vh;
+  }
+  
+  .hero-title-victoria {
+    font-size: 2rem;
+  }
+  
+  .beneficios-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+  
+  .btn-victoria {
+    padding: 0.875rem 2rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content-victoria {
+    padding: 2rem 1rem;
+  }
+  
+  .beneficio-card {
+    padding: 2rem 1.5rem;
+  }
 }

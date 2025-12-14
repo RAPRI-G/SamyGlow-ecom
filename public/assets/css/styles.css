@@ -1,117 +1,241 @@
-html, body {
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100vw;
-}
+/* ============ EFECTOS Y ANIMACIONES SUAVES ============ */
 
-body {
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* Fix para prevenir scroll horizontal */
-.container-wrapper {
-  width: 100%;
-  overflow-x: hidden;
-}
-
-/* ===== HERO.CSS ===== */
-.hero-section {
-  position: relative;
-  min-height: 70vh;
-  width: 100%;
-  background-image: url('../img/bg.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  overflow: hidden;
-}
-
-.hero-overlay {
-  position: absolute;
+/* Partículas de Fondo Suaves */
+.particles {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 1;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.6;
 }
 
-.hero-content {
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 182, 217, 0.3), rgba(255, 201, 224, 0.2));
+  animation: float-particle 20s infinite linear;
+}
+
+@keyframes float-particle {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Texto con Gradiente Suave */
+.gradient-text {
+  background: linear-gradient(135deg, #FFB6D9, #FFC9E0, #FFE8F5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Borde Suave */
+.neon-border {
   position: relative;
-  z-index: 2;
+  border: 2px solid transparent;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #FFB6D9, #FFC9E0) border-box;
+  border-radius: 20px;
 }
 
-.hero-logo {
-  max-width: 150px;
-  width: 100%;
-  height: auto;
-  margin-bottom: 2rem;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+/* Efectos Hover Suaves */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-@media (max-width: 768px) {
-  .hero-logo {
-    max-width: 100px;
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(255, 182, 217, 0.25);
+}
+
+/* Animación de Carga Suave */
+.loading-wave {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-bar {
+  width: 4px;
+  height: 18px;
+  background: linear-gradient(135deg, #FFB6D9, #FFC9E0);
+  border-radius: 4px;
+  animation: loading 1s ease-in-out infinite;
+}
+
+.loading-bar:nth-child(2) { animation-delay: 0.1s; }
+.loading-bar:nth-child(3) { animation-delay: 0.2s; }
+.loading-bar:nth-child(4) { animation-delay: 0.3s; }
+
+@keyframes loading {
+  0%, 100% { 
+    transform: scaleY(1);
+    opacity: 0.5;
   }
-
-  .hero-section {
-    min-height: 60vh;
+  50% { 
+    transform: scaleY(2);
+    opacity: 1;
   }
 }
 
-.typing-effect {
-  opacity: 0;
-  animation: fadeIn 1s ease-in forwards;
-  animation-delay: 0.5s;
-}
-
-@keyframes fadeIn {
-  to { opacity: 1; }
-}
-
-.typing-cursor {
-  display: inline-block;
-  width: 2px;
-  height: 1.2em;
-  background-color: white;
-  margin-left: 4px;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-
-/* Animaciones de entrada */
-.fade-in-up {
+/* Animación de Revelado de Card */
+.reveal-card {
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.6s ease;
 }
 
-.fade-in-up.visible {
+.reveal-card.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.pulse-glam {
-  animation: pulseGlam 2s ease-in-out infinite;
+/* Efecto Brillo Suave */
+.shine {
+  position: relative;
+  overflow: hidden;
 }
 
-@keyframes pulseGlam {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+.shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  transition: 0.8s;
 }
 
-/* Secciones con borde superior */
-.section-border-top {
-  border-top: 3px solid var(--rosa-neon);
+.shine:hover::after {
+  left: 100%;
 }
 
-/* Fix para imágenes responsive */
-img {
-  max-width: 100%;
-  height: auto;
+/* Efecto Glitch Suave */
+.glitch {
+  position: relative;
+  animation: glitch-soft 8s infinite;
+}
+
+@keyframes glitch-soft {
+  0%, 98% { 
+    transform: translate(0);
+  }
+  99% { 
+    transform: translate(-1px, 1px);
+  }
+  100% { 
+    transform: translate(0);
+  }
+}
+
+/* Blob Suave */
+.blob {
+  background: linear-gradient(135deg, rgba(255, 182, 217, 0.2), rgba(255, 201, 224, 0.15));
+  border-radius: 50%;
+  animation: blob-animation 20s infinite;
+  filter: blur(40px);
+  opacity: 0.4;
+}
+
+@keyframes blob-animation {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  50% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+}
+
+/* Efecto Typewriter Suave */
+.typewriter {
+  overflow: hidden;
+  border-right: 2px solid #FFB6D9;
+  white-space: nowrap;
+  animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: #FFB6D9; }
+}
+
+/* Efecto Pulso Suave */
+.pulse-soft {
+  animation: pulse-gentle 3s ease-in-out infinite;
+}
+
+@keyframes pulse-gentle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.95;
+  }
+}
+
+/* Fade In Suave */
+.fade-in {
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Efecto Shimmer */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
