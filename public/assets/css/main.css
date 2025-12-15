@@ -28,6 +28,10 @@
   
   /* Efectos de Vidrio */
   --glass-white: rgba(255, 255, 255, 0.95);
+  
+  /* Transiciones */
+  --transition-default: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Reset y Base */
@@ -35,6 +39,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -44,6 +49,9 @@ body {
   overflow-x: hidden;
   line-height: 1.6;
   position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Fondo Decorativo Sutil */
@@ -82,19 +90,77 @@ header {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: 0.5px;
+  transition: var(--transition-default);
+}
+
+.logo-victoria:hover {
+  background: linear-gradient(135deg, var(--rosa-secundario) 0%, var(--rosa-principal) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transform: scale(1.02);
 }
 
 /* Iconos con Efecto Suave */
 .glow-icon {
   color: var(--rosa-principal);
-  transition: all 0.3s ease;
+  transition: var(--transition-default);
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--sombra-suave);
 }
 
 .glow-icon:hover {
-  color: var(--rosa-secundario);
-  transform: scale(1.1);
-  filter: drop-shadow(0 4px 8px rgba(255, 182, 217, 0.3));
+  color: white;
+  background: var(--gradient-principal);
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: var(--sombra-hover);
+}
+
+/* Efecto de pulso para iconos importantes */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 182, 217, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 182, 217, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 182, 217, 0);
+  }
+}
+
+/* Clase para botones flotantes */
+.floating-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--gradient-principal);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: var(--sombra-hover);
+  z-index: 100;
+  transition: var(--transition-default);
+  animation: pulse 2s infinite;
+  border: none;
+  cursor: pointer;
+}
+
+.floating-btn:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 30px rgba(255, 182, 217, 0.4);
 }
 
 /* ===== HERO SECTION ELEGANTE ===== */
@@ -192,26 +258,41 @@ header {
   transition: 0.6s;
 }
 
-.btn-victoria:hover {
+.btn-victoria:hover:not(.btn-explorar) {
+  transform: none;
+  box-shadow: var(--sombra-suave);
+}
+
+.btn-victoria:hover:not(.btn-explorar)::before {
+  left: -100%;
+}
+
+.btn-victoria.btn-explorar:hover {
   transform: translateY(-3px);
   box-shadow: var(--sombra-hover);
 }
 
-.btn-victoria:hover::before {
+.btn-victoria.btn-explorar:hover::before {
   left: 100%;
 }
 
 .btn-victoria-outline {
   background: transparent;
   border: 2px solid var(--rosa-principal);
-  color: var(--rosa-principal);
+  color: white !important;
   box-shadow: none;
 }
 
 .btn-victoria-outline:hover {
-  background: var(--rosa-principal);
-  color: white;
+  background: transparent;
+  color: white !important;
   border-color: var(--rosa-principal);
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-white-text {
+  color: white !important;
 }
 
 /* ===== SECCIÓN BENEFICIOS MODERNA ===== */

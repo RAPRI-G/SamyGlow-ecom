@@ -4,26 +4,36 @@
     let index = 0;
 
     function typeWriter() {
+      if (!subtitle) return;
       if (index < text.length) {
         subtitle.textContent += text.charAt(index);
         index++;
         setTimeout(typeWriter, 80);
       } else {
+        if (!subtitle) return;
         const cursor = document.createElement('span');
         cursor.className = 'typing-cursor';
         subtitle.appendChild(cursor);
       }
     }
 
-    setTimeout(typeWriter, 1000);
+    if (subtitle) {
+      setTimeout(typeWriter, 1000);
+    }
 
     // ===== MENU MOBILE =====
     const menuBtn = document.getElementById('menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('active');
-    });
+    if (menuBtn && mobileMenu) {
+      menuBtn.addEventListener('click', () => {
+        if (mobileMenu.classList.contains('hidden')) {
+          mobileMenu.classList.toggle('hidden');
+          return;
+        }
+        mobileMenu.classList.toggle('active');
+      });
+    }
 
     // ===== CATEGORIES.JS - Fade in on scroll =====
     const observerOptions = {

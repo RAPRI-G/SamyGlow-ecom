@@ -9,32 +9,113 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/contacto.css"/>
   <link rel="stylesheet" href="assets/css/main.css"/>
+  <style>
+    .hero-slideshow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .hero-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .hero-slide.active {
+      opacity: 1;
+    }
+
+    .hero-slide::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255, 234, 249, 0.89) 0%, rgba(255, 245, 250, 0.9) 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-card {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 201, 224, 0.35);
+      border-radius: 28px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem 1.75rem;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .hero-card-header {
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .hero-card {
+        padding: 2.1rem 1.25rem;
+      }
+    }
+
+    .hero-badge {
+      width: 64px;
+      height: 64px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #FFE8F5, #FFD6E8);
+      box-shadow: 0 10px 25px rgba(255, 182, 217, 0.25);
+      animation: floatSoft 6s ease-in-out infinite;
+    }
+
+    @keyframes floatSoft {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+  </style>
 </head>
+<body>
+
 <!-- Chatbot flotante -->
 <a href="https://poe.com/s/qafKGJV07rcPu1Zll9Bm" 
    target="_blank"
-   class="fixed bottom-6 right-6 bg-[#FF1493] text-white px-5 py-3 rounded-full shadow-xl text-lg font-semibold hover:bg-pink-600 transition flex items-center space-x-2 z-50">
+   class="floating-btn">
    <i class="fas fa-comments"></i>
-   <span>Chat en Vivo</span>
 </a>
 
-<body>
-
   <!-- ===== HEADER / NAV ===== -->
-  <header class="w-full bg-white shadow-lg sticky top-0 z-50 border-b-2" style="border-color: var(--rosa-neon);">
+  <header class="w-full bg-white shadow-lg sticky top-0 z-50" style="border-bottom: 2px solid #FFC9E0;">
     <nav class="max-w-7xl mx-auto px-4 py-3 md:py-4">
       <div class="flex justify-between items-center">
         <!-- Logo -->
         <div class="flex items-center space-x-2">
           <img src="assets/img/logo.png" alt="Samy Glow Logo" class="h-10 md:h-12 w-auto">
-          <span class="text-xl md:text-2xl font-bold hidden sm:inline" style="color: var(--rosa-neon);">Samy Glow</span>
+          <span class="text-xl md:text-2xl font-bold hidden sm:inline logo-victoria">Samy Glow</span>
         </div>
 
         <!-- Menu Desktop -->
         <ul class="hidden md:flex space-x-6 lg:space-x-8 font-medium">
-          <li><a href="index.html" class="hover:text-[#FF1493] transition">Inicio</a></li>
-          <li><a href="tienda.html" class="hover:text-[#FF1493] transition">Tienda</a></li>
-          <li><a href="contacto.html" class="text-[#FF1493] font-bold">Contacto</a></li>
+          <li><a href="index.html" class="text-gray-700 hover:text-[#FFB6D9] transition">Inicio</a></li>
+          <li><a href="tienda.html" class="text-gray-700 hover:text-[#FFB6D9] transition">Tienda</a></li>
+          <li><a href="contacto.html" class="font-semibold" style="color: #FFB6D9;">Contacto</a></li>
         </ul>
 
         <!-- Iconos -->
@@ -44,7 +125,7 @@
           </a>
           <a href="carrito.html" class="glow-icon text-lg md:text-xl relative">
             <i class="fas fa-shopping-cart"></i>
-            <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF1493] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" style="display: none;">0</span>
+            <span id="cart-count" class="absolute -top-2 -right-2 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" style="background: #FFB6D9; display: none;">0</span>
           </a>
           <button id="menu-btn" class="md:hidden text-xl md:text-2xl glow-icon">
             <i class="fas fa-bars"></i>
@@ -52,14 +133,37 @@
         </div>
       </div>
 
-      
+      <!-- Menu Mobile -->
+      <div id="mobile-menu" class="md:hidden hidden">
+        <ul class="flex flex-col space-y-3 mt-4 font-medium">
+          <li><a href="index.html" class="block py-2 text-gray-700 hover:text-[#FFB6D9]">Inicio</a></li>
+          <li><a href="tienda.html" class="block py-2 text-gray-700 hover:text-[#FFB6D9]">Tienda</a></li>
+          <li><a href="contacto.html" class="block py-2 font-semibold" style="color: #FFB6D9;">Contacto</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
 
   <!-- ===== HERO SECTION ===== -->
-  <section class="hero-contact">
-    <div class="max-w-4xl mx-auto">
-      <i class="fas fa-envelope hero-icon"></i>
-      <h1>Contáctanos</h1>
-      <p>Estamos aquí para ayudarte</p>
+  <section class="hero-section flex items-center justify-center" style="min-height: 40vh; position: relative; overflow: hidden;">
+    <div class="hero-slideshow">
+      <div class="hero-slide active" style="background-image: url('assets/img/carrusel-contacto/')"></div>
+    </div>
+
+    <div class="hero-content w-full px-4">
+      <div class="hero-card">
+        <div class="hero-contact" style="background: transparent; border-bottom: 0; padding: 0;">
+          <div class="max-w-4xl mx-auto">
+            <div class="hero-card-header fade-in-up">
+              <div class="hero-badge mb-4">
+                <i class="fas fa-envelope text-2xl" style="color: #FFB6D9;"></i>
+              </div>
+              <h1>Contáctanos</h1>
+              <p>Estamos aquí para ayudarte</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -77,16 +181,16 @@
             <p>Gracias por contactarnos. Te responderemos pronto.</p>
           </div>
 
-          <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border-neon-light">
-            <h2 class="text-2xl md:text-3xl font-bold mb-6 flex items-center">
-              <i class="fas fa-paper-plane mr-3 glow-icon"></i>
+          <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8" style="border: 1px solid rgba(255, 201, 224, 0.2);">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 flex items-center" style="font-family: 'Playfair Display', serif; color: #4A4A4A;">
+              <i class="fas fa-paper-plane mr-3" style="color: #FFB6D9;"></i>
               Envíanos un mensaje
             </h2>
 
             <form id="contact-form" novalidate>
               <!-- Nombre completo -->
               <div class="form-group">
-                <label class="form-label">Nombre completo <span class="text-[#FF1493]">*</span></label>
+                <label class="form-label">Nombre completo <span style="color: #FFB6D9;">*</span></label>
                 <input 
                   type="text" 
                   id="name" 
@@ -99,7 +203,7 @@
 
               <!-- Email -->
               <div class="form-group">
-                <label class="form-label">Email <span class="text-[#FF1493]">*</span></label>
+                <label class="form-label">Email <span style="color: #FFB6D9;">*</span></label>
                 <input 
                   type="email" 
                   id="email" 
@@ -123,7 +227,7 @@
 
               <!-- Asunto -->
               <div class="form-group">
-                <label class="form-label">Asunto <span class="text-[#FF1493]">*</span></label>
+                <label class="form-label">Asunto <span style="color: #FFB6D9;">*</span></label>
                 <select id="subject" class="form-select" required>
                   <option value="">Selecciona un asunto</option>
                   <option value="consulta">Consulta general</option>
@@ -136,7 +240,7 @@
 
               <!-- Mensaje -->
               <div class="form-group">
-                <label class="form-label">Mensaje <span class="text-[#FF1493]">*</span></label>
+                <label class="form-label">Mensaje <span style="color: #FFB6D9;">*</span></label>
                 <textarea 
                   id="message" 
                   class="form-textarea" 
@@ -148,7 +252,7 @@
               </div>
 
               <!-- Submit Button -->
-              <button type="submit" class="btn-primary w-full text-lg">
+              <button type="submit" class="btn-victoria w-full text-lg">
                 <i class="fas fa-paper-plane mr-2"></i>
                 Enviar Mensaje
               </button>
@@ -160,15 +264,15 @@
         <div class="lg:col-span-2 fade-in-up" style="animation-delay: 0.2s;">
           
           <!-- Datos de Contacto -->
-          <div class="contact-card bg-pastel">
-            <h3 class="text-xl font-bold mb-4 flex items-center">
-              <i class="fas fa-address-book mr-2 glow-icon"></i>
+          <div class="contact-card" style="background: linear-gradient(135deg, #FFE8F5, #FFFFFF);">
+            <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #4A4A4A;">
+              <i class="fas fa-address-book mr-2" style="color: #FFB6D9;"></i>
               Información de Contacto
             </h3>
 
             <div class="contact-item">
               <div class="contact-icon">
-                <i class="fas fa-phone glow-icon"></i>
+                <i class="fas fa-phone"></i>
               </div>
               <div>
                 <p class="font-semibold text-sm text-gray-600">Teléfono</p>
@@ -178,7 +282,7 @@
 
             <div class="contact-item">
               <div class="contact-icon">
-                <i class="fas fa-envelope glow-icon"></i>
+                <i class="fas fa-envelope"></i>
               </div>
               <div>
                 <p class="font-semibold text-sm text-gray-600">Email</p>
@@ -188,7 +292,7 @@
 
             <div class="contact-item">
               <div class="contact-icon">
-                <i class="fas fa-location-dot glow-icon"></i>
+                <i class="fas fa-location-dot"></i>
               </div>
               <div>
                 <p class="font-semibold text-sm text-gray-600">Ubicación</p>
@@ -198,7 +302,7 @@
 
             <div class="contact-item">
               <div class="contact-icon">
-                <i class="fas fa-clock glow-icon"></i>
+                <i class="fas fa-clock"></i>
               </div>
               <div>
                 <p class="font-semibold text-sm text-gray-600">Horario</p>
@@ -210,8 +314,8 @@
 
           <!-- Redes Sociales -->
           <div class="contact-card">
-            <h3 class="text-xl font-bold mb-4 flex items-center">
-              <i class="fas fa-share-nodes mr-2 glow-icon"></i>
+            <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #4A4A4A;">
+              <i class="fas fa-share-nodes mr-2" style="color: #FFB6D9;"></i>
               Síguenos
             </h3>
             <p class="text-gray-600 mb-4">Conéctate con nosotros en redes sociales</p>
@@ -235,11 +339,13 @@
   </section>
 
   <!-- ===== PREGUNTAS FRECUENTES ===== -->
-  <section class="w-full py-12 md:py-16 bg-pastel-gradient border-t-2" style="border-color: var(--rosa-neon-light);">
+  <section class="w-full py-12 md:py-16 bg-pastel-gradient" style="border-top: 1px solid rgba(255, 201, 224, 0.2);">
     <div class="max-w-4xl mx-auto px-4">
       <div class="text-center mb-8 md:mb-12 fade-in-up">
-        <i class="fas fa-circle-question text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
-        <h2 class="text-3xl md:text-4xl font-bold">Preguntas Frecuentes</h2>
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style="background: linear-gradient(135deg, #FFE8F5, #FFD6E8);">
+          <i class="fas fa-circle-question text-3xl" style="color: #FFB6D9;"></i>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold" style="font-family: 'Playfair Display', serif; color: #4A4A4A;">Preguntas Frecuentes</h2>
         <p class="text-gray-600 mt-2">Encuentra respuestas rápidas</p>
       </div>
 
@@ -298,8 +404,8 @@
     <div class="text-center mt-10">
       <a href="https://poe.com/s/qafKGJV07rcPu1Zll9Bm" 
         target="_blank"
-        class="inline-block bg-[#FF1493] text-white px-6 py-3 rounded-xl text-lg font-semibold hover:bg-pink-600 transition">
-        Abrir Chatbot
+        class="btn-victoria">
+        <i class="fas fa-comments mr-2"></i>Abrir Chatbot
       </a>
     </div>
 
@@ -308,17 +414,19 @@
   <section class="w-full py-12 md:py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-10 md:mb-12 fade-in-up">
-              <i class="fas fa-map-location-dot text-4xl md:text-5xl glow-icon mb-4"></i>
-              <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight" style="color: var(--texto-oscuro);">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style="background: linear-gradient(135deg, #FFE8F5, #FFD6E8);">
+                <i class="fas fa-map-location-dot text-3xl" style="color: #FFB6D9;"></i>
+              </div>
+              <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight" style="color: #4A4A4A; font-family: 'Playfair Display', serif;">
                   Nuestra Ubicación
               </h2>
           </div>
 
-          <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden fade-in-up border-neon-light" 
-              style="animation-delay: 0.2s;">
+          <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden fade-in-up" 
+              style="animation-delay: 0.2s; border: 1px solid rgba(255, 201, 224, 0.2);">
               
               <div class="p-6 text-center bg-pastel-gradient">
-                  <p class="font-extrabold text-2xl" style="color: var(--rosa-vibrante);">
+                  <p class="font-extrabold text-2xl" style="color: #FFB6D9;">
                       HUANCAYO, Perú 🇵🇪
                   </p>
                   <p class="text-sm mt-1 text-gray-600">
@@ -326,7 +434,7 @@
                   </p>
               </div>
 
-              <div class="relative w-full h-0 pb-[75%] md:pb-[56.25%] border-neon">
+              <div class="relative w-full h-0 pb-[75%] md:pb-[56.25%]">
                   <iframe 
                       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1001.3579428365606!2d-75.25362963466105!3d-11.99801297268903!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x910ebf005ebd6c67%3A0xff19b4e6d62e6b6a!2sGAME%20wasi!5e0!3m2!1ses!2spe!4v1763005027944!5m2!1ses!2spe" 
                       class="absolute top-0 left-0 w-full h-full"
@@ -341,52 +449,93 @@
   </section>
 
   <!-- ===== FOOTER ===== -->
-  <footer class="w-full bg-white py-8 md:py-12 border-t-2" style="border-color: var(--rosa-neon);">
+  <footer class="w-full bg-white py-8 md:py-12" style="border-top: 2px solid #FFE8F5;">
     <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
       <div>
         <div class="flex items-center space-x-2 mb-4">
           <img src="assets/img/logo.png" alt="Samy Glow" class="h-8 md:h-10 w-auto">
-          <span class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">Samy Glow</span>
+          <span class="text-xl md:text-2xl font-bold logo-victoria">Samy Glow</span>
         </div>
         <p class="text-gray-600 text-sm md:text-base">Fragancias originales y exclusivas para cada momento especial.</p>
       </div>
 
       <div>
-        <h4 class="font-bold text-base md:text-lg mb-4">Ayuda</h4>
+        <h4 class="font-bold text-base md:text-lg mb-4" style="color: #4A4A4A;">Ayuda</h4>
         <ul class="space-y-2 text-gray-600 text-sm md:text-base">
-          <li><a href="#" class="hover:text-[#FF1493]">Envíos y entregas</a></li>
-          <li><a href="#" class="hover:text-[#FF1493]">Devoluciones</a></li>
-          <li><a href="#" class="hover:text-[#FF1493]">Atención al cliente</a></li>
-          <li><a href="#" class="hover:text-[#FF1493]">Preguntas frecuentes</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Envíos y entregas</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Devoluciones</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Atención al cliente</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Preguntas frecuentes</a></li>
         </ul>
       </div>
 
       <div>
-        <h4 class="font-bold text-base md:text-lg mb-4">Legal</h4>
+        <h4 class="font-bold text-base md:text-lg mb-4" style="color: #4A4A4A;">Legal</h4>
         <ul class="space-y-2 text-gray-600 text-sm md:text-base">
-          <li><a href="#" class="hover:text-[#FF1493]">Términos y condiciones</a></li>
-          <li><a href="#" class="hover:text-[#FF1493]">Política de privacidad</a></li>
-          <li><a href="#" class="hover:text-[#FF1493]">Cookies</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Términos y condiciones</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Política de privacidad</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Cookies</a></li>
         </ul>
       </div>
 
       <div>
-        <h4 class="font-bold text-base md:text-lg mb-4">Contacto</h4>
+        <h4 class="font-bold text-base md:text-lg mb-4" style="color: #4A4A4A;">Contacto</h4>
         <ul class="space-y-3 text-gray-600 text-sm md:text-base">
           <li class="flex items-center space-x-2">
-            <i class="fab fa-instagram glow-icon" style="color: var(--rosa-neon);"></i>
-            <a href="https://www.instagram.com/Samy.glow02" class="hover:text-[#FF1493]">@samyglow</a>
+            <i class="fab fa-instagram" style="color: #FFB6D9;"></i>
+            <a href="https://www.instagram.com/Samy.glow02" class="hover:text-[#FFB6D9] transition">@samyglow</a>
           </li>
         </ul>
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 mt-6 md:mt-8 pt-6 md:pt-8 border-t-2 text-center text-gray-500 text-sm md:text-base" style="border-color: var(--rosa-neon);">
+    <div class="max-w-7xl mx-auto px-4 mt-6 md:mt-8 pt-6 md:pt-8 text-center text-gray-500 text-sm md:text-base" style="border-top: 2px solid #FFE8F5;">
       <p>&copy; 2025 Samy Glow. Todos los derechos reservados.</p>
     </div>
   </footer>
   <script src="assets/js/cart-manager.js"></script>
   <script src="assets/js/contacto.js"></script>  
+  <script>
+    // Mobile Menu Toggle
+    document.getElementById('menu-btn').addEventListener('click', function() {
+      const mobileMenu = document.getElementById('mobile-menu');
+      mobileMenu.classList.toggle('hidden');
+    });
 
+    // Carrusel automático de imágenes de fondo (Hero)
+    (async function initHeroSlideshow() {
+      const container = document.querySelector('.hero-slideshow');
+      if (!container) return;
+
+      try {
+        const res = await fetch('api/carrusel.php?folder=contacto', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const images = Array.isArray(data.images) ? data.images : [];
+
+        if (images.length > 0) {
+          container.innerHTML = '';
+          images.forEach((src, index) => {
+            const slide = document.createElement('div');
+            slide.className = `hero-slide${index === 0 ? ' active' : ''}`;
+            slide.style.backgroundImage = `url('${src}')`;
+            container.appendChild(slide);
+          });
+        }
+      } catch (e) {
+        console.warn('No se pudo cargar el carrusel local:', e);
+      }
+
+      const heroSlides = container.querySelectorAll('.hero-slide');
+      if (!heroSlides || heroSlides.length < 2) return;
+
+      let currentHeroSlide = 0;
+      setInterval(() => {
+        heroSlides[currentHeroSlide].classList.remove('active');
+        currentHeroSlide = (currentHeroSlide + 1) % heroSlides.length;
+        heroSlides[currentHeroSlide].classList.add('active');
+      }, 5000);
+    })();
+  </script>
 </body>
 </html>

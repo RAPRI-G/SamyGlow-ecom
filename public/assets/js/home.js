@@ -222,32 +222,31 @@ async function cargarProductosDestacados() {
           )}</p>
 
           <div class="mb-4">
-            ${
-              descuento > 0
-                ? `
-                <p class="text-sm text-gray-400 line-through">S/ ${precioOriginal.toFixed(2)}</p>
-                <p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">S/ ${precioFinal.toFixed(2)}</p>`
-                : `<p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">S/ ${precioFinal.toFixed(2)}</p>`
-            }
+            ${descuento > 0 ? `
+              <p class="text-sm text-gray-400 line-through">S/ ${precioOriginal.toFixed(2)}</p>
+              <p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">S/ ${precioFinal.toFixed(2)}</p>
+            ` : `
+              <p class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">S/ ${precioFinal.toFixed(2)}</p>
+            `}
           </div>
 
-          ${
-            sinStock
-              ? `<p class="text-sm text-red-500 mb-2"><i class="fas fa-exclamation-circle mr-1"></i>Agotado</p>`
-              : `<p class="text-sm text-gray-600 mb-2"><i class="fas fa-check-circle mr-1 text-green-500"></i>Disponible</p>`
+          ${sinStock
+            ? `<p class="text-sm text-red-500 mb-2"><i class="fas fa-exclamation-circle mr-1"></i>Agotado</p>`
+            : `<p class="text-sm text-gray-600 mb-2"><i class="fas fa-check-circle mr-1 text-green-500"></i>Disponible</p>`
           }
 
           <button onclick="agregarProductoDesdeHome(${Number(prod.id)})"
                   ${sinStock ? 'disabled' : ''}
-                  class="btn-primary w-full text-sm md:text-base ${
-                    sinStock ? 'opacity-50 cursor-not-allowed' : ''
-                  }">
-            ${sinStock ? 'Sin Stock' : 'Agregar al Carrito'}
+                  class="btn-primary w-full text-sm md:text-base"
+                  style="${sinStock ? 'opacity:0.6; cursor:not-allowed;' : ''}">
+            ${sinStock ? 'Sin stock' : 'Agregar al carrito'}
           </button>
-        </div>`;
+        </div>
+      `;
 
       grid.appendChild(card);
     });
+
   } catch (err) {
     console.error('❌ Error cargando productos destacados:', err);
     const grid = document.getElementById('products-grid');

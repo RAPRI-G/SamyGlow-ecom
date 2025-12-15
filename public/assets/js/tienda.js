@@ -2,21 +2,426 @@
 // DEPENDE DE: cart-manager.js (debe cargarse ANTES)
 
 let productos = [];
+let paginaActual = 1;
+const productosPorPagina = 9;
+let totalPaginas = 1;
+let listaRenderActual = [];
+
+let categoriasDisponibles = [];
+let marcasDisponibles = [];
+let maxPrecioDisponible = 0;
+
+const estadoFiltros = {
+  categorias: new Set(),
+  marcas: new Set(),
+  precioMax: null,
+  sort: 'popular',
+};
+
+function normalizarTexto(valor) {
+  if (valor == null) return '';
+  return String(valor).trim();
+}
+
+function obtenerPrecioProducto(producto) {
+  const precio = parseFloat(producto?.precio_final ?? producto?.precio);
+  return Number.isFinite(precio) ? precio : 0;
+}
+
+function obtenerCategoriaProducto(producto) {
+  const categoria = normalizarTexto(producto?.categoria);
+  return categoria || 'Sin categoría';
+}
+
+function inferirMarcaDesdeNombre(nombre) {
+  const raw = normalizarTexto(nombre);
+  if (!raw) return '';
+
+  const stopWords = new Set([
+    'fragrance',
+    'mist',
+    'body',
+    'lotion',
+    'cream',
+    'butter',
+    'moisturizing',
+    'hydrating',
+    'hair',
+    'spray',
+    'refreshing',
+    'refresh',
+    'luxury',
+    'shea',
+    'gold',
+    'shine',
+    'and',
+  ]);
+
+  const tokens = raw.split(/\s+/).filter(Boolean);
+  const kept = [];
+  for (const tok of tokens) {
+    const clean = tok.replace(/[^\p{L}\p{N}&]/gu, '').toLowerCase();
+    if (clean && stopWords.has(clean)) break;
+    kept.push(tok);
+  }
+
+  return kept.length ? kept.join(' ').trim() : raw;
+}
+
+function obtenerMarcaProducto(producto) {
+  const marca = normalizarTexto(producto?.marca);
+  const inferida = inferirMarcaDesdeNombre(producto?.nombre);
+  return marca || inferida || 'Otros';
+}
+
+async function cargarCategoriasParaFiltros() {
+  try {
+    const res = await fetch('./api/categorias.php');
+    if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
+    const json = await res.json();
+    if (!json.success || !Array.isArray(json.data)) throw new Error(json.message || 'Respuesta inválida de categorías');
+    categoriasDisponibles = json.data.map((c) => normalizarTexto(c.nombre)).filter(Boolean);
+  } catch (e) {
+    categoriasDisponibles = [];
+  }
+}
+
+function construirMarcasDisponibles() {
+  const set = new Set();
+  productos.forEach((p) => {
+    const m = obtenerMarcaProducto(p);
+    if (m) set.add(m);
+  });
+  marcasDisponibles = Array.from(set).sort((a, b) => a.localeCompare(b));
+}
+
+function construirCategoriasDisponiblesDesdeProductos() {
+  const set = new Set();
+  productos.forEach((p) => {
+    const c = obtenerCategoriaProducto(p);
+    if (c) set.add(c);
+  });
+  categoriasDisponibles = Array.from(set).sort((a, b) => a.localeCompare(b));
+}
+
+function crearCheckboxItem({ value, label, checked, className }) {
+  const safeValue = normalizarTexto(value);
+  const safeLabel = normalizarTexto(label) || safeValue;
+
+  const labelEl = document.createElement('label');
+  labelEl.className = 'flex items-center cursor-pointer hover:text-[#FFB6D9]';
+
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.className = className;
+  input.value = safeValue;
+  input.checked = Boolean(checked);
+  input.dataset.value = safeValue;
+
+  const span = document.createElement('span');
+  span.className = 'text-sm';
+  span.textContent = safeLabel;
+
+  labelEl.appendChild(input);
+  labelEl.appendChild(span);
+  return labelEl;
+}
+
+function renderizarFiltrosUI() {
+  const catDesktop = document.getElementById('category-filters');
+  const catMobile = document.getElementById('category-filters-mobile');
+  const brandDesktop = document.getElementById('brand-filters');
+  const brandMobile = document.getElementById('brand-filters-mobile');
+
+  if (catDesktop) catDesktop.innerHTML = '';
+  if (catMobile) catMobile.innerHTML = '';
+  if (brandDesktop) brandDesktop.innerHTML = '';
+  if (brandMobile) brandMobile.innerHTML = '';
+
+  const categorias = categoriasDisponibles.length ? categoriasDisponibles : [];
+  const marcas = marcasDisponibles.length ? marcasDisponibles : [];
+
+  categorias.forEach((cat) => {
+    const isChecked = estadoFiltros.categorias.has(cat);
+    if (catDesktop) {
+      catDesktop.appendChild(
+        crearCheckboxItem({
+          value: cat,
+          label: cat,
+          checked: isChecked,
+          className: 'category-filter mr-2',
+        })
+      );
+    }
+    if (catMobile) {
+      catMobile.appendChild(
+        crearCheckboxItem({
+          value: cat,
+          label: cat,
+          checked: isChecked,
+          className: 'category-filter-mobile mr-2',
+        })
+      );
+    }
+  });
+
+  marcas.forEach((m) => {
+    const isChecked = estadoFiltros.marcas.has(m);
+    if (brandDesktop) {
+      brandDesktop.appendChild(
+        crearCheckboxItem({
+          value: m,
+          label: m,
+          checked: isChecked,
+          className: 'brand-filter mr-2',
+        })
+      );
+    }
+    if (brandMobile) {
+      brandMobile.appendChild(
+        crearCheckboxItem({
+          value: m,
+          label: m,
+          checked: isChecked,
+          className: 'brand-filter-mobile mr-2',
+        })
+      );
+    }
+  });
+}
+
+function leerCheckboxSeleccionados(selectors) {
+  const values = new Set();
+  selectors.forEach((sel) => {
+    document.querySelectorAll(sel).forEach((el) => {
+      if (el.checked) values.add(normalizarTexto(el.value));
+    });
+  });
+  return values;
+}
+
+function leerPrecioMaxDesdeUI() {
+  const desktop = document.getElementById('price-range');
+  const mobile = document.getElementById('price-range-mobile');
+  const val = desktop ? Number(desktop.value) : mobile ? Number(mobile.value) : NaN;
+  return Number.isFinite(val) ? val : null;
+}
+
+function leerSortDesdeUI() {
+  const select = document.getElementById('sort-select');
+  const val = select ? normalizarTexto(select.value) : '';
+  return val || 'popular';
+}
+
+function actualizarPrecioUI(valor) {
+  const desktop = document.getElementById('price-range');
+  const mobile = document.getElementById('price-range-mobile');
+  const valueDesktop = document.getElementById('price-value');
+  const valueMobile = document.getElementById('price-value-mobile');
+
+  if (desktop && Number.isFinite(valor)) desktop.value = String(valor);
+  if (mobile && Number.isFinite(valor)) mobile.value = String(valor);
+  if (valueDesktop && Number.isFinite(valor)) valueDesktop.textContent = `S/ ${valor}`;
+  if (valueMobile && Number.isFinite(valor)) valueMobile.textContent = `S/ ${valor}`;
+}
+
+function actualizarMaxPrecioUI(max) {
+  const desktop = document.getElementById('price-range');
+  const mobile = document.getElementById('price-range-mobile');
+  if (desktop) desktop.max = String(max);
+  if (mobile) mobile.max = String(max);
+}
+
+function ordenarProductos(lista, sort) {
+  const items = Array.isArray(lista) ? [...lista] : [];
+  const modo = normalizarTexto(sort);
+
+  if (modo === 'price-asc') {
+    items.sort((a, b) => obtenerPrecioProducto(a) - obtenerPrecioProducto(b));
+    return items;
+  }
+  if (modo === 'price-desc') {
+    items.sort((a, b) => obtenerPrecioProducto(b) - obtenerPrecioProducto(a));
+    return items;
+  }
+  if (modo === 'newest') {
+    items.sort((a, b) => Number(b.id) - Number(a.id));
+    return items;
+  }
+
+  items.sort((a, b) => {
+    const da = Number(a.descuento) || 0;
+    const db = Number(b.descuento) || 0;
+    if (db !== da) return db - da;
+    return Number(b.stock) - Number(a.stock);
+  });
+  return items;
+}
+
+function aplicarFiltrosDesdeUI() {
+  const categoriasChecked = leerCheckboxSeleccionados(['.category-filter', '.category-filter-mobile']);
+  const marcasChecked = leerCheckboxSeleccionados(['.brand-filter', '.brand-filter-mobile']);
+  const precioMax = leerPrecioMaxDesdeUI();
+  const sort = leerSortDesdeUI();
+
+  estadoFiltros.categorias = categoriasChecked;
+  estadoFiltros.marcas = marcasChecked;
+  estadoFiltros.precioMax = precioMax;
+  estadoFiltros.sort = sort;
+
+  let filtrados = productos.filter((p) => {
+    const categoria = obtenerCategoriaProducto(p);
+    const marca = obtenerMarcaProducto(p);
+    const precio = obtenerPrecioProducto(p);
+
+    const okCategoria = estadoFiltros.categorias.size > 0 && estadoFiltros.categorias.has(categoria);
+    const okMarca = estadoFiltros.marcas.size > 0 && estadoFiltros.marcas.has(marca);
+    const okPrecio = estadoFiltros.precioMax == null || precio <= estadoFiltros.precioMax;
+
+    return okCategoria && okMarca && okPrecio;
+  });
+
+  filtrados = ordenarProductos(filtrados, estadoFiltros.sort);
+  paginaActual = 1;
+  renderizarProductos(filtrados);
+}
+
+function limpiarFiltrosUI() {
+  document.querySelectorAll('.category-filter, .category-filter-mobile, .brand-filter, .brand-filter-mobile').forEach((el) => {
+    el.checked = true;
+  });
+
+  const sortSelect = document.getElementById('sort-select');
+  if (sortSelect) sortSelect.value = 'popular';
+
+  if (Number.isFinite(maxPrecioDisponible) && maxPrecioDisponible > 0) actualizarPrecioUI(maxPrecioDisponible);
+}
+
+function configurarSyncFiltros() {
+  const catDesktop = document.getElementById('category-filters');
+  const catMobile = document.getElementById('category-filters-mobile');
+  const brandDesktop = document.getElementById('brand-filters');
+  const brandMobile = document.getElementById('brand-filters-mobile');
+
+  const syncChange = (fromEl, toEl) => {
+    fromEl.addEventListener('change', (e) => {
+      const input = e.target;
+      if (!input || input.tagName !== 'INPUT' || input.type !== 'checkbox') return;
+      const v = input.dataset.value;
+      if (!v) return;
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        toEl.querySelectorAll(`input[type="checkbox"][data-value="${CSS.escape(v)}"]`).forEach((other) => {
+          other.checked = input.checked;
+        });
+        return;
+      }
+      toEl.querySelectorAll('input[type="checkbox"]').forEach((other) => {
+        if (other.dataset.value === v) other.checked = input.checked;
+      });
+    });
+  };
+
+  if (catDesktop && catMobile) {
+    syncChange(catDesktop, catMobile);
+    syncChange(catMobile, catDesktop);
+  }
+  if (brandDesktop && brandMobile) {
+    syncChange(brandDesktop, brandMobile);
+    syncChange(brandMobile, brandDesktop);
+  }
+}
+
+function configurarEventosFiltros() {
+  const aplicarBtn = document.getElementById('apply-filters');
+  const limpiarBtn = document.getElementById('clear-filters');
+  const aplicarMobileBtn = document.getElementById('apply-filters-mobile');
+  const limpiarMobileBtn = document.getElementById('clear-filters-mobile');
+
+  const sortSelect = document.getElementById('sort-select');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', () => {
+      aplicarFiltrosDesdeUI();
+    });
+  }
+
+  const cerrarMobile = () => {
+    const mobileFilters = document.getElementById('mobile-filters');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    if (mobileFilters) mobileFilters.classList.remove('active');
+    if (mobileOverlay) mobileOverlay.classList.remove('active');
+  };
+
+  if (aplicarBtn) aplicarBtn.addEventListener('click', () => aplicarFiltrosDesdeUI());
+  if (aplicarMobileBtn) aplicarMobileBtn.addEventListener('click', () => {
+    aplicarFiltrosDesdeUI();
+    cerrarMobile();
+  });
+
+  if (limpiarBtn) limpiarBtn.addEventListener('click', () => {
+    estadoFiltros.categorias = new Set(categoriasDisponibles);
+    estadoFiltros.marcas = new Set(marcasDisponibles);
+    estadoFiltros.precioMax = maxPrecioDisponible;
+    estadoFiltros.sort = 'popular';
+    limpiarFiltrosUI();
+    renderizarFiltrosUI();
+    aplicarFiltrosDesdeUI();
+  });
+  if (limpiarMobileBtn) limpiarMobileBtn.addEventListener('click', () => {
+    estadoFiltros.categorias = new Set(categoriasDisponibles);
+    estadoFiltros.marcas = new Set(marcasDisponibles);
+    estadoFiltros.precioMax = maxPrecioDisponible;
+    estadoFiltros.sort = 'popular';
+    limpiarFiltrosUI();
+    renderizarFiltrosUI();
+    aplicarFiltrosDesdeUI();
+    cerrarMobile();
+  });
+
+  const priceDesktop = document.getElementById('price-range');
+  const priceMobile = document.getElementById('price-range-mobile');
+  const onPriceInput = (val) => {
+    const v = Number(val);
+    if (!Number.isFinite(v)) return;
+    actualizarPrecioUI(v);
+  };
+
+  if (priceDesktop) {
+    priceDesktop.addEventListener('input', (e) => onPriceInput(e.target.value));
+  }
+  if (priceMobile) {
+    priceMobile.addEventListener('input', (e) => onPriceInput(e.target.value));
+  }
+}
+
+function aplicarFiltrosDesdeQueryString() {
+  const params = new URLSearchParams(window.location.search);
+  const categoriaParam = normalizarTexto(params.get('categoria'));
+  if (!categoriaParam) return;
+
+  const categorias = categoriasDisponibles.map((c) => c.toLowerCase());
+  const idx = categorias.indexOf(categoriaParam.toLowerCase());
+  if (idx < 0) return;
+
+  const categoriaExacta = categoriasDisponibles[idx];
+  document.querySelectorAll('.category-filter, .category-filter-mobile').forEach((el) => {
+    el.checked = normalizarTexto(el.value).toLowerCase() === categoriaExacta.toLowerCase();
+  });
+}
 
 /* ============================
    🔹 FUNCIÓN PARA CORREGIR URLS DE IMAGEN
 ============================ */
 function corregirUrlImagen(url) {
   if (!url || typeof url !== 'string') return 'assets/img/logo.png';
-  
+
   console.log('🔧 URL original:', url);
-  
+
   // Si ya es una URL correcta y no tiene duplicación
   if (url.startsWith('image.php?f=productos/') && !url.includes('image.php?f=uploads/')) {
     console.log('✅ URL ya está correcta');
     return url;
   }
-  
+
   // Si tiene duplicación (image.php?f= dentro de image.php?f=)
   if (url.includes('image.php?f=') && url.split('image.php?f=').length > 2) {
     console.log('🔄 Corrigiendo URL duplicada');
@@ -27,12 +432,12 @@ function corregirUrlImagen(url) {
     console.log('✅ URL corregida:', urlCorregida);
     return urlCorregida;
   }
-  
+
   // Si es un nombre simple (solo el archivo)
   if (!url.includes('/') && !url.includes('\\')) {
     return 'image.php?f=productos/' + url;
   }
-  
+
   // Si es otra cosa, devolver tal cual
   return url;
 }
@@ -43,14 +448,34 @@ function corregirUrlImagen(url) {
 document.addEventListener('DOMContentLoaded', () => {
   cargarProductos();
   configurarMenuMobile();
+  inicializarPaginacion();
 });
+
+function inicializarPaginacion() {
+  const prevBtn = document.getElementById('prev-page');
+  const nextBtn = document.getElementById('next-page');
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (paginaActual <= 1) return;
+      paginaActual -= 1;
+      renderizarProductos(listaRenderActual);
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (paginaActual >= totalPaginas) return;
+      paginaActual += 1;
+      renderizarProductos(listaRenderActual);
+    });
+  }
+}
 
 /* ============================
    🔹 CARGAR PRODUCTOS
 ============================ */
 async function cargarProductos() {
   const grid = document.getElementById('products-grid');
-  
+
   // Mostrar indicador de carga
   if (grid) {
     grid.innerHTML = `
@@ -62,22 +487,22 @@ async function cargarProductos() {
 
   try {
     console.log('📦 Intentando cargar productos desde: ./api/productos.php');
-    
+
     const res = await fetch('./api/productos.php');
-    
+
     console.log('📡 Respuesta recibida:', {
       status: res.status,
       statusText: res.statusText,
       ok: res.ok
     });
-    
+
     if (!res.ok) {
       throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
     }
-    
+
     const texto = await res.text();
     console.log('📄 Texto crudo recibido:', texto.substring(0, 200));
-    
+
     let json;
     try {
       json = JSON.parse(texto);
@@ -102,7 +527,7 @@ async function cargarProductos() {
       imagen: json.data[0]?.imagen,
       tipo: typeof json.data[0]?.imagen
     });
-    
+
     // Verificar URLs
     console.log('🔍 Verificando URLs de los primeros 3 productos:');
     json.data.slice(0, 3).forEach((p, i) => {
@@ -116,11 +541,41 @@ async function cargarProductos() {
     // Guardar productos en la variable global
     productos = json.data;
     console.log(`✅ ${productos.length} productos cargados exitosamente`);
-    
-    renderizarProductos(productos);
+
+    // Construir opciones de filtros (categorías/marcas/precio)
+    await cargarCategoriasParaFiltros();
+
+    // Unir categorías del API + las que realmente llegan en productos
+    const setCategorias = new Set(
+      (categoriasDisponibles || []).map((c) => normalizarTexto(c)).filter(Boolean)
+    );
+    productos.forEach((p) => setCategorias.add(obtenerCategoriaProducto(p)));
+    categoriasDisponibles = Array.from(setCategorias).sort((a, b) => a.localeCompare(b));
+
+    construirMarcasDisponibles();
+
+    maxPrecioDisponible = Math.ceil(
+      productos.reduce((max, p) => Math.max(max, obtenerPrecioProducto(p)), 0)
+    );
+    if (!Number.isFinite(maxPrecioDisponible) || maxPrecioDisponible <= 0) maxPrecioDisponible = 200;
+
+    estadoFiltros.categorias = new Set(categoriasDisponibles);
+    estadoFiltros.marcas = new Set(marcasDisponibles);
+    estadoFiltros.precioMax = maxPrecioDisponible;
+    estadoFiltros.sort = 'popular';
+
+    actualizarMaxPrecioUI(maxPrecioDisponible);
+    actualizarPrecioUI(maxPrecioDisponible);
+    renderizarFiltrosUI();
+    configurarSyncFiltros();
+    configurarEventosFiltros();
+    aplicarFiltrosDesdeQueryString();
+
+    listaRenderActual = productos;
+    aplicarFiltrosDesdeUI();
   } catch (err) {
     console.error('❌ Error cargando productos:', err);
-    
+
     if (grid) {
       grid.innerHTML = `
         <div class="col-span-full py-12 text-center">
@@ -143,13 +598,23 @@ function renderizarProductos(listaProductos) {
   if (!grid) return;
   grid.innerHTML = '';
 
-  if (!listaProductos || listaProductos.length === 0) {
+  listaRenderActual = Array.isArray(listaProductos) ? listaProductos : [];
+  totalPaginas = Math.max(1, Math.ceil(listaRenderActual.length / productosPorPagina));
+  if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+  if (paginaActual < 1) paginaActual = 1;
+
+  if (!listaRenderActual || listaRenderActual.length === 0) {
     grid.innerHTML = '<p class="text-center col-span-full py-12 text-gray-500">No hay productos disponibles</p>';
     actualizarContadores(0);
+    actualizarControlesPaginacion();
     return;
   }
 
-  listaProductos.forEach((producto) => {
+  const inicio = (paginaActual - 1) * productosPorPagina;
+  const fin = inicio + productosPorPagina;
+  const paginaProductos = listaRenderActual.slice(inicio, fin);
+
+  paginaProductos.forEach((producto) => {
     const precioOriginal = parseFloat(producto.precio);
     const precioFinal = parseFloat(producto.precio_final ?? producto.precio);
     const descuento = Number(producto.descuento) || 0;
@@ -194,7 +659,8 @@ function renderizarProductos(listaProductos) {
           }
         </p>
 
-        <button class="mt-4 w-full btn-primary" 
+        <button class="mt-4 w-full btn-primary"
+                style="${sinStock ? 'opacity:0.6; cursor:not-allowed;' : ''}"
                 ${sinStock ? 'disabled' : ''} 
                 onclick="agregarProductoDesdeTienda(${Number(producto.id)})">
           ${sinStock ? 'Agotado' : 'Agregar al carrito'}
@@ -205,7 +671,47 @@ function renderizarProductos(listaProductos) {
     grid.appendChild(card);
   });
 
-  actualizarContadores(listaProductos.length);
+  actualizarContadores(listaRenderActual.length);
+  actualizarControlesPaginacion();
+}
+
+function actualizarControlesPaginacion() {
+  const container = document.getElementById('pagination-container');
+  const pageNumbers = document.getElementById('page-numbers');
+  const prevBtn = document.getElementById('prev-page');
+  const nextBtn = document.getElementById('next-page');
+
+  if (!container || !pageNumbers) return;
+
+  if (totalPaginas <= 1) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = 'flex';
+
+  if (prevBtn) prevBtn.disabled = paginaActual <= 1;
+  if (nextBtn) nextBtn.disabled = paginaActual >= totalPaginas;
+
+  pageNumbers.innerHTML = '';
+
+  const maxBotones = 5;
+  let start = Math.max(1, paginaActual - Math.floor(maxBotones / 2));
+  let end = Math.min(totalPaginas, start + maxBotones - 1);
+  start = Math.max(1, end - maxBotones + 1);
+
+  for (let p = start; p <= end; p += 1) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = p === paginaActual ? 'pagination-btn active' : 'pagination-btn';
+    btn.textContent = String(p);
+    btn.addEventListener('click', () => {
+      if (p === paginaActual) return;
+      paginaActual = p;
+      renderizarProductos(listaRenderActual);
+    });
+    pageNumbers.appendChild(btn);
+  }
 }
 
 /* ============================
@@ -247,7 +753,10 @@ function actualizarContadores(cantidad) {
   if (resultsCountEl) resultsCountEl.textContent = String(cantidad);
   
   const totalCountEl = document.getElementById('total-count');
-  if (totalCountEl) totalCountEl.textContent = String(cantidad);
+  if (totalCountEl) {
+    const total = Array.isArray(productos) ? productos.length : cantidad;
+    totalCountEl.textContent = String(total);
+  }
 }
 
 function configurarMenuMobile() {

@@ -10,6 +10,126 @@
   <link rel="stylesheet" href="assets/css/main.css"/>
   <link rel="stylesheet" href="assets/css/styles.css"/>
   <link rel="stylesheet" href="assets/css/tienda.css"/>
+  <style>
+    .hero-slideshow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .hero-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .hero-slide.active {
+      opacity: 1;
+    }
+
+    .hero-slide::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255, 247, 251, 0.88) 0%, rgba(255, 232, 245, 0.92) 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-card {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 201, 224, 0.35);
+      border-radius: 28px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem 1.75rem;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .hero-card-header {
+      text-align: center;
+    }
+
+    .hero-card-footer {
+      margin-top: 1.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 201, 224, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    @media (max-width: 768px) {
+      .hero-card {
+        padding: 2.1rem 1.25rem;
+      }
+
+      .hero-card-footer {
+        justify-content: center;
+        text-align: center;
+      }
+
+      .hero-actions {
+        justify-content: center;
+        min-width: auto;
+      }
+    }
+
+    .hero-badge {
+      width: 64px;
+      height: 64px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #FFE8F5, #FFD6E8);
+      box-shadow: 0 10px 25px rgba(255, 182, 217, 0.25);
+      animation: floatSoft 6s ease-in-out infinite;
+    }
+
+    @keyframes floatSoft {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+  </style>
 </head>
 <body>
 
@@ -22,12 +142,9 @@
       <div class="flex justify-between items-center">
         <!-- Logo -->
         <div class="flex items-center space-x-2">
-          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #FFB6D9, #FFC9E0);">
-            <i class="fas fa-gem text-white text-xl md:text-2xl"></i>
-          </div>
+          <img src="assets/img/logo.png" alt="Samy Glow Logo" class="h-10 md:h-12 w-auto">
           <span class="text-xl md:text-2xl font-bold hidden sm:inline logo-victoria">Samy Glow</span>
         </div>
-
         <!-- Menu Desktop -->
         <ul class="hidden md:flex space-x-6 lg:space-x-8 font-medium">
           <li><a href="index.html" class="text-gray-700 hover:text-[#FFB6D9] transition">Inicio</a></li>
@@ -62,43 +179,19 @@
   </header>
 
   <!-- ===== HERO TIENDA ===== -->
-  <section class="w-full bg-pastel-gradient py-8 md:py-12 border-b-2" style="border-color: rgba(255, 201, 224, 0.3);">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-6 fade-in-up">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style="background: linear-gradient(135deg, #FFE8F5, #FFD6E8);">
-          <i class="fas fa-shopping-bag text-3xl" style="color: #FFB6D9;"></i>
-        </div>
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3" style="font-family: 'Playfair Display', serif;">Nuestra Colección Exclusiva</h1>
-        <p class="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">Descubre fragancias irresistibles para cada ocasión</p>
-      </div>
+  <section class="hero-section" style="min-height: 42vh; position: relative; overflow: hidden; border-bottom: 2px solid rgba(255, 201, 224, 0.3);">
+    <div class="hero-slideshow">
+      <div class="hero-slide active" style="background-image: url('assets/img/carrusel-tienda/')"></div>
+    </div>
 
-      <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mt-8">
-        <!-- Breadcrumb -->
-        <div class="flex items-center space-x-2 text-sm">
-          <a href="index.html" class="hover:text-[#FFB6D9] transition">Inicio</a>
-          <i class="fas fa-chevron-right text-xs" style="color: #FFB6D9;"></i>
-          <span class="font-semibold" style="color: #FFB6D9;">Tienda</span>
-        </div>
-
-        <!-- Sorting & Results -->
-        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <span class="text-sm text-gray-600">
-            Mostrando <span id="results-count">0</span> de <span id="total-count">0</span> productos
-          </span>
-          
-          <div class="flex items-center gap-2">
-            <label class="text-sm font-medium">Ordenar:</label>
-            <select id="sort-select" class="px-3 py-2 rounded-lg border-2 text-sm focus:outline-none" style="border-color: rgba(255, 201, 224, 0.3); border-radius: 50px;">
-              <option value="popular">Más vendidos</option>
-              <option value="price-asc">Precio: menor a mayor</option>
-              <option value="price-desc">Precio: mayor a menor</option>
-              <option value="newest">Nuevos</option>
-            </select>
+    <div class="hero-content max-w-7xl mx-auto px-4 py-8 md:py-10">
+      <div class="hero-card">
+        <div class="hero-card-header fade-in-up">
+          <div class="hero-badge mb-4">
+            <i class="fas fa-shopping-bag text-2xl" style="color: #FFB6D9;"></i>
           </div>
-
-          <button id="mobile-filter-btn" class="md:hidden btn-secondary text-sm">
-            <i class="fas fa-filter mr-2"></i>Filtros
-          </button>
+          <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3" style="font-family: 'Playfair Display', serif;">Nuestra Colección Exclusiva</h1>
+          <p class="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">Descubre fragancias irresistibles para cada ocasión</p>
         </div>
       </div>
     </div>
@@ -123,24 +216,7 @@
                 <i class="fas fa-layer-group mr-2" style="color: #FFB6D9;"></i>
                 Categorías
               </h4>
-              <div class="space-y-2">
-                <label class="flex items-center cursor-pointer hover:text-[#FFB6D9]">
-                  <input type="checkbox" class="category-filter mr-2" value="Eau de Parfum" checked>
-                  <span class="text-sm">Eau de Parfum</span>
-                </label>
-                <label class="flex items-center cursor-pointer hover:text-[#FFB6D9]">
-                  <input type="checkbox" class="category-filter mr-2" value="Eau de Toilette" checked>
-                  <span class="text-sm">Eau de Toilette</span>
-                </label>
-                <label class="flex items-center cursor-pointer hover:text-[#FFB6D9]">
-                  <input type="checkbox" class="category-filter mr-2" value="Brumas Corporales" checked>
-                  <span class="text-sm">Brumas Corporales</span>
-                </label>
-                <label class="flex items-center cursor-pointer hover:text-[#FFB6D9]">
-                  <input type="checkbox" class="category-filter mr-2" value="Sets Regalo" checked>
-                  <span class="text-sm">Sets Regalo</span>
-                </label>
-              </div>
+              <div id="category-filters" class="space-y-2"></div>
             </div>
 
             <hr class="my-6" style="border-color: #FFD6E8;">
@@ -168,24 +244,7 @@
                 <i class="fas fa-star mr-2" style="color: #FFB6D9;"></i>
                 Marcas
               </h4>
-              <div class="space-y-2">
-                <label class="flex items-center cursor-pointer hover:text-[#FFB6D9]">
-                  <input type="checkbox" class="brand-filter mr-2" value="Samy" checked>
-                  <span class="text-sm">Samy Signature</span>
-                </label>
-                <label class="flex items-center cursor-pointer hover:text-[#FFB6D9]">
-                  <input type="checkbox" class="brand-filter mr-2" value="Glow" checked>
-                  <span class="text-sm">Glow Collection</span>
-                </label>
-                <label class="flex items-center cursor-pointer hover:text-[#FFB6D9]">
-                  <input type="checkbox" class="brand-filter mr-2" value="Velvet" checked>
-                  <span class="text-sm">Velvet Dreams</span>
-                </label>
-                <label class="flex items-center cursor-pointer hover:text-[#FFB6D9]">
-                  <input type="checkbox" class="brand-filter mr-2" value="Rose" checked>
-                  <span class="text-sm">Rose Elite</span>
-                </label>
-              </div>
+              <div id="brand-filters" class="space-y-2"></div>
             </div>
 
             <button class="btn-primary w-full mt-6" id="apply-filters">
@@ -210,24 +269,7 @@
                 <i class="fas fa-layer-group mr-2" style="color: #FFB6D9;"></i>
                 Categorías
               </h4>
-              <div class="space-y-2">
-                <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="category-filter-mobile mr-2" value="Eau de Parfum" checked>
-                  <span class="text-sm">Eau de Parfum</span>
-                </label>
-                <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="category-filter-mobile mr-2" value="Eau de Toilette" checked>
-                  <span class="text-sm">Eau de Toilette</span>
-                </label>
-                <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="category-filter-mobile mr-2" value="Brumas Corporales" checked>
-                  <span class="text-sm">Brumas Corporales</span>
-                </label>
-                <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="category-filter-mobile mr-2" value="Sets Regalo" checked>
-                  <span class="text-sm">Sets Regalo</span>
-                </label>
-              </div>
+              <div id="category-filters-mobile" class="space-y-2"></div>
             </div>
 
             <hr class="my-6" style="border-color: #FFD6E8;">
@@ -255,24 +297,7 @@
                 <i class="fas fa-star mr-2" style="color: #FFB6D9;"></i>
                 Marcas
               </h4>
-              <div class="space-y-2">
-                <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="brand-filter-mobile mr-2" value="Samy" checked>
-                  <span class="text-sm">Samy Signature</span>
-                </label>
-                <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="brand-filter-mobile mr-2" value="Glow" checked>
-                  <span class="text-sm">Glow Collection</span>
-                </label>
-                <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="brand-filter-mobile mr-2" value="Velvet" checked>
-                  <span class="text-sm">Velvet Dreams</span>
-                </label>
-                <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" class="brand-filter-mobile mr-2" value="Rose" checked>
-                  <span class="text-sm">Rose Elite</span>
-                </label>
-              </div>
+              <div id="brand-filters-mobile" class="space-y-2"></div>
             </div>
 
             <div class="flex gap-3 mt-6">
@@ -284,6 +309,31 @@
 
         <!-- ===== PRODUCTS GRID ===== -->
         <div class="flex-1">
+          <div class="mb-5 md:mb-6">
+            <div class="bg-white/80 backdrop-blur rounded-2xl border px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                 style="border-color: rgba(255, 201, 224, 0.35);">
+              <div class="text-sm text-gray-600">
+                Mostrando <span id="results-count">0</span> de <span id="total-count">0</span> productos
+              </div>
+
+              <div class="flex items-center gap-3 justify-between sm:justify-end">
+                <div class="flex items-center gap-2">
+                  <label for="sort-select" class="text-sm font-medium text-gray-700">Ordenar:</label>
+                  <select id="sort-select" class="px-3 py-2 rounded-lg border-2 text-sm focus:outline-none"
+                          style="border-color: rgba(255, 201, 224, 0.3); border-radius: 50px;">
+                    <option value="popular">Más vendidos</option>
+                    <option value="price-asc">Precio: menor a mayor</option>
+                    <option value="price-desc">Precio: mayor a menor</option>
+                    <option value="newest">Nuevos</option>
+                  </select>
+                </div>
+
+                <button id="mobile-filter-btn" class="md:hidden btn-secondary text-sm">
+                  <i class="fas fa-filter mr-2"></i>Filtros
+                </button>
+              </div>
+            </div>
+          </div>
           <!-- Grilla de productos -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8" id="products-grid">
             <!-- Loading inicial -->
@@ -385,20 +435,61 @@
     const mobileOverlay = document.getElementById('mobile-overlay');
     const closeMobileFilters = document.getElementById('close-mobile-filters');
 
-    mobileFilterBtn.addEventListener('click', () => {
-      mobileFilters.classList.add('active');
-      mobileOverlay.classList.add('active');
-    });
+    if (mobileFilterBtn && mobileFilters && mobileOverlay) {
+      mobileFilterBtn.addEventListener('click', () => {
+        mobileFilters.classList.add('active');
+        mobileOverlay.classList.add('active');
+      });
+    }
 
-    closeMobileFilters.addEventListener('click', () => {
-      mobileFilters.classList.remove('active');
-      mobileOverlay.classList.remove('active');
-    });
+    if (closeMobileFilters && mobileFilters && mobileOverlay) {
+      closeMobileFilters.addEventListener('click', () => {
+        mobileFilters.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+      });
+    }
 
-    mobileOverlay.addEventListener('click', () => {
-      mobileFilters.classList.remove('active');
-      mobileOverlay.classList.remove('active');
-    });
+    if (mobileOverlay && mobileFilters) {
+      mobileOverlay.addEventListener('click', () => {
+        mobileFilters.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+      });
+    }
+
+    // Carrusel automático de imágenes de fondo (Hero)
+    (async function initHeroSlideshow() {
+      const container = document.querySelector('.hero-slideshow');
+      if (!container) return;
+
+      try {
+        const res = await fetch('api/carrusel.php?folder=tienda', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const images = Array.isArray(data.images) ? data.images : [];
+
+        if (images.length > 0) {
+          container.innerHTML = '';
+          images.forEach((src, index) => {
+            const slide = document.createElement('div');
+            slide.className = `hero-slide${index === 0 ? ' active' : ''}`;
+            slide.style.backgroundImage = `url('${src}')`;
+            container.appendChild(slide);
+          });
+        }
+      } catch (e) {
+        console.warn('No se pudo cargar el carrusel local:', e);
+      }
+
+      const heroSlides = container.querySelectorAll('.hero-slide');
+      if (!heroSlides || heroSlides.length < 2) return;
+
+      let currentHeroSlide = 0;
+      setInterval(() => {
+        heroSlides[currentHeroSlide].classList.remove('active');
+        currentHeroSlide = (currentHeroSlide + 1) % heroSlides.length;
+        heroSlides[currentHeroSlide].classList.add('active');
+      }, 5000);
+    })();
   </script>
 </body>
 </html>

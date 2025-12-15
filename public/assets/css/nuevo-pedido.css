@@ -145,7 +145,7 @@
 
 .modal-content .btn-primary {
   background: var(--gradient-principal);
-  color: white;
+  color: white !important;
   box-shadow: var(--sombra-suave);
   position: relative;
   overflow: hidden;
@@ -408,7 +408,7 @@
 
 #checkout-form-container .btn-primary {
   background: var(--gradient-principal);
-  color: white;
+  color: white !important;
   border: none;
   box-shadow: var(--sombra-suave);
   position: relative;

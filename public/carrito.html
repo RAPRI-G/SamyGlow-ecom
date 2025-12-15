@@ -13,20 +13,20 @@
 </head>
 <body>
   <!-- ===== HEADER / NAV ===== -->
-  <header class="w-full bg-white shadow-lg sticky top-0 z-50 border-b-2" style="border-color: var(--rosa-neon);">
+  <header class="w-full bg-white shadow-lg sticky top-0 z-50" style="border-bottom: 2px solid #FFC9E0;">
     <nav class="max-w-7xl mx-auto px-4 py-3 md:py-4">
       <div class="flex justify-between items-center">
         <!-- Logo -->
         <div class="flex items-center space-x-2">
           <img src="assets/img/logo.png" alt="Samy Glow Logo" class="h-10 md:h-12 w-auto">
-          <span class="text-xl md:text-2xl font-bold hidden sm:inline" style="color: var(--rosa-neon);">Samy Glow</span>
+          <span class="text-xl md:text-2xl font-bold hidden sm:inline logo-victoria">Samy Glow</span>
         </div>
 
         <!-- Menu Desktop -->
         <ul class="hidden md:flex space-x-6 lg:space-x-8 font-medium">
-          <li><a href="index.html" class="hover:text-[#FF1493] transition">Inicio</a></li>
-          <li><a href="tienda.html" class="hover:text-[#FF1493] transition">Tienda</a></li>
-          <li><a href="contacto.html" class="hover:text-[#FF1493] transition">Contacto</a></li>
+          <li><a href="index.html" class="text-gray-700 hover:text-[#FFB6D9] transition">Inicio</a></li>
+          <li><a href="tienda.html" class="text-gray-700 hover:text-[#FFB6D9] transition">Tienda</a></li>
+          <li><a href="contacto.html" class="text-gray-700 hover:text-[#FFB6D9] transition">Contacto</a></li>
         </ul>
 
         <!-- Iconos -->
@@ -36,7 +36,7 @@
           </a>
           <a href="carrito.html" class="glow-icon text-lg md:text-xl relative">
             <i class="fas fa-shopping-cart"></i>
-            <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF1493] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" style="display: none;">0</span>
+            <span id="cart-count" class="absolute -top-2 -right-2 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" style="background: #FFB6D9; display: none;">0</span>
           </a>
           <button id="menu-btn" class="md:hidden text-xl md:text-2xl glow-icon">
             <i class="fas fa-bars"></i>
@@ -45,15 +45,16 @@
       </div>
 
       <!-- Menu Mobile -->
-      <div id="mobile-menu">
+      <div id="mobile-menu" class="md:hidden hidden">
         <ul class="flex flex-col space-y-3 mt-4 font-medium">
-          <li><a href="index.html" class="block py-2 hover:text-[#FF1493]">Inicio</a></li>
-          <li><a href="tienda.html" class="block py-2 hover:text-[#FF1493]">Tienda</a></li>
-          <li><a href="contacto.html" class="block py-2 hover:text-[#FF1493]">Contacto</a></li>
+          <li><a href="index.html" class="block py-2 text-gray-700 hover:text-[#FFB6D9]">Inicio</a></li>
+          <li><a href="tienda.html" class="block py-2 text-gray-700 hover:text-[#FFB6D9]">Tienda</a></li>
+          <li><a href="contacto.html" class="block py-2 text-gray-700 hover:text-[#FFB6D9]">Contacto</a></li>
         </ul>
       </div>
     </nav>
   </header>
+
   <!-- ===== HERO SECTION ===== -->
   <section class="hero-cart">
     <div class="max-w-4xl mx-auto">
@@ -61,11 +62,12 @@
       <h1>Mi Carrito de Compras</h1>
       <div class="breadcrumb">
         <a href="index.html">Inicio</a>
-        <i class="fas fa-chevron-right text-xs" style="color: var(--rosa-neon);"></i>
-        <span class="font-semibold" style="color: var(--rosa-neon);">Carrito</span>
+        <i class="fas fa-chevron-right text-xs" style="color: #FFB6D9;"></i>
+        <span class="font-semibold" style="color: #FFB6D9;">Carrito</span>
       </div>
     </div>
   </section>
+
   <!-- ===== MAIN CONTENT ===== -->
   <section class="w-full py-8 md:py-12">
     <div class="max-w-7xl mx-auto px-4">
@@ -74,12 +76,15 @@
       </div>
     </div>
   </section>
+
   <!-- ===== RECOMMENDED PRODUCTS ===== -->
-  <section class="w-full py-12 md:py-16 bg-pastel-gradient border-t-2" style="border-color: var(--rosa-neon-light);">
+  <section class="w-full py-12 md:py-16" style="background: linear-gradient(180deg, #FFFFFF 0%, #FFF5FA 50%, #FFFFFF 100%); border-top: 1px solid rgba(255, 201, 224, 0.2);">
     <div class="max-w-7xl mx-auto px-4">
       <div class="text-center mb-8 md:mb-12">
-        <i class="fas fa-star text-4xl md:text-5xl glow-icon mb-4" style="color: var(--rosa-neon);"></i>
-        <h2 class="text-3xl md:text-4xl font-bold">También te puede interesar</h2>
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style="background: linear-gradient(135deg, #FFE8F5, #FFD6E8);">
+          <i class="fas fa-star text-3xl" style="color: #FFB6D9;"></i>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold" style="color: #4A4A4A; font-family: 'Playfair Display', serif;">También te puede interesar</h2>
         <p class="text-gray-600 mt-2">Descubre más fragancias exclusivas</p>
       </div>
 
@@ -93,68 +98,76 @@
   <div class="mobile-checkout">
     <div class="flex justify-between items-center mb-3">
       <span class="font-semibold">Total:</span>
-      <span id="mobile-total" class="text-2xl font-bold" style="color: var(--rosa-neon);">$0.00</span>
+      <span id="mobile-total" class="text-2xl font-bold" style="color: #FFB6D9;">$0.00</span>
     </div>
-    <button onclick="procederAlPago()" class="btn-primary w-full btn-pulse">
+    <button onclick="procederAlPago()" class="btn-primary w-full">
       <i class="fas fa-credit-card mr-2"></i>Proceder al Pago
     </button>
   </div>
 
   <!-- ===== FOOTER ===== -->
-  <footer class="w-full bg-white py-8 md:py-12 border-t-2" style="border-color: var(--rosa-neon);">
+  <footer class="w-full bg-white py-8 md:py-12" style="border-top: 2px solid #FFE8F5;">
     <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
       <div>
         <div class="flex items-center space-x-2 mb-4">
           <img src="assets/img/logo.png" alt="Samy Glow" class="h-8 md:h-10 w-auto">
-          <span class="text-xl md:text-2xl font-bold" style="color: var(--rosa-neon);">Samy Glow</span>
+          <span class="text-xl md:text-2xl font-bold logo-victoria">Samy Glow</span>
         </div>
         <p class="text-gray-600 text-sm md:text-base">Fragancias originales y exclusivas para cada momento especial.</p>
       </div>
 
       <div>
-        <h4 class="font-bold text-base md:text-lg mb-4">Ayuda</h4>
+        <h4 class="font-bold text-base md:text-lg mb-4" style="color: #4A4A4A;">Ayuda</h4>
         <ul class="space-y-2 text-gray-600 text-sm md:text-base">
-          <li><a href="#" class="hover:text-[#FF1493]">Envíos y entregas</a></li>
-          <li><a href="#" class="hover:text-[#FF1493]">Devoluciones</a></li>
-          <li><a href="#" class="hover:text-[#FF1493]">Atención al cliente</a></li>
-          <li><a href="#" class="hover:text-[#FF1493]">Preguntas frecuentes</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Envíos y entregas</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Devoluciones</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Atención al cliente</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Preguntas frecuentes</a></li>
         </ul>
       </div>
 
       <div>
-        <h4 class="font-bold text-base md:text-lg mb-4">Legal</h4>
+        <h4 class="font-bold text-base md:text-lg mb-4" style="color: #4A4A4A;">Legal</h4>
         <ul class="space-y-2 text-gray-600 text-sm md:text-base">
-          <li><a href="#" class="hover:text-[#FF1493]">Términos y condiciones</a></li>
-          <li><a href="#" class="hover:text-[#FF1493]">Política de privacidad</a></li>
-          <li><a href="#" class="hover:text-[#FF1493]">Cookies</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Términos y condiciones</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Política de privacidad</a></li>
+          <li><a href="#" class="hover:text-[#FFB6D9] transition">Cookies</a></li>
         </ul>
       </div>
 
       <div>
-        <h4 class="font-bold text-base md:text-lg mb-4">Contacto</h4>
+        <h4 class="font-bold text-base md:text-lg mb-4" style="color: #4A4A4A;">Contacto</h4>
         <ul class="space-y-3 text-gray-600 text-sm md:text-base">
           <li class="flex items-center space-x-2">
-            <i class="fas fa-phone glow-icon" style="color: var(--rosa-neon);"></i>
+            <i class="fas fa-phone" style="color: #FFB6D9;"></i>
             <span>+51 919 462 329</span>
           </li>
           <li class="flex items-center space-x-2">
-            <i class="fas fa-envelope glow-icon" style="color: var(--rosa-neon);"></i>
+            <i class="fas fa-envelope" style="color: #FFB6D9;"></i>
             <span>sollerriverasamira@gmail.com</span>
           </li>
           <li class="flex items-center space-x-2">
-            <i class="fab fa-instagram glow-icon" style="color: var(--rosa-neon);"></i>
-            <a href="https://www.instagram.com/Samy.glow02" class="hover:text-[#FF1493]">@samyglow</a>
+            <i class="fab fa-instagram" style="color: #FFB6D9;"></i>
+            <a href="https://www.instagram.com/Samy.glow02" class="hover:text-[#FFB6D9] transition">@samyglow</a>
           </li>
         </ul>
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 mt-6 md:mt-8 pt-6 md:pt-8 border-t-2 text-center text-gray-500 text-sm md:text-base" style="border-color: var(--rosa-neon);">
+    <div class="max-w-7xl mx-auto px-4 mt-6 md:mt-8 pt-6 md:pt-8 text-center text-gray-500 text-sm md:text-base" style="border-top: 2px solid #FFE8F5;">
       <p>&copy; 2025 Samy Glow. Todos los derechos reservados.</p>
     </div>
   </footer>
-    <script src="assets/js/cart-manager.js"></script>
-    <script src="assets/js/nuevo-pedido.js"></script>
-    <script src="assets/js/carrito.js"></script>
+
+  <script src="assets/js/cart-manager.js"></script>
+  <script src="assets/js/nuevo-pedido.js"></script>
+  <script src="assets/js/carrito.js"></script>
+  <script>
+    // Mobile Menu Toggle
+    document.getElementById('menu-btn').addEventListener('click', function() {
+      const mobileMenu = document.getElementById('mobile-menu');
+      mobileMenu.classList.toggle('hidden');
+    });
+  </script>
 </body>
 </html>
