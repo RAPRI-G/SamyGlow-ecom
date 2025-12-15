@@ -466,6 +466,18 @@ header {
   animation: floatSoft 6s ease-in-out infinite;
 }
 
+/* ===== CONTENEDOR DE EFECTOS DECORATIVOS ===== */
+.decorative-effects-container {
+  position: absolute;
+  pointer-events: none;
+  z-index: 30;
+  width: 560px;
+  height: 560px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
 /* ===== SCROLLBAR ELEGANTE ===== */
 ::-webkit-scrollbar {
   width: 10px;
