@@ -91,6 +91,25 @@
       .samy-animated { animation: none !important; }
     }
 
+    @keyframes borderGlow {
+      0%, 100% {
+        box-shadow: 0 12px 40px rgba(255,182,217,0.5), 0 8px 24px rgba(255,192,203,0.6), inset 0 4px 8px rgba(255,255,255,0.7), 0 0 0 3px rgba(255,255,255,0.5), 0 0 0 6px rgba(255,182,217,0.3);
+        transform: scale(1) rotate(0deg);
+      }
+      25% {
+        box-shadow: 0 15px 45px rgba(255,182,217,0.6), 0 10px 28px rgba(255,192,203,0.7), inset 0 4px 8px rgba(255,255,255,0.8), 0 0 0 3px rgba(255,255,255,0.7), 0 0 0 6px rgba(255,182,217,0.4);
+        transform: scale(1.05) rotate(2deg);
+      }
+      50% {
+        box-shadow: 0 18px 50px rgba(255,182,217,0.7), 0 12px 32px rgba(255,192,203,0.8), inset 0 4px 8px rgba(255,255,255,0.9), 0 0 0 3px rgba(255,255,255,0.8), 0 0 0 6px rgba(255,182,217,0.6);
+        transform: scale(1.1) rotate(0deg);
+      }
+      75% {
+        box-shadow: 0 15px 45px rgba(255,182,217,0.6), 0 10px 28px rgba(255,192,203,0.7), inset 0 4px 8px rgba(255,255,255,0.8), 0 0 0 3px rgba(255,255,255,0.7), 0 0 0 6px rgba(255,182,217,0.4);
+        transform: scale(1.05) rotate(-2deg);
+      }
+    }
+
     .samy-animated {
       animation: samyFloat 4s ease-in-out infinite;
     }
@@ -165,7 +184,7 @@
 
             <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4" style="color: #4A4A4A; font-family: 'Playfair Display', serif;">
               Fragancias
-              <span style="background: linear-gradient(135deg, #FFB6D9, #FFC9E0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Premium</span>
+              <span style="background: linear-gradient(135deg, #FFB6D9, #FFC9E0); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Premium</span>
             </h1>
 
             <p class="text-base sm:text-lg mb-4" style="color: #6B6B6B;">
@@ -200,12 +219,12 @@
                 <div aria-hidden="true" class="absolute inset-0" style="pointer-events: none; z-index: 25;">
                   <span class="flower-particle" style="top: 14%; left: 22%; --rot: -10deg; animation-delay: -0.8s; animation-duration: 6.2s; opacity: 0.75;"><i class="fas fa-spa"></i></span>
                   <span class="flower-particle" style="top: 24%; right: 18%; --rot: 14deg; animation-delay: -2.1s; animation-duration: 5.4s; opacity: 0.65;"><i class="fas fa-spa"></i></span>
-                  <span class="flower-particle" style="top: 58%; left: 10%; --rot: 8deg; animation-delay: -1.4s; animation-duration: 6.8s; opacity: 0.55;"><i class="fas fa-seedling"></i></span>
-                  <span class="flower-particle" style="bottom: 18%; left: 18%; --rot: -16deg; animation-delay: -3.0s; animation-duration: 5.9s; opacity: 0.6;"><i class="fas fa-spa"></i></span>
-                  <span class="flower-particle" style="bottom: 14%; right: 22%; --rot: 10deg; animation-delay: -1.9s; animation-duration: 6.5s; opacity: 0.7;"><i class="fas fa-spa"></i></span>
                 </div>
               </div>
-              <video src="assets/img/Samy.mp4" alt="Samy" class="absolute inset-0 w-full h-full object-contain" style="padding: 0px; transform: scaleX(-1) scale(1.26); z-index: 15;" autoplay loop muted playsinline></video>
+              <video src="assets/img/Samy.mp4" alt="Samy" class="absolute inset-0 w-full h-full object-contain" style="padding: 0px; transform: scaleX(-1) scale(0.9); z-index: 15;" autoplay loop muted playsinline></video>
+              <div class="absolute bottom-0 left-4 w-32 h-32 rounded-full opacity-95 flex items-center justify-center" style="z-index: 20; background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,182,217,0.85) 100%); box-shadow: 0 12px 40px rgba(255,182,217,0.5), 0 8px 24px rgba(255,192,203,0.6), inset 0 4px 8px rgba(255,255,255,0.7), 0 0 0 3px rgba(255,255,255,0.5), 0 0 0 6px rgba(255,182,217,0.3); backdrop-filter: blur(4px); border: 2px solid rgba(255,255,255,0.8); animation: borderGlow 2s ease-in-out infinite;">
+                <img src="assets/img/logo.png" alt="Samy Glow" class="w-16 h-16 object-contain">
+              </div>
             </div>
           </div>
         </div>
