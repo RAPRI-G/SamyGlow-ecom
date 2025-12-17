@@ -1,10 +1,10 @@
 <?php
+// models/Configuracion.php
 class Configuracion {
     private $pdo;
 
-    public function __construct() {
-        global $pdo;
-        $this->pdo = $pdo;
+    public function __construct($pdo) { // Cambiar aquí
+        $this->pdo = $pdo; // Cambiar aquí
     }
 
     public function obtenerUsuarios() {

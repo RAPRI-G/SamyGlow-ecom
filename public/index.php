@@ -630,6 +630,51 @@ switch ($view) {
         $controller->index();
         break;
 
+    // 🔹 APIS PARA GESTIÓN DE USUARIOS ADMIN
+    case 'api-crear-usuario':
+        if (!isset($_SESSION['usuario'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'No autorizado']);
+            exit;
+        }
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiCrearUsuario();
+        break;
+
+    case 'api-listar-usuarios':
+        if (!isset($_SESSION['usuario'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'No autorizado']);
+            exit;
+        }
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiListarUsuarios();
+        break;
+
+    case 'api-actualizar-usuario':
+        if (!isset($_SESSION['usuario'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'No autorizado']);
+            exit;
+        }
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiActualizarUsuario();
+        break;
+
+    case 'api-eliminar-usuario':
+        if (!isset($_SESSION['usuario'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'No autorizado']);
+            exit;
+        }
+        require_once __DIR__ . '/../app/controllers/ConfiguracionController.php';
+        $controller = new ConfiguracionController();
+        $controller->apiEliminarUsuario();
+        break;
+
     // =====================================
     // ❌ 404 - Página no encontrada
     // =====================================

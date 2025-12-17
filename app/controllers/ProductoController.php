@@ -23,7 +23,6 @@ class ProductoController
             session_start();
         }
 
-        // Evitar caché
         header("Cache-Control: no-cache, no-store, must-revalidate");
         header("Pragma: no-cache");
         header("Expires: 0");
@@ -38,6 +37,21 @@ class ProductoController
 
         // Obtener datos para la vista
         $productos = $this->productoModel->listar();
+
+        // 🔴 AGREGAR: Procesar las imágenes para cada producto
+        foreach ($productos as &$producto) {
+            if (!empty($producto['imagen'])) {
+                // Usar los métodos del modelo para obtener URL y ruta física
+                $producto['imagen_url'] = $this->productoModel->obtenerUrlImagen($producto['imagen']);
+                $producto['imagen_ruta_fisica'] = $this->productoModel->obtenerRutaFisica($producto['imagen']);
+                $producto['imagen_existe'] = file_exists($producto['imagen_ruta_fisica']);
+            } else {
+                $producto['imagen_url'] = null;
+                $producto['imagen_existe'] = false;
+            }
+        }
+        unset($producto); // Importante: romper la referencia
+
         $categorias = $this->categoriaModel->listar();
         $estadisticas = $this->productoModel->obtenerEstadisticas();
         $productosStockBajo = $this->productoModel->productosStockBajo();
@@ -147,7 +161,8 @@ class ProductoController
     // En ProductoController.php, modifica el método manejarSubidaImagen:
     private function manejarSubidaImagen($archivo)
     {
-        $directorioDestino = __DIR__ . '/../../uploads/productos/';
+        // Ruta ABSOLUTA en el servidor
+        $directorioDestino = $_SERVER['DOCUMENT_ROOT'] . '/SamyGlow-ecom/uploads/productos/';
 
         // Crear directorio si no existe
         if (!is_dir($directorioDestino)) {
@@ -168,35 +183,30 @@ class ProductoController
             throw new Exception('La imagen no puede ser mayor a 5MB');
         }
 
-        // 🔴 CAMBIO AQUÍ: Usar solo el nombre original del archivo
+        // Generar nombre único
         $nombreOriginal = pathinfo($archivo['name'], PATHINFO_FILENAME);
         $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
-
-        // Limpiar y formatear nombre del archivo
         $nombreLimpio = $this->sanitizarNombreArchivo($nombreOriginal);
 
-        // Si el nombre está vacío después de limpiar, usar un nombre por defecto
         if (empty($nombreLimpio)) {
-            $nombreLimpio = 'producto';
+            $nombreLimpio = 'producto_' . uniqid();
         }
 
         $nombreArchivo = $nombreLimpio . '.' . $extension;
         $rutaCompleta = $directorioDestino . $nombreArchivo;
 
-        // Si ya existe, agregar un número incremental
-        $contador = 1;
-        while (file_exists($rutaCompleta)) {
-            $nombreArchivo = $nombreLimpio . '_' . $contador . '.' . $extension;
+        // Si ya existe, agregar timestamp
+        if (file_exists($rutaCompleta)) {
+            $nombreArchivo = $nombreLimpio . '_' . time() . '.' . $extension;
             $rutaCompleta = $directorioDestino . $nombreArchivo;
-            $contador++;
         }
 
         // Mover archivo
         if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
-            // 🔴 Importante: Retornar solo 'uploads/productos/nombre_archivo.ext'
-            return 'uploads/productos/' . $nombreArchivo;
+            // 🔴 GUARDAR SOLO EL NOMBRE DEL ARCHIVO, NO LA RUTA
+            return $nombreArchivo;
         } else {
-            throw new Exception('Error al subir la imagen. Verifica los permisos de la carpeta uploads/');
+            throw new Exception('Error al subir la imagen.');
         }
     }
 

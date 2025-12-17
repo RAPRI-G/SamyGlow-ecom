@@ -75,28 +75,26 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10 bg-pink-100 rounded-lg flex items-center justify-center">
-                                                    <?php if (!empty($producto['imagen'])): ?>
-                                                        <?php
-                                                        $imagenPath = $producto['imagen'];
-                                                        if (!str_starts_with($imagenPath, 'uploads/')) {
-                                                            $imagenPath = 'uploads/productos/' . $imagenPath;
+                                                    <?php
+                                                    // SOLUCIÓN TEMPORAL: Forzar la URL correcta
+                                                    if (!empty($producto['imagen'])) {
+                                                        // Extraer solo el nombre del archivo
+                                                        $nombreArchivo = basename($producto['imagen']);
+                                                        // Construir URL MANUALMENTE
+                                                        $urlImagen = '/SamyGlow-ecom/uploads/productos/' . $nombreArchivo;
+                                                        $rutaFisica = $_SERVER['DOCUMENT_ROOT'] . $urlImagen;
+
+                                                        if (file_exists($rutaFisica)) {
+                                                            echo '<img src="' . htmlspecialchars($urlImagen) . '" 
+                          alt="' . htmlspecialchars($producto['nombre']) . '"
+                          class="h-8 w-8 rounded-lg object-cover">';
+                                                        } else {
+                                                            echo '<i class="fas fa-cube text-pink-600"></i>';
                                                         }
-
-                                                        // Verificar si la imagen existe físicamente
-                                                        $rutaAbsoluta = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($imagenPath, '/');
-                                                        $imagenExiste = file_exists($rutaAbsoluta);
-                                                        ?>
-
-                                                        <?php if ($imagenExiste): ?>
-                                                            <img src="<?= htmlspecialchars($imagenPath) ?>"
-                                                                alt="<?= htmlspecialchars($producto['nombre']) ?>"
-                                                                class="h-8 w-8 rounded-lg object-cover">
-                                                        <?php else: ?>
-                                                            <i class="fas fa-cube text-pink-600"></i>
-                                                        <?php endif; ?>
-                                                    <?php else: ?>
-                                                        <i class="fas fa-cube text-pink-600"></i>
-                                                    <?php endif; ?>
+                                                    } else {
+                                                        echo '<i class="fas fa-cube text-pink-600"></i>';
+                                                    }
+                                                    ?>
                                                 </div>
                                                 <div class="ml-4">
                                                     <div class="text-sm font-medium text-gray-900"><?= htmlspecialchars($producto['nombre']) ?></div>
@@ -1590,9 +1588,36 @@
     }
 
     function mostrarModalEditarProducto(producto) {
-        let html = `
+    // CORREGIR LA RUTA DE LA IMAGEN
+    let imagenUrl = '';
+    let imagenHtml = '<p class="text-sm text-gray-500 mt-2">No hay imagen actual</p>';
+    
+    if (producto.imagen) {
+        // Extraer solo el nombre del archivo
+        let nombreArchivo = producto.imagen.split('/').pop();
+        
+        // Construir URL CORRECTA
+        imagenUrl = '/SamyGlow-ecom/uploads/productos/' + nombreArchivo;
+        
+        imagenHtml = `
+            <div class="mt-2">
+                <p class="text-sm text-gray-600 mb-2">Imagen actual:</p>
+                <img src="${imagenUrl}" 
+                     alt="${escapeHtml(producto.nombre)}" 
+                     class="w-32 h-32 object-cover rounded-lg border"
+                     onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <p class="text-sm text-gray-500 mt-2" style="display:none;">
+                    <i class="fas fa-exclamation-triangle text-yellow-500 mr-1"></i>
+                    No se pudo cargar la imagen (${nombreArchivo})
+                </p>
+            </div>
+        `;
+    }
+    
+    let html = `
     <form id="form-editar-producto" class="space-y-4" onsubmit="guardarCambiosProducto(event, ${producto.id})">
         <input type="hidden" id="edit-producto-id" value="${producto.id}">
+        <input type="hidden" id="edit-imagen-actual" value="${producto.imagen || ''}">
         
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Producto *</label>
@@ -1649,19 +1674,12 @@
                        onchange="previsualizarImagenEditar(this)">
             </div>
             <div id="imagen-preview-editar">
-${producto.imagen ? `
-    <div class="mt-2">
-        <p class="text-sm text-gray-600 mb-2">Imagen actual:</p>
-        <img src="${producto.imagen}" alt="${escapeHtml(producto.nombre)}" 
-             class="w-32 h-32 object-cover rounded-lg border"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-        <p class="text-sm text-gray-500 mt-2" style="display:none;">
-            <i class="fas fa-exclamation-triangle text-yellow-500 mr-1"></i>
-            No se pudo cargar la imagen
-        </p>
-    </div>
-` : '<p class="text-sm text-gray-500 mt-2">No hay imagen actual</p>'}
+                ${imagenHtml}
             </div>
+            <button type="button" id="btn-eliminar-imagen-editar" class="hidden mt-2 bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded transition-colors text-sm"
+                    onclick="eliminarImagenProducto(${producto.id})">
+                <i class="fas fa-trash mr-1"></i>Eliminar Imagen Actual
+            </button>
         </div>
         
         <div class="flex items-center">
@@ -1682,12 +1700,12 @@ ${producto.imagen ? `
     </form>
     `;
 
-        document.getElementById('contenido-modal-producto').innerHTML = html;
+    document.getElementById('contenido-modal-producto').innerHTML = html;
 
-        setTimeout(() => {
-            document.getElementById('modal-editar-producto').classList.add('active');
-        }, 10);
-    }
+    setTimeout(() => {
+        document.getElementById('modal-editar-producto').classList.add('active');
+    }, 10);
+}
 
     function getOpcionesCategorias(categoriaSeleccionada) {
         const categorias = [{

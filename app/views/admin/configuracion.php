@@ -12,12 +12,6 @@
                 <button class="tab-button flex-1 py-3 px-4 text-center font-medium text-gray-600 hover:bg-gray-50 active" data-tab="usuarios">
                     <i class="fas fa-user-shield mr-2"></i>Usuarios Admin
                 </button>
-                <button class="tab-button flex-1 py-3 px-4 text-center font-medium text-gray-600 hover:bg-gray-50" data-tab="backup">
-                    <i class="fas fa-database mr-2"></i>Backup
-                </button>
-                <button class="tab-button flex-1 py-3 px-4 text-center font-medium text-gray-600 hover:bg-gray-50" data-tab="config-general">
-                    <i class="fas fa-sliders-h mr-2"></i>General
-                </button>
             </div>
         </div>
 
@@ -35,7 +29,7 @@
                                     <i class="fas fa-user-plus mr-2"></i>Nuevo Usuario
                                 </button>
                             </div>
-                            
+
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
@@ -84,7 +78,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Estadísticas -->
                     <div class="space-y-6">
                         <div class="card">
@@ -106,7 +100,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="card">
                             <h3 class="section-title">Recomendaciones</h3>
                             <div class="space-y-3">
@@ -124,217 +118,6 @@
                                         <p class="text-xs text-gray-500">Recomendado cambiar cada 90 días</p>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Backup de Datos -->
-            <div class="tab-panel" id="backup-panel">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Configuración -->
-                    <div class="card">
-                        <h2 class="text-xl font-bold text-gray-800 mb-6">Configuración de Backup</h2>
-                        
-                        <div class="form-group">
-                            <label>Frecuencia de Backup</label>
-                            <select class="form-control" id="frecuencia-backup">
-                                <option value="diario">Diario</option>
-                                <option value="semanal" selected>Semanal</option>
-                                <option value="mensual">Mensual</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Tipos de Datos</label>
-                            <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <input type="checkbox" id="backup-productos" class="rounded border-gray-300 text-pink-600 focus:ring-pink-500" checked>
-                                    <label for="backup-productos" class="ml-2 text-gray-700">Productos</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="checkbox" id="backup-clientes" class="rounded border-gray-300 text-pink-600 focus:ring-pink-500" checked>
-                                    <label for="backup-clientes" class="ml-2 text-gray-700">Clientes</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="checkbox" id="backup-ventas" class="rounded border-gray-300 text-pink-600 focus:ring-pink-500" checked>
-                                    <label for="backup-ventas" class="ml-2 text-gray-700">Ventas</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Destino del Backup</label>
-                            <select class="form-control" id="destino-backup">
-                                <option value="local" selected>Almacenamiento Local</option>
-                                <option value="nube">Nube</option>
-                                <option value="ambos">Local + Nube</option>
-                            </select>
-                        </div>
-                        
-                        <div class="flex space-x-4">
-                            <button class="btn btn-secondary" onclick="probarBackup()">
-                                <i class="fas fa-vial mr-2"></i>Probar
-                            </button>
-                            <button class="btn btn-primary" onclick="guardarConfigBackup()">
-                                <i class="fas fa-save mr-2"></i>Guardar
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Acciones -->
-                    <div class="space-y-6">
-                        <div class="card">
-                            <h3 class="section-title">Backup Manual</h3>
-                            <p class="text-gray-600 mb-4">Realiza un respaldo completo inmediatamente</p>
-                            <button class="btn btn-primary w-full" onclick="realizarBackupManual()">
-                                <i class="fas fa-download mr-2"></i>Realizar Backup
-                            </button>
-                        </div>
-                        
-                        <div class="card">
-                            <h3 class="section-title">Historial</h3>
-                            <div class="space-y-3" id="historial-backups">
-                                <?php if (!empty($backups)): ?>
-                                    <?php foreach ($backups as $backup): ?>
-                                        <div class="flex justify-between items-center p-3 border border-gray-200 rounded">
-                                            <div>
-                                                <div class="font-medium"><?= htmlspecialchars($backup['tipo']) ?></div>
-                                                <div class="text-sm text-gray-500">
-                                                    <?= date('Y-m-d H:i', strtotime($backup['fecha'])) ?> • <?= $backup['tamaño'] ?>
-                                                </div>
-                                            </div>
-                                            <span class="status-badge status-activa">Completado</span>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <div class="text-center py-4 text-gray-500">
-                                        <i class="fas fa-database text-gray-300 text-2xl mb-2"></i>
-                                        <p>No hay backups realizados</p>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        
-                        <div class="card">
-                            <h3 class="section-title">Estado</h3>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Último Backup</span>
-                                    <span class="font-bold">
-                                        <?= !empty($backups) ? date('Y-m-d H:i', strtotime($backups[0]['fecha'])) : 'Nunca' ?>
-                                    </span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Tamaño</span>
-                                    <span class="font-bold">
-                                        <?= !empty($backups) ? $backups[0]['tamaño'] : '0 MB' ?>
-                                    </span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Estado</span>
-                                    <span class="status-badge status-activa">Activo</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Configuración General -->
-            <div class="tab-panel" id="config-general-panel">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Tienda -->
-                    <div class="card">
-                        <h2 class="text-xl font-bold text-gray-800 mb-6">Configuración de la Tienda</h2>
-                        
-                        <div class="form-group">
-                            <label for="nombre-tienda">Nombre</label>
-                            <input type="text" id="nombre-tienda" class="form-control" value="<?= htmlspecialchars($configGeneral['nombre_tienda'] ?? 'SamyGlow') ?>">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="correo-tienda">Correo</label>
-                            <input type="email" id="correo-tienda" class="form-control" value="<?= htmlspecialchars($configGeneral['correo_tienda'] ?? 'info@samyglow.com') ?>">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="moneda-tienda">Moneda</label>
-                            <select class="form-control" id="moneda-tienda">
-                                <option value="PEN" <?= ($configGeneral['moneda_tienda'] ?? 'PEN') === 'PEN' ? 'selected' : '' ?>>Soles (PEN)</option>
-                                <option value="USD" <?= ($configGeneral['moneda_tienda'] ?? 'PEN') === 'USD' ? 'selected' : '' ?>>Dólares (USD)</option>
-                            </select>
-                        </div>
-                        
-                        <button class="btn btn-primary" onclick="guardarConfigTienda()">
-                            <i class="fas fa-save mr-2"></i>Guardar
-                        </button>
-                    </div>
-                    
-                    <!-- Opciones -->
-                    <div class="space-y-6">
-                        <div class="card">
-                            <h3 class="section-title">Notificaciones</h3>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium">Stock Bajo</p>
-                                        <p class="text-sm text-gray-500">Alertas de stock bajo</p>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="notif-stock" <?= ($configGeneral['notificaciones_stock'] ?? true) ? 'checked' : '' ?>>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium">Nuevos Pedidos</p>
-                                        <p class="text-sm text-gray-500">Alertas de pedidos</p>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="notif-pedidos" <?= ($configGeneral['notificaciones_pedidos'] ?? true) ? 'checked' : '' ?>>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card">
-                            <h3 class="section-title">Seguridad</h3>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium">2FA</p>
-                                        <p class="text-sm text-gray-500">Autenticación en dos pasos</p>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="auth-dos-pasos" <?= ($configGeneral['autenticacion_dos_pasos'] ?? false) ? 'checked' : '' ?>>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium">Registro</p>
-                                        <p class="text-sm text-gray-500">Historial de acciones</p>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="registro-auditoria" <?= ($configGeneral['registro_auditoria'] ?? true) ? 'checked' : '' ?>>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card">
-                            <h3 class="section-title">Sistema</h3>
-                            <div class="space-y-3">
-                                <button class="btn btn-secondary w-full" onclick="limpiarCache()">
-                                    <i class="fas fa-broom mr-2"></i>Limpiar Cache
-                                </button>
-                                <button class="btn btn-secondary w-full" onclick="revisarActualizaciones()">
-                                    <i class="fas fa-sync-alt mr-2"></i>Actualizaciones
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -395,61 +178,66 @@
     /* ============================================= */
     /* 🎨 ESTILOS ESPECÍFICOS DE CONFIGURACIÓN */
     /* ============================================= */
-    
+
     .sidebar {
         background: linear-gradient(180deg, #f472b6 0%, #a78bfa 100%);
         color: white;
     }
-    
+
     .active-menu {
         background: rgba(255, 255, 255, 0.2);
         border-right: 4px solid white;
     }
-    
+
     .submenu {
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.3s ease;
     }
-    
+
     .submenu.open {
         max-height: 500px;
     }
-    
+
     .content-section {
         display: none;
     }
-    
+
     .content-section.active {
         display: block;
     }
-    
+
     .tab-button.active {
         background-color: #f472b6;
         color: white;
     }
-    
+
     .tab-panel {
         display: none;
     }
-    
+
     .tab-panel.active {
         display: block;
         animation: fadeIn 0.3s ease;
     }
-    
+
     @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
-    
+
     .card {
         background: white;
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         padding: 1.5rem;
     }
-    
+
     .metric-card {
         background: linear-gradient(135deg, #f472b6 0%, #a78bfa 100%);
         color: white;
@@ -457,35 +245,35 @@
         padding: 1.5rem;
         text-align: center;
     }
-    
+
     .status-badge {
         padding: 4px 8px;
         border-radius: 12px;
         font-size: 12px;
         font-weight: 600;
     }
-    
+
     .status-activa {
         background-color: #d1fae5;
         color: #065f46;
     }
-    
+
     .status-inactiva {
         background-color: #fef3c7;
         color: #d97706;
     }
-    
+
     .form-group {
         margin-bottom: 1.5rem;
     }
-    
+
     .form-group label {
         display: block;
         font-weight: 500;
         margin-bottom: 0.5rem;
         color: #374151;
     }
-    
+
     .form-control {
         width: 100%;
         padding: 0.75rem;
@@ -493,13 +281,13 @@
         border-radius: 0.5rem;
         transition: all 0.2s;
     }
-    
+
     .form-control:focus {
         outline: none;
         border-color: #f472b6;
         box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.1);
     }
-    
+
     .btn {
         padding: 0.75rem 1.5rem;
         border-radius: 0.5rem;
@@ -508,38 +296,38 @@
         cursor: pointer;
         border: none;
     }
-    
+
     .btn-primary {
         background: #f472b6;
         color: white;
     }
-    
+
     .btn-primary:hover {
         background: #ec4899;
     }
-    
+
     .btn-secondary {
         background: #6b7280;
         color: white;
     }
-    
+
     .btn-secondary:hover {
         background: #4b5563;
     }
-    
+
     .toggle-switch {
         position: relative;
         display: inline-block;
         width: 60px;
         height: 34px;
     }
-    
+
     .toggle-switch input {
         opacity: 0;
         width: 0;
         height: 0;
     }
-    
+
     .toggle-slider {
         position: absolute;
         cursor: pointer;
@@ -551,7 +339,7 @@
         transition: .4s;
         border-radius: 34px;
     }
-    
+
     .toggle-slider:before {
         position: absolute;
         content: "";
@@ -563,15 +351,15 @@
         transition: .4s;
         border-radius: 50%;
     }
-    
-    input:checked + .toggle-slider {
+
+    input:checked+.toggle-slider {
         background-color: #f472b6;
     }
-    
-    input:checked + .toggle-slider:before {
+
+    input:checked+.toggle-slider:before {
         transform: translateX(26px);
     }
-    
+
     .section-title {
         font-size: 1.25rem;
         font-weight: 600;
@@ -605,8 +393,13 @@
     }
 
     @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
     }
 
     /* Notificaciones */
@@ -623,8 +416,15 @@
     }
 
     @keyframes slideInRight {
-        from { opacity: 0; transform: translateX(100%); }
-        to { opacity: 1; transform: translateX(0); }
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 </style>
 
@@ -645,11 +445,11 @@
                     btn.classList.remove('active');
                 });
                 this.classList.add('active');
-                
+
                 document.querySelectorAll('.tab-panel').forEach(panel => {
                     panel.classList.remove('active');
                 });
-                
+
                 const tabId = this.getAttribute('data-tab');
                 document.getElementById(tabId + '-panel').classList.add('active');
             });
@@ -754,7 +554,7 @@
         const username = document.getElementById('nuevo-username').value;
         const email = document.getElementById('nuevo-email').value;
         const password = document.getElementById('nuevo-password').value;
-        
+
         if (password.length < 6) {
             mostrarNotificacion('La contraseña debe tener al menos 6 caracteres', 'error');
             return;
@@ -782,7 +582,7 @@
                 mostrarNotificacion('✅ Usuario creado exitosamente', 'success');
                 cerrarModal('modal-nuevo-usuario');
                 document.getElementById('form-nuevo-usuario').reset();
-                
+
                 // Recargar la página para ver los cambios
                 setTimeout(() => {
                     window.location.reload();
@@ -853,6 +653,59 @@
         document.getElementById('modal-editar-usuario').classList.remove('hidden');
     }
 
+    async function eliminarUsuario(usuarioId) {
+        if (!confirm('¿Estás seguro de eliminar este usuario? Esta acción no se puede deshacer.')) {
+            return;
+        }
+
+        try {
+            mostrarLoading('Eliminando usuario...');
+
+            // Para debug: mostrar la URL que se está llamando
+            console.log('URL a llamar:', 'index.php?view=api-eliminar-usuario');
+
+            const response = await fetch('index.php?view=api-eliminar-usuario', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: usuarioId
+                })
+            });
+
+            // Para debug: ver la respuesta cruda
+            const rawResponse = await response.text();
+            console.log('Respuesta cruda:', rawResponse);
+
+            // Intentar parsear como JSON
+            let result;
+            try {
+                result = JSON.parse(rawResponse);
+            } catch (parseError) {
+                console.error('Error parseando JSON:', parseError);
+                console.error('Respuesta recibida:', rawResponse.substring(0, 200));
+                throw new Error('La respuesta del servidor no es JSON válido: ' + rawResponse.substring(0, 100));
+            }
+
+            ocultarLoading();
+
+            if (result.success) {
+                mostrarNotificacion('✅ Usuario eliminado exitosamente', 'success');
+
+                // Recargar la página para ver los cambios
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                throw new Error(result.error || 'Error al eliminar usuario');
+            }
+        } catch (error) {
+            ocultarLoading();
+            mostrarNotificacion('❌ Error al eliminar usuario: ' + error.message, 'error');
+        }
+    }
+
     async function guardarCambiosUsuario(e, usuarioId) {
         e.preventDefault();
 
@@ -893,7 +746,7 @@
             if (result.success) {
                 mostrarNotificacion('✅ Usuario actualizado exitosamente', 'success');
                 cerrarModal('modal-editar-usuario');
-                
+
                 // Recargar la página para ver los cambios
                 setTimeout(() => {
                     window.location.reload();
@@ -904,6 +757,6 @@
         } catch (error) {
             ocultarLoading();
         }
-            mostrarNotificacion('❌ Error al actualizar usuario: ' + error.message, 'error');
+        mostrarNotificacion('❌ Error al actualizar usuario: ' + error.message, 'error');
     }
 </script>

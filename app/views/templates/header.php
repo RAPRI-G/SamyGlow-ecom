@@ -19,9 +19,6 @@ header("Expires: 0");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Panel - SamyGlow' ?></title>
-    <link rel="icon" type="image/png" href="../public/assets/img/logo.png"/>
-    <link rel="shortcut icon" type="image/png" href="../public/assets/img/logo.png"/>
-    <link rel="apple-touch-icon" href="../public/assets/img/logo.png"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -171,31 +168,8 @@ header("Expires: 0");
                     <?= htmlspecialchars($pageTitle ?? 'Dashboard') ?>
                 </h1>
 
-                <!-- Buscador -->
-                <div class="flex-1 mx-6 hidden md:flex">
-                    <div class="relative w-full max-w-md">
-                        <input
-                            type="text"
-                            id="searchInput"
-                            placeholder="Buscar productos, clientes o pedidos..."
-                            class="w-full px-4 py-2 pl-10 pr-4 text-sm text-gray-700 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
-                            autocomplete="off" />
-                        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
-                        <div id="searchResults"
-                            class="hidden absolute mt-2 w-full bg-white border border-gray-100 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
-                            <ul id="resultsList" class="divide-y divide-gray-100 text-sm text-gray-700"></ul>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Notificaciones y Usuario -->
                 <div class="flex items-center space-x-6">
-                    <div class="relative">
-                        <button id="notifButton" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none relative">
-                            <i class="fas fa-bell text-xl"></i>
-                            <span class="notification-dot"></span>
-                        </button>
-                    </div>
 
                     <div class="relative">
                         <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">

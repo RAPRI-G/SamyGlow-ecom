@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
-$dbname = 'vjetvzgr_samyglow';
-$user = 'vjetvzgr_samyglow';
-$pass = 'samyglow.qatunas.com/';
+$dbname = 'tienda_samyglow';
+$user = 'root';
+$pass = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
