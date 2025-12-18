@@ -512,6 +512,12 @@ switch ($view) {
         $controller = new PromocionController();
         $controller->listarEliminadas();
         break;
+        
+    case 'api-productos-disponibles-promocion':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->productosDisponiblesPromocion();
+        break;
 
     case 'api-contar-papelera-promociones':
         require_once __DIR__ . '/../app/controllers/PromocionController.php';
@@ -523,6 +529,12 @@ switch ($view) {
         require_once __DIR__ . '/../app/controllers/PromocionController.php';
         $controller = new PromocionController();
         $controller->vaciarPapelera();
+        break;
+
+    case 'api-obtener-productos-en-otras-promociones':
+        require_once __DIR__ . '/../app/controllers/PromocionController.php';
+        $controller = new PromocionController();
+        $controller->obtenerProductosEnOtrasPromociones();
         break;
 
     // En el switch case, agrega estas rutas:

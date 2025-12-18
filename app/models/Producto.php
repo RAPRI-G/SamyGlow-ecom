@@ -66,103 +66,135 @@ class Producto
     }
 
     public function obtenerUrlImagen($rutaImagen)
-{
-    if (empty($rutaImagen)) {
-        return null;
-    }
-    
-    // DEBUG: Ver qué contiene realmente
-    error_log("DEBUG obtenerUrlImagen - Ruta original: " . $rutaImagen);
-    
-    // 🔴 ELIMINAR 'public/' si existe en la ruta
-    $rutaImagen = str_replace('public/', '', $rutaImagen);
-    
-    // 🔴 ELIMINAR 'SamyGlow-ecom/' si existe
-    $rutaImagen = str_replace('SamyGlow-ecom/', '', $rutaImagen);
-    
-    // Asegurar que empiece con 'uploads/'
-    if (!str_starts_with($rutaImagen, 'uploads/')) {
-        $rutaImagen = 'uploads/productos/' . $rutaImagen;
-    }
-    
-    // Asegurar que NO tenga slash inicial
-    $rutaImagen = ltrim($rutaImagen, '/');
-    
-    $urlFinal = '/' . $rutaImagen;
-    error_log("DEBUG obtenerUrlImagen - URL final: " . $urlFinal);
-    
-    return $urlFinal;
-}
+    {
+        if (empty($rutaImagen)) {
+            return null;
+        }
 
-// 🔹 Método para obtener ruta física del archivo
-public function obtenerRutaFisica($rutaImagen)
-{
-    if (empty($rutaImagen)) {
-        return null;
-    }
-    
-    // 🔴 LIMPIAR LA RUTA primero
-    $rutaImagen = str_replace('public/', '', $rutaImagen);
-    $rutaImagen = str_replace('SamyGlow-ecom/', '', $rutaImagen);
-    $rutaImagen = ltrim($rutaImagen, '/');
-    
-    // Base path corregido
-    $basePath = $_SERVER['DOCUMENT_ROOT'] . '/SamyGlow-ecom/';
-    
-    if (str_starts_with($rutaImagen, 'uploads/productos/')) {
-        return $basePath . $rutaImagen;
-    } elseif (str_starts_with($rutaImagen, 'uploads/')) {
-        return $basePath . $rutaImagen;
-    } else {
-        return $basePath . 'uploads/productos/' . $rutaImagen;
-    }
-}
+        // DEBUG: Ver qué contiene realmente
+        error_log("DEBUG obtenerUrlImagen - Ruta original: " . $rutaImagen);
 
-    // 🔹 Obtener producto por ID
-    public function obtenerPorId($id)
-{
-    $sql = "SELECT p.*, c.nombre as categoria_nombre 
-            FROM productos p 
-            LEFT JOIN categorias c ON p.categoria_id = c.id 
-            WHERE p.id = :id";
-    $stmt = $this->pdo->prepare($sql);
-    $stmt->execute(['id' => $id]);
-    
-    $producto = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($producto && !empty($producto['imagen'])) {
-        // Corregir la ruta de la imagen si es necesario
-        $producto['imagen_corregida'] = $this->corregirRutaImagen($producto['imagen']);
-    }
-    
-    return $producto;
-}
+        // 🔴 ELIMINAR 'public/' si existe en la ruta
+        $rutaImagen = str_replace('public/', '', $rutaImagen);
 
-private function corregirRutaImagen($rutaImagen)
-{
-    if (empty($rutaImagen)) {
-        return null;
-    }
-    
-    // Eliminar 'public/' si existe
-    $rutaImagen = str_replace('public/', '', $rutaImagen);
-    
-    // Eliminar 'SamyGlow-ecom/' si existe
-    $rutaImagen = str_replace('SamyGlow-ecom/', '', $rutaImagen);
-    
-    // Si no empieza con 'uploads/productos/', agregarlo
-    if (!str_starts_with($rutaImagen, 'uploads/productos/')) {
-        // Si ya empieza con 'uploads/', dejarlo así
+        // 🔴 ELIMINAR 'SamyGlow-ecom/' si existe
+        $rutaImagen = str_replace('SamyGlow-ecom/', '', $rutaImagen);
+
+        // Asegurar que empiece con 'uploads/'
         if (!str_starts_with($rutaImagen, 'uploads/')) {
             $rutaImagen = 'uploads/productos/' . $rutaImagen;
         }
+
+        // Asegurar que NO tenga slash inicial
+        $rutaImagen = ltrim($rutaImagen, '/');
+
+        $urlFinal = '/' . $rutaImagen;
+        error_log("DEBUG obtenerUrlImagen - URL final: " . $urlFinal);
+
+        return $urlFinal;
     }
-    
-    // Asegurar que no tenga slash inicial
-    $rutaImagen = ltrim($rutaImagen, '/');
-    
-    return '/' . $rutaImagen;
-}
+
+    // 🔹 Método para obtener ruta física del archivo
+    public function obtenerRutaFisica($rutaImagen)
+    {
+        if (empty($rutaImagen)) {
+            return null;
+        }
+
+        // 🔴 LIMPIAR LA RUTA primero
+        $rutaImagen = str_replace('public/', '', $rutaImagen);
+        $rutaImagen = str_replace('SamyGlow-ecom/', '', $rutaImagen);
+        $rutaImagen = ltrim($rutaImagen, '/');
+
+        // Base path corregido
+        $basePath = $_SERVER['DOCUMENT_ROOT'] . '/SamyGlow-ecom/';
+
+        if (str_starts_with($rutaImagen, 'uploads/productos/')) {
+            return $basePath . $rutaImagen;
+        } elseif (str_starts_with($rutaImagen, 'uploads/')) {
+            return $basePath . $rutaImagen;
+        } else {
+            return $basePath . 'uploads/productos/' . $rutaImagen;
+        }
+    }
+
+    // 🔹 Obtener producto por ID
+    public function obtenerPorId($id)
+    {
+        $sql = "SELECT p.*, c.nombre as categoria_nombre 
+            FROM productos p 
+            LEFT JOIN categorias c ON p.categoria_id = c.id 
+            WHERE p.id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+
+        $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($producto && !empty($producto['imagen'])) {
+            // Corregir la ruta de la imagen si es necesario
+            $producto['imagen_corregida'] = $this->corregirRutaImagen($producto['imagen']);
+        }
+
+        return $producto;
+    }
+
+    // 🔹 VERIFICAR SI LOS PRODUCTOS EXISTEN
+    public function verificarProductosExisten($productosIds)
+    {
+        if (empty($productosIds)) {
+            return [];
+        }
+
+        $placeholders = str_repeat('?,', count($productosIds) - 1) . '?';
+        $sql = "SELECT id FROM productos WHERE id IN ($placeholders) AND eliminado = 0";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($productosIds);
+
+        return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+    }
+
+    // 🔹 OBTENER NOMBRES DE PRODUCTOS POR IDs
+    public function obtenerNombresPorIds($ids)
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+        $sql = "SELECT nombre FROM productos WHERE id IN ($placeholders)";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($ids);
+
+        return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+    }
+
+    private function corregirRutaImagen($rutaImagen)
+    {
+        if (empty($rutaImagen)) {
+            return null;
+        }
+
+        // Eliminar 'public/' si existe
+        $rutaImagen = str_replace('public/', '', $rutaImagen);
+
+        // Eliminar 'SamyGlow-ecom/' si existe
+        $rutaImagen = str_replace('SamyGlow-ecom/', '', $rutaImagen);
+
+        // Si no empieza con 'uploads/productos/', agregarlo
+        if (!str_starts_with($rutaImagen, 'uploads/productos/')) {
+            // Si ya empieza con 'uploads/', dejarlo así
+            if (!str_starts_with($rutaImagen, 'uploads/')) {
+                $rutaImagen = 'uploads/productos/' . $rutaImagen;
+            }
+        }
+
+        // Asegurar que no tenga slash inicial
+        $rutaImagen = ltrim($rutaImagen, '/');
+
+        return '/' . $rutaImagen;
+    }
 
     // 🔹 Crear nuevo producto (ACTUALIZADO para imágenes)
     public function crear($datos)

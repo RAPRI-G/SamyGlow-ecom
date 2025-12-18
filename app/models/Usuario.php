@@ -46,7 +46,7 @@ class Usuario {
                         $newHash = password_hash($password, PASSWORD_DEFAULT);
                         $update = $this->pdo->prepare("UPDATE usuarios SET password_hash = :ph WHERE id = :id");
                         $update->execute(['ph' => $newHash, 'id' => $user['id']]);
-                        // refrescar el user['password_hash'] por seguridad antes de devolver (no es obligatorio)
+                        // refrescar el user['password_hash'] por seguridad antes de devolver 
                         $user['password_hash'] = $newHash;
                         error_log("Auth: usuario '$username' migrado SHA256 -> password_hash().");
                     } catch (Exception $e) {

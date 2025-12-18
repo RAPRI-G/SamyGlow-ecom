@@ -9,11 +9,25 @@ class PromocionController
     private $promocionModel;
     private $productoModel;
 
+    // En PromocionController.php, modifica el constructor:
+
     public function __construct()
     {
         global $pdo;
+
+        // LOG para verificar la conexión
+        error_log("🔌 Inicializando PromocionController");
+        error_log("📊 PDO disponible: " . ($pdo ? 'SÍ' : 'NO'));
+
+        if (!$pdo) {
+            error_log("❌ ERROR: No hay conexión PDO");
+            throw new Exception("No hay conexión a la base de datos");
+        }
+
         $this->promocionModel = new Promocion($pdo);
         $this->productoModel = new Producto($pdo);
+
+        error_log("✅ Modelos inicializados correctamente");
     }
 
     // 🔹 VISTA PRINCIPAL DE GESTIÓN DE PROMOCIONES
@@ -58,17 +72,65 @@ class PromocionController
     {
         header('Content-Type: application/json');
 
+        // LOG para depuración
+        error_log("📡 API listarPromociones llamada");
+        error_log("📊 Método: " . $_SERVER['REQUEST_METHOD']);
+        error_log("🔗 URL: " . $_SERVER['REQUEST_URI']);
+
         try {
+            // LOG de conexión PDO
+            error_log("📦 Conectando con PDO...");
+
             $promociones = $this->promocionModel->listar();
+
+            // LOG de resultados
+            error_log("✅ Promociones obtenidas: " . count($promociones));
+
             echo json_encode([
                 'success' => true,
                 'data' => $promociones,
                 'total' => count($promociones)
             ]);
         } catch (Exception $e) {
+            // LOG del error detallado
+            error_log("❌ ERROR en listarPromociones: " . $e->getMessage());
+            error_log("📝 Trace: " . $e->getTraceAsString());
+
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al obtener promociones: ' . $e->getMessage()
+                'message' => 'Error al obtener promociones: ' . $e->getMessage(),
+                'error_details' => $e->getMessage() // Solo para depuración
+            ]);
+        }
+    }
+
+    // 🔹 API: OBTENER PRODUCTOS DISPONIBLES PARA NUEVA PROMOCIÓN
+    public function productosDisponiblesPromocion()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            // Obtener productos que NO están en ninguna promoción activa
+            $productosDisponibles = $this->promocionModel->obtenerProductosConEstadoPromocion();
+
+            // Filtrar solo los que tienen 0 promociones activas
+            $productosFiltrados = array_filter($productosDisponibles, function ($producto) {
+                return $producto['total_promociones_activas'] == 0;
+            });
+
+            // Re-indexar el array
+            $productosFiltrados = array_values($productosFiltrados);
+
+            echo json_encode([
+                'success' => true,
+                'data' => $productosFiltrados,
+                'total' => count($productosFiltrados),
+                'message' => 'Productos disponibles para nueva promoción'
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al obtener productos: ' . $e->getMessage()
             ]);
         }
     }
@@ -85,16 +147,51 @@ class PromocionController
                 throw new Exception('ID de promoción inválido');
             }
 
+            // Obtener datos de la promoción
             $promocion = $this->promocionModel->obtener($id);
 
-            if ($promocion) {
-                echo json_encode([
-                    'success' => true,
-                    'data' => $promocion
-                ]);
-            } else {
+            if (!$promocion) {
                 throw new Exception('Promoción no encontrada');
             }
+
+            // Obtener TODOS los productos con su estado
+            $todosProductos = $this->promocionModel->obtenerTodosProductosConEstado($id);
+
+            // Separar en categorías para facilitar el manejo en el frontend
+            $productosEnEstaPromocion = [];
+            $productosEnOtrasPromociones = [];
+            $productosDisponibles = [];
+
+            foreach ($todosProductos as $producto) {
+                switch ($producto['estado_promocion']) {
+                    case 'en_esta_promocion':
+                        $productosEnEstaPromocion[] = $producto;
+                        break;
+                    case 'en_otra_promocion':
+                        $productosEnOtrasPromociones[] = $producto;
+                        break;
+                    default:
+                        $productosDisponibles[] = $producto;
+                        break;
+                }
+            }
+
+            echo json_encode([
+                'success' => true,
+                'data' => $promocion,
+                'productos' => [
+                    'todos' => $todosProductos,
+                    'en_esta_promocion' => $productosEnEstaPromocion,
+                    'en_otras_promociones' => $productosEnOtrasPromociones,
+                    'disponibles' => $productosDisponibles
+                ],
+                'contadores' => [
+                    'total' => count($todosProductos),
+                    'en_esta' => count($productosEnEstaPromocion),
+                    'en_otras' => count($productosEnOtrasPromociones),
+                    'disponibles' => count($productosDisponibles)
+                ]
+            ]);
         } catch (Exception $e) {
             echo json_encode([
                 'success' => false,
@@ -104,6 +201,7 @@ class PromocionController
     }
 
     // 🔹 API: REGISTRAR NUEVA PROMOCIÓN
+    // 🔹 API: REGISTRAR NUEVA PROMOCIÓN - CORREGIR VALIDACIÓN
     public function registrarPromocion()
     {
         header('Content-Type: application/json');
@@ -118,7 +216,7 @@ class PromocionController
                 'nombre' => trim($_POST['nombre']),
                 'descripcion' => trim($_POST['descripcion'] ?? ''),
                 'tipo' => $_POST['tipo'],
-                'valor_descuento' => $_POST['valor_descuento'] ?? null,
+                'valor_descuento' => $_POST['valor_descuento'] ?? 0,  // Default a 0
                 'fecha_inicio' => $_POST['fecha_inicio'],
                 'fecha_fin' => $_POST['fecha_fin'],
                 'activa' => isset($_POST['activa']) ? 1 : 0,
@@ -130,6 +228,7 @@ class PromocionController
                 throw new Exception('La fecha de inicio no puede ser posterior a la fecha de fin');
             }
 
+            // VALIDACIÓN CORREGIDA PARA ENVÍO GRATIS
             if ($datos['tipo'] !== 'envio_gratis' && (empty($datos['valor_descuento']) || $datos['valor_descuento'] <= 0)) {
                 throw new Exception('El valor de descuento debe ser mayor a 0');
             }
@@ -141,6 +240,22 @@ class PromocionController
 
                 if (empty($productos)) {
                     throw new Exception('Debes seleccionar al menos un producto para la promoción');
+                }
+
+                // VERIFICAR SI LOS PRODUCTOS YA ESTÁN EN OTRAS PROMOCIONES
+                if (!empty($productos)) {
+                    $productosEnOtrasPromociones = $this->promocionModel->obtenerProductosEnPromocionesActivas();
+
+                    // Filtrar productos que están en otras promociones
+                    $productosConflicto = array_intersect($productos, $productosEnOtrasPromociones);
+
+                    if (!empty($productosConflicto)) {
+                        // Obtener nombres de productos en conflicto
+                        $nombresProductos = $this->productoModel->obtenerNombresPorIds($productosConflicto);
+                        $listaNombres = implode(', ', $nombresProductos);
+
+                        throw new Exception("Los siguientes productos ya están en otras promociones activas: " . $listaNombres);
+                    }
                 }
             }
 
@@ -160,66 +275,116 @@ class PromocionController
     }
 
     // 🔹 API: ACTUALIZAR PROMOCIÓN
+    // app/controllers/PromocionController.php - ACTUALIZA actualizarPromocion()
+
     public function actualizarPromocion()
     {
         header('Content-Type: application/json');
 
+        error_log("📥 Iniciando actualizarPromocion");
+        error_log("📦 POST data: " . print_r($_POST, true));
+        error_log("📦 INPUT data: " . file_get_contents('php://input'));
+
         try {
-            $id = intval($_POST['id'] ?? 0);
+            // Obtener datos JSON
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            // Si no hay JSON, usar POST normal
+            if (!$input || json_last_error() !== JSON_ERROR_NONE) {
+                error_log("⚠️ No se pudo decodificar JSON, usando POST");
+                $input = $_POST;
+            }
+
+            error_log("📊 Datos recibidos: " . print_r($input, true));
+
+            $id = intval($input['id'] ?? 0);
 
             if ($id <= 0) {
                 throw new Exception('ID de promoción inválido');
             }
 
             // Validar datos requeridos
-            if (empty($_POST['nombre']) || empty($_POST['tipo']) || empty($_POST['fecha_inicio']) || empty($_POST['fecha_fin'])) {
-                throw new Exception('Todos los campos obligatorios deben ser completados');
+            $camposRequeridos = ['nombre', 'tipo', 'fecha_inicio', 'fecha_fin'];
+            foreach ($camposRequeridos as $campo) {
+                if (empty($input[$campo])) {
+                    throw new Exception("El campo '$campo' es obligatorio");
+                }
             }
 
             $datos = [
-                'nombre' => trim($_POST['nombre']),
-                'descripcion' => trim($_POST['descripcion'] ?? ''),
-                'tipo' => $_POST['tipo'],
-                'valor_descuento' => $_POST['valor_descuento'] ?? null,
-                'fecha_inicio' => $_POST['fecha_inicio'],
-                'fecha_fin' => $_POST['fecha_fin'],
-                'activa' => isset($_POST['activa']) ? 1 : 0,
-                'max_usos' => $_POST['max_usos'] ?? null
+                'nombre' => trim($input['nombre']),
+                'descripcion' => trim($input['descripcion'] ?? ''),
+                'tipo' => $input['tipo'],
+                'valor_descuento' => isset($input['valor_descuento']) ? floatval($input['valor_descuento']) : 0,
+                'fecha_inicio' => $input['fecha_inicio'],
+                'fecha_fin' => $input['fecha_fin'],
+                'activa' => isset($input['activa']) ? intval($input['activa']) : 0,
+                'max_usos' => !empty($input['max_usos']) ? intval($input['max_usos']) : null
             ];
+
+            error_log("📝 Datos procesados: " . print_r($datos, true));
 
             // Validaciones
             if ($datos['fecha_inicio'] > $datos['fecha_fin']) {
                 throw new Exception('La fecha de inicio no puede ser posterior a la fecha de fin');
             }
 
-            if ($datos['tipo'] !== 'envio_gratis' && (empty($datos['valor_descuento']) || $datos['valor_descuento'] <= 0)) {
+            if ($datos['tipo'] !== 'envio_gratis' && $datos['valor_descuento'] <= 0) {
                 throw new Exception('El valor de descuento debe ser mayor a 0');
             }
 
             // Obtener productos seleccionados
             $productos = [];
-            if ($datos['tipo'] !== 'envio_gratis' && isset($_POST['productos']) && is_array($_POST['productos'])) {
-                $productos = array_map('intval', $_POST['productos']);
+            if ($datos['tipo'] !== 'envio_gratis') {
+                if (isset($input['productos']) && is_array($input['productos'])) {
+                    $productos = array_map('intval', $input['productos']);
+                    error_log("📦 Productos recibidos: " . print_r($productos, true));
 
-                if (empty($productos)) {
-                    throw new Exception('Debes seleccionar al menos un producto para la promoción');
+                    // Validar que los productos existan
+                    if (!empty($productos)) {
+                        $productosExistentes = $this->productoModel->verificarProductosExisten($productos);
+                        if (count($productosExistentes) !== count($productos)) {
+                            throw new Exception('Algunos productos no existen en el sistema');
+                        }
+
+                        // Verificar que los productos no estén en otras promociones activas
+                        $productosEnOtrasPromociones = $this->promocionModel->obtenerProductosEnPromocionesActivas($id);
+                        $productosConflicto = array_intersect($productos, array_column($productosEnOtrasPromociones, 'producto_id'));
+
+                        if (!empty($productosConflicto)) {
+                            $nombresProductos = $this->productoModel->obtenerNombresPorIds($productosConflicto);
+                            throw new Exception("Los siguientes productos ya están en otras promociones: " . implode(', ', $nombresProductos));
+                        }
+                    }
+                } else {
+                    error_log("⚠️ No se recibieron productos para promoción no-envío gratis");
+                    // Permitir promociones sin productos (el usuario podría quitar todos)
                 }
             }
 
+            // Actualizar la promoción
+            error_log("🔄 Ejecutando actualización en modelo...");
             $resultado = $this->promocionModel->actualizar($id, $datos, $productos);
+
+            error_log("✅ Resultado de actualización: " . ($resultado ? 'true' : 'false'));
 
             if ($resultado) {
                 echo json_encode([
                     'success' => true,
-                    'message' => 'Promoción actualizada exitosamente'
+                    'message' => 'Promoción actualizada exitosamente',
+                    'promocion_id' => $id
                 ]);
             } else {
-                throw new Exception('Error al actualizar la promoción');
+                throw new Exception('No se pudo actualizar la promoción');
             }
         } catch (Exception $e) {
+            error_log("❌ ERROR en actualizarPromocion: " . $e->getMessage());
+            error_log("📝 Trace: " . $e->getTraceAsString());
+
             echo json_encode([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'error_details' => $e->getMessage() // Solo para depuración
             ]);
         }
     }
@@ -367,16 +532,19 @@ class PromocionController
         }
     }
 
-    // 🔹 API: LISTAR PRODUCTOS PARA PROMOCIÓN
+    // 🔹 API: LISTAR PRODUCTOS PARA NUEVA PROMOCIÓN
     public function listarProductosPromocion()
     {
         header('Content-Type: application/json');
 
         try {
-            $productos = $this->productoModel->listar();
+            // Obtener productos DISPONIBLES (no usados en ninguna promoción activa)
+            $productosDisponibles = $this->promocionModel->obtenerProductosDisponibles();
+
             echo json_encode([
                 'success' => true,
-                'data' => $productos
+                'data' => $productosDisponibles,
+                'message' => 'Productos disponibles para promoción'
             ]);
         } catch (Exception $e) {
             echo json_encode([
@@ -385,6 +553,28 @@ class PromocionController
             ]);
         }
     }
+
+    // 🔹 API: OBTENER PRODUCTOS EN OTRAS PROMOCIONES ACTIVAS
+    public function obtenerProductosEnOtrasPromociones()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $productos = $this->promocionModel->obtenerProductosEnPromocionesActivas();
+
+            echo json_encode([
+                'success' => true,
+                'data' => $productos,
+                'total' => count($productos)
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     // 🔹 API: MOVER PROMOCIÓN A PAPELERA
     public function moverPapelera()
     {
